@@ -1,0 +1,11 @@
+Hallo,
+
+Klicke diesen Link, um dein Passwort bei leerstandsmelder.de zurückzusetzen:
+
+!RESET_URL!
+
+Falls Du dein Password nicht ändern wolltest, lösche einfach diese E-Mail.
+
+--
+
+http://www.leerstandsmelder.de

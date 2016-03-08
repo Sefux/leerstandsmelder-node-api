@@ -1,0 +1,7 @@
+.idea/
+node_modules/
+config.json
+tmp/*
+assets/*
+uploads/*
+!.gitkeep

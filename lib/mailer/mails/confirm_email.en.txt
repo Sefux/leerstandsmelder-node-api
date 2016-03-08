@@ -1,0 +1,11 @@
+Hallo,
+
+Bestätige Deine E-Mail, indem Du auf folgenden Link klickst:
+
+!CONFIRM_URL!
+
+Danke!
+
+--
+
+http://www.leerstandsmelder.de
