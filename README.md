@@ -1,8 +1,10 @@
 # Leerstandsmelder API
 
-[![dependency Status](https://david-dm.org/PieceMeta/node-sparql-hollandaise.svg)](https://david-dm.org/PieceMeta/node-sparql-hollandaise) [![devDependency Status](https://david-dm.org/PieceMeta/node-sparql-hollandaise/dev-status.svg)](https://david-dm.org/PieceMeta/node-sparql-hollandaise#info=devDependencies)
+[![dependency Status](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api.svg)](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api) [![devDependency Status](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api/dev-status.svg)](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api#info=devDependencies)
 
-Leerstandsmelder Node.JS API server
+API server for [Leerstandsmelder.de](http://www.leerstandsmelder.de) based on [restify](http://restify.com) and written in ES6 JavaScript for [Node.js](https://nodejs.org).
+
+This software is part of a complete relaunch of the platform, now making it open source and independent from Google's map service. The API has a pretty standard JSON-over-HTTP CRUD interface and adds an interface to basic geospatial queries through the 2D-index in MongoDB.
 
 ## Requirements
 
@@ -11,11 +13,21 @@ Leerstandsmelder Node.JS API server
 
 ## Installing
 
+Install dependencies
 ```shell
 npm install
+```
+
+Then create a config file
+```
 cd bin
 ./setup
-cd ..
+```
+
+## Running
+
+Start the server with
+```
 node app.js
 ```
 
