@@ -51,5 +51,11 @@ module.exports = {
             controller: users.map('confirmUser'),
             scope: 'public'
         }
+    },
+    '/users/me/reset': {
+        'post': {
+            controller: users.map('resetUser'),
+            scope: 'public'
+        }
     }
 };

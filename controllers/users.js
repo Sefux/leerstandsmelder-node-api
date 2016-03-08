@@ -47,6 +47,17 @@ class UsersController extends CommonController {
             pre: Promise.resolve
         };
 
+        this.coroutines.resetUserResource = {
+            main: Promise.coroutine(function* (req, res, next, config) {
+                var user = yield mongoose.model('User').findOne({email: req.params.email}).exec();
+
+                yield user.sendPasswordResetMail();
+
+                rHandler.handleDataResponse(user, 201, res, next);
+            }),
+            pre: Promise.resolve
+        };
+
         this.coroutines.putResource.pre = function (req, res, next, config) {
             if (req.user.uuid !== req.params.uuid) {
                 throw new restify.NotAuthorizedError();
