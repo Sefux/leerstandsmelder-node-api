@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Leerstandsmelder Node.JS API server",
   "main": "app.js",
-  "engines": "4.2.x || 1.2.x",
+  "engines": "4.x",
   "scripts": {
     "test": "./node_modules/.bin/mocha $(find test -path '*.spec.*') --recursive --timeout 10000"
   },

@@ -8,7 +8,7 @@ This software is part of a complete relaunch of the platform, now making it open
 
 ## Requirements
 
-* NodeJS 4.2.x (or io.js)
+* NodeJS 4.x
 * MongoDB 3.0.x
 
 ## Installing
