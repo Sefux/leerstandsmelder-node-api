@@ -13,6 +13,12 @@ class CommonController {
                     var query = require('../lib/util/query-mapping')({}, req, config),
                         q = mongoose.model(config.resource).find(query);
                     q = config.select ? q.select(config.select) : q;
+                    if (req.params.skip) {
+                        q = q.skip(parseInt(req.params.skip));
+                    }
+                    if (req.params.limit) {
+                        q = q.limit(parseInt(req.params.limit));
+                    }
                     rHandler.handleDataResponse(yield q.exec(), 200, res, next);
                 }),
                 pre: Promise.resolve
