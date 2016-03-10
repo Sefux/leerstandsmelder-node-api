@@ -19,6 +19,9 @@ class CommonController {
                     if (req.params.limit) {
                         q = q.limit(parseInt(req.params.limit));
                     }
+                    if (req.params.sort) {
+                        q = q.sort(req.params.sort);
+                    }
                     rHandler.handleDataResponse(yield q.exec(), 200, res, next);
                 }),
                 pre: Promise.resolve
