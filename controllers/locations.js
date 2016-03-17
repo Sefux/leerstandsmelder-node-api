@@ -34,6 +34,42 @@ class LocationsController extends CommonController {
                 };
             rHandler.handleDataResponse(result, 200, res, next);
         });
+
+        this.coroutines.citiesResource = {
+            pre: Promise.resolve,
+            main: Promise.coroutine(function* (req, res, next, config) {
+                return Promise.resolve()
+                    .then(function () {
+                        return mongoose.model('Location').mapReduce({
+                            map: function () {
+                                emit(this.city.replace(/^\s+|\s+$/g, ''), 1);
+                            },
+                            reduce: function (k, v) {
+                                return v.length;
+                            }
+                        });
+                    })
+                    .then(function (results) {
+                        rHandler.handleDataResponse(results, 200, res, next);
+                    });
+            })
+        };
+
+        this.coroutines.searchResource = {
+            pre: Promise.resolve,
+            main: Promise.coroutine(function* (req, res, next, config) {
+                return Promise.resolve()
+                    .then(function () {
+                        return mongoose.model('Location').find({
+
+                        });
+                    })
+                    .then(function (results) {
+                        rHandler.handleDataResponse(results, 200, res, next);
+                    });
+            })
+        };
+
     }
 }
 

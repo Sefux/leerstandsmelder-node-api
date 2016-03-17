@@ -32,4 +32,6 @@ var mongoose = require('mongoose'),
         id: false
     });
 
+Location.index()
+
 module.exports.Location = require('../lib/util/model-helper').setup(Location);
