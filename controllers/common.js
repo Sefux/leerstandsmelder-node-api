@@ -29,7 +29,7 @@ class CommonController {
             getResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
                     var q = mongoose.model(config.resource)
-                        .findOne({uuid: req.params.uuid});
+                        .findOne({$or: [{uuid: req.params.uuid}, {slug: req.params.uuid}]});
                     q = config.select ? q.select(config.select) : q;
                     rHandler.handleDataResponse(yield q.exec(), 200, res, next);
                 }),

@@ -1,6 +1,7 @@
 'use strict';
 
 var mongoose = require('mongoose'),
+    slug = require('speakingurl'),
     Schema = mongoose.Schema,
     Location = new Schema({
 
@@ -22,16 +23,37 @@ var mongoose = require('mongoose'),
             index: '2d'
         },
         active: {type: Boolean, default: true},
+        slug: {type:String, index: true},
+        slug_aliases: [String],
         legacy_id: String,
+        legacy_slug: String,
 
         created: Date,
         updated: Date
 
     }, {
+        toObject: {virtuals: true},
+        toJSON: {virtuals: true},
         autoindex: process.env.NODE_ENV !== 'production',
         id: false
     });
 
-Location.index()
+Location.methods.updateSlug = function () {
+    this.slug = slug(this.title + ' ' + this.uuid.substr(0,5));
+};
 
-module.exports.Location = require('../lib/util/model-helper').setup(Location);
+module.exports.Location = require('../lib/util/model-helper').setup(
+    Location,
+    function (next) {
+        var now = Date.now();
+        this.updated = now;
+        if (!this.created) {
+            this.created = now;
+        }
+        if (this.modifiedPaths().indexOf('title') > -1) {
+            this.updateSlug();
+        } else {
+            next();
+        }
+    }
+);

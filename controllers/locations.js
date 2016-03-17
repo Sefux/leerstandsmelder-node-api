@@ -50,6 +50,21 @@ class LocationsController extends CommonController {
                         });
                     })
                     .then(function (results) {
+                        var output = [],
+                            slug = require('speakingurl');
+                        return Promise.map(results, function (item) {
+                                return output.push({
+                                    name: item._id,
+                                    url: '/cities/' + slug(item._id),
+                                    locations: item.value,
+                                    views: 0
+                                });
+                            })
+                            .then(function () {
+                                return output;
+                            });
+                    })
+                    .then(function (results) {
                         rHandler.handleDataResponse(results, 200, res, next);
                     });
             })
