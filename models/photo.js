@@ -7,7 +7,7 @@ var mongoose = require('mongoose'),
 
         uuid: {type: String, unique: true},
         location_uuid: {type: String, required: true},
-        author_uuid: {type: String, index: true, required: true},
+        user_uuid: {type: String, index: true, required: true},
         creator_uuid: {type: String, index: true, required: true},
         publisher_uuid: {type: String, index: true, required: true},
         rights_holder_uuid: {type: String, index: true, required: true},

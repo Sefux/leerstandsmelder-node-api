@@ -12,7 +12,7 @@ class UsersController extends CommonController {
         super();
 
         this.coroutines.getResource.main = Promise.coroutine(function* (req, res, next, config) {
-            var selectAttributes = 'uuid login';
+            var selectAttributes = 'uuid nickname';
 
             if (req.user && req.user.uuid === req.params.uuid) {
                 selectAttributes = 'uuid login email';

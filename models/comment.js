@@ -5,7 +5,7 @@ var mongoose = require('mongoose'),
     Comment = new Schema({
 
         uuid: {type: String, unique: true},
-        author_uuid: {type: String, index: true, required: true},
+        user_uuid: {type: String, index: true, required: true},
         subject_uuid: {type: String, index: true, required: true},
         body: {type: String, required: true},
         legacy_id: String,

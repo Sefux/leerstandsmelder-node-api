@@ -22,7 +22,25 @@ class CommonController {
                     if (req.params.sort) {
                         q = q.sort(req.params.sort);
                     }
-                    rHandler.handleDataResponse(yield q.exec(), 200, res, next);
+                    var results = yield q.exec();
+                    if (results.length > 0 && results[0].user_uuid) {
+                        var output = [];
+                        return Promise.map(results, function (result) {
+                                return mongoose.model('User')
+                                    .findOne({uuid: result.user_uuid})
+                                    .select('uuid nickname').exec()
+                                    .then(function (user) {
+                                        result = result.toObject();
+                                        result.user = user;
+                                        output.push(result);
+                                    });
+                            })
+                            .then(function () {
+                                rHandler.handleDataResponse(output, 200, res, next);
+                            });
+                    } else {
+                        rHandler.handleDataResponse(results, 200, res, next);
+                    }
                 }),
                 pre: Promise.resolve
             },
@@ -31,7 +49,14 @@ class CommonController {
                     var q = mongoose.model(config.resource)
                         .findOne({$or: [{uuid: req.params.uuid}, {slug: req.params.uuid}]});
                     q = config.select ? q.select(config.select) : q;
-                    rHandler.handleDataResponse(yield q.exec(), 200, res, next);
+                    var result = yield q.exec();
+                    result = result.toObject();
+                    if (result.user_uuid) {
+                        result.user = yield mongoose.model('User')
+                            .findOne({uuid:result.user_uuid})
+                            .select('uuid nickname').exec();
+                    }
+                    rHandler.handleDataResponse(result, 200, res, next);
                 }),
                 pre: Promise.resolve
             },
