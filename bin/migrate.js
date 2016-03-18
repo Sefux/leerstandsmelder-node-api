@@ -94,6 +94,7 @@ function importUsers() {
                 updated: user.updated_at
             };
             // manual value fix for user removed, contains email address
+            if (userObject.email === '') userObject.email = '';
             return insertOrUpdate(userObject, 'User')
                 .then(function () {
                     count += 1;

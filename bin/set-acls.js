@@ -29,7 +29,7 @@ Promise.coroutine(function* () {
                 for (var r of resources) {
                     mongoose.model(r.res, r.model);
                 }
-                acl.init(mongoose.connection.db);
+                mongoose.model('AclEntry', require('../models/acl-entry').AclEntry);
                 console.log('connected to mongodb!');
                 resolve();
             });

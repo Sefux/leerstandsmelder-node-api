@@ -37,14 +37,13 @@ Promise.coroutine(function* () {
     mongoose.model('User', require('./models/user').User);
     mongoose.model('ApiKey', require('./models/api-key').ApiKey);
     mongoose.model('AccessToken', require('./models/access-token').AccessToken);
+    mongoose.model('AclEntry', require('./models/acl-entry').AclEntry);
     mongoose.model('Challenge', require('./models/challenge').Challenge);
     mongoose.model('Comment', require('./models/comment').Comment);
     mongoose.model('Location', require('./models/location').Location);
     mongoose.model('Region', require('./models/region').Region);
     mongoose.model('Photo', require('./models/photo').Photo);
     mongoose.model('Post', require('./models/post').Post);
-
-    acl.init(mongoose.connection.db);
 
     var server = restify.createServer({
         name: `Leerstandsmelder API Server v${version}`,

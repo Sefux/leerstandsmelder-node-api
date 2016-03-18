@@ -28,10 +28,6 @@ class UsersController extends CommonController {
             var user = yield mongoose.model('User').create(req.body);
 
             yield user.sendConfirmationMail();
-            for (var i = 0; i < 0; i < user.roles.length) {
-                acl.addUserRole(user.uuid, user.roles[i]);
-            }
-            acl.addUserRole(user.uuid, user.uuid);
 
             return rHandler.handleDataResponse(user, 201, res, next);
         });
