@@ -8,16 +8,16 @@ var mongoose = require('mongoose'),
         uuid: {type: String, unique: true},
         user_uuid: {type: String, index: true, required: true},
 
-        title: {type: String, required: true},
-        description: String,
+        title: {type: String, required: true, index: 'text'},
+        description: {type: String, index: 'text'},
         degree: String,
-        owner: String,
+        owner: {type: String, index: 'text'},
         rumor: Number,
         emptySince: Date,
         buildingType: String,
-        street: String,
-        city: String,
-        postcode: String,
+        street: {type: String, index: 'text'},
+        city: {type: String, index: 'index'},
+        postcode: {type: String, index: 'text'},
         lonlat: {
             type: [Number],  // [<longitude>, <latitude>]
             index: '2dsphere'

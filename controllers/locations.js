@@ -34,22 +34,6 @@ class LocationsController extends CommonController {
                 };
             rHandler.handleDataResponse(result, 200, res, next);
         });
-
-        this.coroutines.searchResource = {
-            pre: Promise.resolve,
-            main: Promise.coroutine(function* (req, res, next, config) {
-                return Promise.resolve()
-                    .then(function () {
-                        return mongoose.model('Location').find({
-
-                        });
-                    })
-                    .then(function (results) {
-                        rHandler.handleDataResponse(results, 200, res, next);
-                    });
-            })
-        };
-
     }
 }
 

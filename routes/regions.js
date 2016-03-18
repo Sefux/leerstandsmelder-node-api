@@ -38,5 +38,14 @@ module.exports = {
             }),
             scope: 'public'
         }
+    },
+    '/search/regions/:uuid': {
+        'get': {
+            controller: res.map('search', {
+                resource: 'Location',
+                select: 'uuid title lonlat street postcode city created updated'
+            }),
+            scope: 'public'
+        }
     }
 };
