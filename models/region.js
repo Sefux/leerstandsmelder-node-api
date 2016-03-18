@@ -28,6 +28,10 @@ var mongoose = require('mongoose'),
         id: false
     });
 
+Region.virtual('num_locations').get(function () {
+    return mongoose.model('Location').count({region_uuid: this.uuid});
+});
+
 Region.methods.updateSlug = function () {
     this.slug = slug(this.title);
 };

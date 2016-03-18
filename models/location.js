@@ -22,6 +22,7 @@ var mongoose = require('mongoose'),
             type: [Number],  // [<longitude>, <latitude>]
             index: '2d'
         },
+        region_uuid: {type:String, required: true},
         active: {type: Boolean, default: true},
         slug: {type:String, index: true},
         slug_aliases: [String],

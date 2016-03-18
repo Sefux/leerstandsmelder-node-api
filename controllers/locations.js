@@ -35,41 +35,6 @@ class LocationsController extends CommonController {
             rHandler.handleDataResponse(result, 200, res, next);
         });
 
-        this.coroutines.citiesResource = {
-            pre: Promise.resolve,
-            main: Promise.coroutine(function* (req, res, next, config) {
-                return Promise.resolve()
-                    .then(function () {
-                        return mongoose.model('Location').mapReduce({
-                            map: function () {
-                                emit(this.city.replace(/^\s+|\s+$/g, ''), 1);
-                            },
-                            reduce: function (k, v) {
-                                return v.length;
-                            }
-                        });
-                    })
-                    .then(function (results) {
-                        var output = [],
-                            slug = require('speakingurl');
-                        return Promise.map(results, function (item) {
-                                return output.push({
-                                    name: item._id,
-                                    url: '/cities/' + slug(item._id),
-                                    locations: item.value,
-                                    views: 0
-                                });
-                            })
-                            .then(function () {
-                                return output;
-                            });
-                    })
-                    .then(function (results) {
-                        rHandler.handleDataResponse(results, 200, res, next);
-                    });
-            })
-        };
-
         this.coroutines.searchResource = {
             pre: Promise.resolve,
             main: Promise.coroutine(function* (req, res, next, config) {

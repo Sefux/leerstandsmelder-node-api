@@ -16,15 +16,6 @@ module.exports = {
             scope: 'user'
         }
     },
-    '/cities': {
-        'get': {
-            controller: locations.map('cities', {
-                resource: 'Location',
-                select: 'uuid title lonlat postcode city created updated'
-            }),
-            scope: 'public'
-        }
-    },
     '/locations/:uuid': {
         'get': {
             controller: res.map('get', {resource: 'Location'}),

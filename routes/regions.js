@@ -1,7 +1,7 @@
 'use strict';
 
-var CommonController = require('../controllers/common'),
-    res = new CommonController();
+var RegionsController = require('../controllers/regions'),
+    res = new RegionsController();
 
 module.exports = {
     '/regions': {
@@ -27,6 +27,16 @@ module.exports = {
             controller: res.map('del', {resource: 'Region'}),
             overrideVerb: 'del',
             scope: 'admin'
+        }
+    },
+    '/regions/:uuid/locations': {
+        'get': {
+            controller: res.map('find', {
+                resource: 'Location',
+                query: {id_mapping: 'region_uuid'},
+                select: 'uuid title lonlat postcode city created updated'
+            }),
+            scope: 'public'
         }
     }
 };
