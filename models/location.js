@@ -20,7 +20,7 @@ var mongoose = require('mongoose'),
         postcode: String,
         lonlat: {
             type: [Number],  // [<longitude>, <latitude>]
-            index: '2d'
+            index: '2dsphere'
         },
         region_uuid: {type:String, required: true},
         active: {type: Boolean, default: true},

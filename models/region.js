@@ -10,7 +10,7 @@ var mongoose = require('mongoose'),
         title: {type: String, required: true},
         lonlat: {
             type: [Number],  // [<longitude>, <latitude>]
-            index: '2d'
+            index: '2dsphere'
         },
         zoom: {type:Number, default: 14},
         hide: {type:Boolean, default: false},

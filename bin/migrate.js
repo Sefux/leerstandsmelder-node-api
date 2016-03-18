@@ -8,7 +8,10 @@ var Promise = require('bluebird'),
     path = require('path'),
     secureRandom = require('secure-random'),
     fs = require('fs-extra'),
-    config = require('../lib/config');
+    config = require('../lib/config'),
+    skipOrphans = false;
+
+mongoose.Promise = Promise;
 
 var connection = mysql.createConnection({
     host: 'localhost',
@@ -21,7 +24,10 @@ var connection = mysql.createConnection({
 Promise.promisifyAll(connection);
 Promise.promisifyAll(fs);
 
-Promise.promisify(config.load)()
+Promise.resolve()
+    .then(function() {
+        return config.load();
+    })
     .then(function () {
         if (!config.get) {
             throw new Error('Server has not been configured yet. Please run bin/setup.');
@@ -34,6 +40,7 @@ Promise.promisify(config.load)()
         mongoose.model('User', require('../models/user').User);
         mongoose.model('Comment', require('../models/comment').Comment);
         mongoose.model('Location', require('../models/location').Location);
+        mongoose.model('Region', require('../models/region').Region);
         mongoose.model('Photo', require('../models/photo').Photo);
         mongoose.model('Post', require('../models/post').Post);
         connection.connect();
@@ -41,6 +48,9 @@ Promise.promisify(config.load)()
     })
     .then(function () {
         return importUsers();
+    })
+    .then(function () {
+        return importGroups();
     })
     .then(function () {
         return importPlaces();
@@ -68,7 +78,7 @@ function importUsers() {
     var count = 0;
     return connection.queryAsync('SELECT * FROM users')
         .then(function (rows) {
-            return rows[0];
+            return rows;
         })
         .map(function (user) {
             var passbytes = secureRandom.randomBuffer(16);
@@ -83,6 +93,7 @@ function importUsers() {
                 created: user.created_at,
                 updated: user.updated_at
             };
+            // manual value fix for user removed, contains email address
             return insertOrUpdate(userObject, 'User')
                 .then(function () {
                     count += 1;
@@ -96,6 +107,9 @@ function importUsers() {
         }, {concurrency: 10})
         .then(function () {
             console.log('done processing %d users', count);
+        })
+        .catch(function (err) {
+            console.log('error processing users: ' + err.message);
         });
 }
 
@@ -103,7 +117,7 @@ function importPlaces() {
     var count = 0;
     return connection.queryAsync('SELECT * FROM places')
         .then(function (rows) {
-            return rows[0];
+            return rows;
         })
         .map(function (row) {
             var placeObject = {
@@ -124,12 +138,20 @@ function importPlaces() {
             };
             return getUuidForLegacyId(row.user_id, 'User')
                 .then(function (userUuid) {
-                    if (!userUuid) {
+                    if (!userUuid && skipOrphans) {
                         console.log('warning: skipping orphan record id %s for user id %s', row.id, row.user_id);
                     } else {
                         placeObject.user_uuid = userUuid;
-                        return insertOrUpdate(placeObject, 'Location');
+                        if (placeObject.user_uuid === undefined) placeObject.user_uuid = 'anonymous';
+                        return getUuidForLegacyId(row.group_id, 'Region');
                     }
+                })
+                .then(function (regionUuid) {
+                    if (!regionUuid) {
+                        regionUuid = 'orphaned';
+                    }
+                    placeObject.region_uuid = regionUuid;
+                    return insertOrUpdate(placeObject, 'Location');
                 })
                 .then(function (location) {
                     if (location) {
@@ -140,7 +162,7 @@ function importPlaces() {
                     }
                 })
                 .catch(function (err) {
-                    console.log('warning: could not insert location for legacy id %s with error: %s', userObject.legacy_id, err.message);
+                    console.log('warning: could not insert location for legacy id %s with error: %s', placeObject.legacy_id, err.message);
                 });;
         }, {concurrency: 10})
         .then(function () {
@@ -148,26 +170,69 @@ function importPlaces() {
         });
 }
 
+function importGroups() {
+    var count = 0;
+    return connection.queryAsync('SELECT * FROM groups')
+        .then(function (rows) {
+            return rows;
+        })
+        .map(function (row) {
+            var groupObject = {
+                title: row.name,
+                lonlat: [row.lng, row.lat],
+                legacy_id: row.id,
+                hide: row.hide === 1,
+                hide_message: row.hide_message,
+                zoom: row.zoom,
+                created: row.created_at,
+                updated: row.updated_at
+            };
+            return insertOrUpdate(groupObject, 'Region')
+                .then(function (location) {
+                    if (location) {
+                        count += 1;
+                        if (count % 25 === 0) {
+                            console.log('processed %d groups', count);
+                        }
+                    }
+                })
+                .catch(function (err) {
+                    console.log('warning: could not insert group for legacy id %s with error: %s', groupObject.legacy_id, err.message);
+                });
+            ;
+        }, {concurrency: 10})
+        .then(function () {
+            console.log('done processing %d groups', count);
+        });
+}
+
 function importComments() {
     var count = 0;
     return connection.queryAsync('SELECT * FROM comments')
         .then(function (rows) {
-            return rows[0];
+            return rows;
         })
         .map(function (row) {
             var commentObject = {
-                body: row.body,
+                body: row.body || '[EMPTY BODY]',
+                legacy_id: row.id,
                 created: row.created_at,
                 updated: row.updated_at
             };
             return getUuidForLegacyId(row.user_id, 'User')
                 .then(function (userUuid) {
+                    if (!userUuid) {
+                        userUuid = 'anonymous';
+                    }
                     commentObject.author_uuid = userUuid;
                     return getUuidForLegacyId(row.place_id, 'Location');
                 })
                 .then(function (locationUuid) {
+                    if (!locationUuid) {
+                        locationUuid = 'orphaned';
+                    }
                     commentObject.subject_uuid = locationUuid;
-                    if (!commentObject.subject_uuid || !commentObject.author_uuid) {
+                    if ((!commentObject.subject_uuid || !commentObject.author_uuid) && skipOrphans) {
                         console.log('warning: skipping orphan record id %s for user id %s and place id %s', row.id, row.user_id, row.place_id);
                     } else {
                         return insertOrUpdate(commentObject, 'Comment');
@@ -194,7 +259,7 @@ function importPhotos() {
     var count = 0;
     return connection.queryAsync('SELECT * FROM pictures')
         .then(function (rows) {
-            return rows[0];
+            return rows;
         })
         .map(function (row) {
             var photoObject = {
@@ -208,8 +273,12 @@ function importPhotos() {
                 created: row.created_at,
                 updated: row.updated_at
             };
+            if (photoObject.extension === '' && photoObject.mime_type === 'image/jpeg') photoObject.extension = 'jpg';
             return getUuidForLegacyId(row.user_id, 'User')
                 .then(function (userUuid) {
+                    if (!userUuid) {
+                        userUuid = 'anonymous';
+                    }
                     photoObject.author_uuid = userUuid;
                     photoObject.creator_uuid = userUuid;
                     photoObject.publisher_uuid = userUuid;
@@ -218,7 +287,7 @@ function importPhotos() {
                 })
                 .then(function (locationUuid) {
                     photoObject.location_uuid = locationUuid;
-                    if (!photoObject.location_uuid || !photoObject.author_uuid) {
+                    if ((!photoObject.location_uuid || !photoObject.author_uuid) && skipOrphans) {
                         console.log('warning: skipping orphan record id %s for user id %s and place id %s', row.id, row.user_id, row.place_id);
                     } else {
                         return insertOrUpdate(photoObject, 'Photo');
@@ -245,7 +314,7 @@ function importPosts() {
     var count = 0;
     return connection.queryAsync('SELECT * FROM posts')
         .then(function (rows) {
-            return rows[0];
+            return rows;
         })
         .map(function (row) {
             var commentObject = {
@@ -277,22 +346,29 @@ function importPostComments() {
     var count = 0;
     return connection.queryAsync('SELECT * FROM post_comments')
         .then(function (rows) {
-            return rows[0];
+            return rows;
         })
         .map(function (row) {
             var commentObject = {
-                body: row.body,
+                body: row.body || '[EMPTY BODY]',
+                legacy_id: row.id,
                 created: row.created_at,
                 updated: row.updated_at
             };
             return getUuidForLegacyId(row.user_id, 'User')
                 .then(function (userUuid) {
+                    if (!userUuid) {
+                        userUuid = 'anonymous';
+                    }
                     commentObject.author_uuid = userUuid;
                     return getUuidForLegacyId(row.post_id, 'Post');
                 })
                 .then(function (postUuid) {
+                    if (!postUuid) {
+                        postUuid = 'orphaned';
+                    }
                     commentObject.subject_uuid = postUuid;
-                    if (!commentObject.subject_uuid || !commentObject.author_uuid) {
+                    if ((!commentObject.subject_uuid || !commentObject.author_uuid) && skipOrphans) {
                         console.log('warning: skipping orphan record id %s for user id %s and place id %s', row.id, row.user_id, row.place_id);
                     } else {
                         return insertOrUpdate(commentObject, 'Comment');
@@ -323,6 +399,12 @@ function insertOrUpdate(payload, resourceName) {
             } else {
                 return mongoose.model(resourceName).findOneAndUpdate({legacy_id: payload.legacy_id}, payload);
             }
+        })
+        .catch(function (err) {
+            console.log('failed to insert/update resource ' +
+                resourceName + ' with legacy id: ' +
+                payload.legacy_id + ' message: ' + err.message);
+            return null;
         });
 }
 
