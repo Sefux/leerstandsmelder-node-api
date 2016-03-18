@@ -1,7 +1,9 @@
 'use strict';
 
 var RegionsController = require('../controllers/regions'),
-    res = new RegionsController();
+    LocationsController = require('../controllers/locations'),
+    res = new RegionsController(),
+    locations = new LocationsController();
 
 module.exports = {
     '/regions': {
@@ -31,10 +33,10 @@ module.exports = {
     },
     '/regions/:uuid/locations': {
         'get': {
-            controller: res.map('find', {
+            controller: locations.map('find', {
                 resource: 'Location',
                 query: {id_mapping: 'region_uuid'},
-                select: 'uuid title lonlat postcode city created updated'
+                select: 'uuid slug title lonlat postcode city created updated'
             }),
             scope: 'public'
         }
@@ -43,7 +45,7 @@ module.exports = {
         'get': {
             controller: res.map('search', {
                 resource: 'Location',
-                select: 'uuid title lonlat street postcode city created updated'
+                select: 'uuid slug title lonlat street postcode city created updated'
             }),
             scope: 'public'
         }
