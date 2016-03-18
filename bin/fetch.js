@@ -17,6 +17,8 @@ var Promise = require('bluebird'),
         });
     });
 
+mongoose.Promise = Promise;
+
 Promise.promisifyAll(fs);
 Promise.promisifyAll(checksum);
 

@@ -7,6 +7,8 @@ var Promise = require('bluebird'),
     config = require('../lib/config'),
     acl = require('../lib/auth/acl-manager');
 
+mongoose.Promise = Promise;
+
 Promise.coroutine(function* () {
     yield config.load();
     var resources = [
