@@ -20,7 +20,10 @@ var Promise = require('bluebird'),
 Promise.promisifyAll(fs);
 Promise.promisifyAll(checksum);
 
-Promise.promisify(config.load)()
+Promise.resolve()
+    .then(function () {
+        return config.load();
+    })
     .then(function () {
         if (!config.get) {
             throw new Error('Server has not been configured yet. Please run bin/setup.');
