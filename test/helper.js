@@ -2,6 +2,7 @@
 
 var mongoose = require('mongoose'),
     chance = require('chance').Chance(),
+    uuid = require('../lib/util/uuid'),
     acl = require('../lib/auth/acl-manager'),
     dburl = 'mongodb://127.0.0.1:27017/leerstandsmelder-api-test';
 
@@ -18,6 +19,7 @@ module.exports.init = function () {
         _mongoose.model('Challenge', require('../models/challenge').Challenge);
         _mongoose.model('Comment', require('../models/comment').Comment);
         _mongoose.model('Location', require('../models/location').Location);
+        _mongoose.model('Region', require('../models/region').Region);
         _mongoose.model('Photo', require('../models/photo').Photo);
         _mongoose.model('Post', require('../models/post').Post);
         module.exports.acl.init(_mongoose.connection.db);
@@ -44,7 +46,8 @@ module.exports.getFixture = function (resource) {
                 city: chance.city(),
                 postcode: chance.zip(),
                 lonlat: [chance.longitude(), chance.latitude()],
-                legacy_id: chance.word({length: 8})
+                legacy_id: chance.word({length: 8}),
+                region_uuid: uuid.v4()
             };
         default:
             throw new Error('no fixture available for ' + resource);
