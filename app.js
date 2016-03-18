@@ -12,6 +12,7 @@ var restify = require('restify'),
     fs = require('fs-extra'),
     Promise = require('bluebird');
 
+mongoose.Promise = Promise;
 Promise.promisifyAll(fs);
 
 Promise.coroutine(function* () {
@@ -39,6 +40,7 @@ Promise.coroutine(function* () {
     mongoose.model('Challenge', require('./models/challenge').Challenge);
     mongoose.model('Comment', require('./models/comment').Comment);
     mongoose.model('Location', require('./models/location').Location);
+    mongoose.model('Region', require('./models/region').Region);
     mongoose.model('Photo', require('./models/photo').Photo);
     mongoose.model('Post', require('./models/post').Post);
 
@@ -72,6 +74,7 @@ Promise.coroutine(function* () {
     yield routes.init([
         require('./routes/comments'),
         require('./routes/locations'),
+        require('./routes/regions'),
         require('./routes/photos'),
         require('./routes/posts'),
         require('./routes/users')

@@ -32,8 +32,6 @@ var mongoose = require('mongoose'),
         updated: Date
 
     }, {
-        toObject: {virtuals: true},
-        toJSON: {virtuals: true},
         autoindex: process.env.NODE_ENV !== 'production',
         id: false
     });
@@ -50,8 +48,12 @@ module.exports.Location = require('../lib/util/model-helper').setup(
         if (!this.created) {
             this.created = now;
         }
+        if (!this.uuid) {
+            this.generateUUID();
+        }
         if (this.modifiedPaths().indexOf('title') > -1) {
             this.updateSlug();
+            next();
         } else {
             next();
         }

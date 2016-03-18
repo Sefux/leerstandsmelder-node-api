@@ -8,6 +8,7 @@ var mongoose = require('mongoose'),
         author_uuid: {type: String, index: true, required: true},
         subject_uuid: {type: String, index: true, required: true},
         body: {type: String, required: true},
+        legacy_id: String,
 
         created: Date,
         updated: Date

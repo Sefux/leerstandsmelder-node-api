@@ -1,15 +1,21 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-    striptags = require('striptags'),
     slug = require('speakingurl'),
     Schema = mongoose.Schema,
-    Post = new Schema({
+    Region = new Schema({
 
         uuid: {type: String, unique: true},
+
         title: {type: String, required: true},
-        body: {type: String, required: true},
-        slug: {type:String, index: true},
+        lonlat: {
+            type: [Number],  // [<longitude>, <latitude>]
+            index: '2d'
+        },
+        zoom: {type:Number, default: 14},
+        hide: {type:Boolean, default: false},
+        hide_message: String,
+        slug: {type: String, index: true},
         slug_aliases: [String],
         legacy_id: String,
         legacy_slug: String,
@@ -18,22 +24,16 @@ var mongoose = require('mongoose'),
         updated: Date
 
     }, {
-        toObject: {virtuals: true},
-        toJSON: {virtuals: true},
         autoindex: process.env.NODE_ENV !== 'production',
         id: false
     });
 
-Post.virtual('abstract').get(function () {
-    return striptags(this.body).substring(0, 400);
-});
-
-Post.methods.updateSlug = function () {
+Region.methods.updateSlug = function () {
     this.slug = slug(this.title);
 };
 
-module.exports.Post = require('../lib/util/model-helper').setup(
-    Post,
+module.exports.Region = require('../lib/util/model-helper').setup(
+    Region,
     function (next) {
         var now = Date.now();
         this.updated = now;

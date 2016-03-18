@@ -11,6 +11,7 @@ Promise.coroutine(function* () {
     yield config.load();
     var resources = [
             {res: 'Location', path: '/locations', model: require('../models/location').Location},
+            {res: 'Region', path: '/regions', model: require('../models/region').Region},
             {res: 'Post', path: '/posts', model: require('../models/post').Post}
         ],
         dburl = 'mongodb://' +
