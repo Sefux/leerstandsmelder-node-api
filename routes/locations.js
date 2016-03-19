@@ -8,7 +8,7 @@ var CommonController = require('../controllers/common'),
 module.exports = {
     '/locations': {
         'get': {
-            controller: locations.map('find', {resource: 'Location', select: 'uuid title lonlat postcode city created updated'}),
+            controller: locations.map('find', {resource: 'Location', select: 'uuid user_uuid title lonlat postcode city street owner buildingType created updated'}),
             scope: 'public'
         },
         'post': {

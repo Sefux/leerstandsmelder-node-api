@@ -39,7 +39,23 @@ class LocationsController extends CommonController {
                     total: yield mongoose.model(config.resource).count(q._conditions),
                     results: data
                 };
-            rHandler.handleDataResponse(result, 200, res, next);
+
+            var output = [];
+            return Promise.map(data, function (result) {
+                return mongoose.model('User')
+                    .findOne({uuid: result.user_uuid})
+                    .select('uuid nickname').exec()
+                    .then(function (user) {
+                        result = result.toObject();
+                        result.user = user;
+                        output.push(result);
+                    });
+            })
+            .then(function () {
+                result.results = output;
+                rHandler.handleDataResponse(result, 200, res, next);
+            });
+
         });
     }
 }
