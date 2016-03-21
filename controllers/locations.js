@@ -61,17 +61,22 @@ class LocationsController extends CommonController {
         this.coroutines.searchResource = {
             pre: Promise.resolve,
             main: Promise.coroutine(function* (req, res, next, config) {
-                var reg = new RegExp(req.params.q, 'i'),
+                var parts = req.params.q.split(' '),
                     query = {
-                        $or: [
-                            {title: {$regex: reg}},
-                            {description: {$regex: reg}},
-                            {owner: {$regex: reg}},
-                            {street: {$regex: reg}},
-                            {city: {$regex: reg}},
-                            {postcode: {$regex: reg}},
-                            {street: {$regex: reg}}
-                        ]
+                        $and: parts.map(function (part) {
+                            var reg = new RegExp(part, 'i');
+                            return {
+                                $or: [
+                                    {title: {$regex: reg}},
+                                    {description: {$regex: reg}},
+                                    {owner: {$regex: reg}},
+                                    {street: {$regex: reg}},
+                                    {city: {$regex: reg}},
+                                    {postcode: {$regex: reg}},
+                                    {street: {$regex: reg}}
+                                ]
+                            };
+                        })
                     };
                 if (req.params.uuid) {
                     query.region_uuid = req.params.uuid;
