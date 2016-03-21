@@ -57,6 +57,21 @@ class LocationsController extends CommonController {
             });
 
         });
+
+        this.coroutines.searchResource = {
+            pre: Promise.resolve,
+            main: Promise.coroutine(function* (req, res, next, config) {
+                var query = {
+                    $text: {$search: req.params.q}
+                };
+                if (req.params.uuid) {
+                    query.region_uuid = req.params.uuid;
+                }
+                var q = mongoose.model('Location').find(query);
+                q = config.select ? q.select(config.select) : q;
+                rHandler.handleDataResponse(yield q.exec(), 200, res, next);
+            })
+        };
     }
 }
 

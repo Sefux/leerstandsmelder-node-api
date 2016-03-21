@@ -52,15 +52,6 @@ class RegionsController extends CommonController {
             }
         });
 
-        this.coroutines.searchResource = {
-            pre: Promise.resolve,
-            main: Promise.coroutine(function* (req, res, next, config) {
-                var q = mongoose.model('Location').find({$text: {$search: req.params.q}, region_uuid: req.params.uuid});
-                q = config.select ? q.select(config.select) : q;
-                rHandler.handleDataResponse(yield q.exec(), 200, res, next);
-            })
-        };
-
     }
 }
 

@@ -1,14 +1,12 @@
 'use strict';
 
-var CommonController = require('../controllers/common'),
-    LocationsController = require('../controllers/locations'),
-    res = new CommonController(),
-    locations = new LocationsController();
+var LocationsController = require('../controllers/locations'),
+    res = new LocationsController();
 
 module.exports = {
     '/locations': {
         'get': {
-            controller: locations.map('find', {resource: 'Location', select: 'uuid user_uuid title lonlat postcode city street owner buildingType created updated'}),
+            controller: res.map('find', {resource: 'Location', select: 'uuid user_uuid title lonlat postcode city street owner buildingType created updated'}),
             scope: 'public'
         },
         'post': {
@@ -40,6 +38,24 @@ module.exports = {
     '/locations/:uuid/comments': {
         'get': {
             controller: res.map('find', {resource: 'Comment', query: {id_mapping: 'subject_uuid'}}),
+            scope: 'public'
+        }
+    },
+    '/search/locations': {
+        'get': {
+            controller: res.map('search', {
+                resource: 'Location',
+                select: 'uuid slug title lonlat street postcode city created updated'
+            }),
+            scope: 'public'
+        }
+    },
+    '/search/locations/:uuid': {
+        'get': {
+            controller: res.map('search', {
+                resource: 'Location',
+                select: 'uuid slug title lonlat street postcode city created updated'
+            }),
             scope: 'public'
         }
     }
