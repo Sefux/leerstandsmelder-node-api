@@ -48,6 +48,15 @@ class LocationsController extends CommonController {
                     .then(function (user) {
                         result = result.toObject();
                         result.user = user;
+                        return mongoose.model('Photo')
+                            .findOne({location_uuid: result.uuid})
+                            .select('thumb_url')
+                            .exec();
+                    })
+                    .then(function (photo) {
+                        if (photo) {
+                            result.thumb_url = photo.thumb_url;
+                        }
                         output.push(result);
                     });
             })
