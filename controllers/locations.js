@@ -50,7 +50,7 @@ class LocationsController extends CommonController {
                         result.user = user;
                         return mongoose.model('Photo')
                             .findOne({location_uuid: result.uuid})
-                            .select('thumb_url')
+                            .select('thumb_url uuid extension')
                             .exec();
                     })
                     .then(function (photo) {
