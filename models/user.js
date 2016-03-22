@@ -27,15 +27,15 @@ var mongoose = require('mongoose'),
         id: false
     });
 
-User.plugin(uniqueValidator, { message: 'This E-Mail is already registered.' });
+User.plugin(uniqueValidator, { message: 'errors.users.email_exists' });
 
 User.path('email').validate(function (value) {
     return validator.isEmail(value);
-}, 'Invalid email');
+}, 'errors.users.invalid_email');
 
 User.path('crypted_password').validate(function (value) {
     return validator.isLength(value, 8);
-}, 'Password must be at least 8 characters long.');
+}, 'errors.users.password_too_short');
 
 User.virtual('password').set(function (password) {
     this.password_salt = this.constructor.generatePasswordSalt();
@@ -45,7 +45,7 @@ User.virtual('password').set(function (password) {
 User.methods.isValidPassword = function (password) {
     var instance = this;
     if (this.failed_logins > 3 && Date.now() - this.last_login < 300000) {
-        throw new Error('Too many failed login attempts. Account blocked for 5 minutes.');
+        throw new Error('errors.users.too_many_failed_logins');
     } else {
         return this.constructor.encryptPassword(password, this.password_salt)
             .then(Promise.coroutine(function* (password_hash) {
