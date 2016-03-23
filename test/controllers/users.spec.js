@@ -45,17 +45,6 @@ describe('UsersController', () => {
         return users.coroutines.postResource.main(req, res, next);
     });
 
-    it('confirms a user', () => {
-        req = {
-            params: {token: currentUser.single_access_token}
-        };
-        next = () => {
-            proxySend.calledOnce.should.be.true;
-            proxySend.calledWith(200);
-        };
-        return users.coroutines.confirmUserResource.main(req, res, next, {resource: 'User'});
-    });
-
     it('fetches a user', () => {
         req = {
             user: currentUser,

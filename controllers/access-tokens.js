@@ -21,7 +21,7 @@ module.exports.post = function (req, res, next) {
         // Email & password
 
         if (req.body.email) {
-            let user = yield mongoose.model('User').findOne({email: req.params.email}),
+            let user = yield mongoose.model('User').findOne({email: req.body.email}),
                 valid = yield user.isValidPassword(req.body.password);
             cred.user = valid ? user : null;
         }

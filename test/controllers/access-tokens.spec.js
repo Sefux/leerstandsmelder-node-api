@@ -47,7 +47,7 @@ describe('AccessTokensController', () => {
 
     it('authenticates with api key credentials', () => {
         req = {
-            params: {
+            body: {
                 key: currentApiKeyConfirmed.key,
                 secret: currentApiKeyConfirmed.secret
             }
@@ -65,7 +65,7 @@ describe('AccessTokensController', () => {
 
     it('authenticates with login and password', () => {
         req = {
-            params: {
+            body: {
                 email: currentUserConfirmed.email,
                 password: userTemplateConfirmed.password
             }
