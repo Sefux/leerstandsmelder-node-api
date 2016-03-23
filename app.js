@@ -38,7 +38,7 @@ Promise.coroutine(function* () {
     mongoose.model('ApiKey', require('./models/api-key').ApiKey);
     mongoose.model('AccessToken', require('./models/access-token').AccessToken);
     mongoose.model('AclEntry', require('./models/acl-entry').AclEntry);
-    mongoose.model('Challenge', require('./models/challenge').Challenge);
+    mongoose.model('Captcha', require('./models/captcha').Captcha);
     mongoose.model('Comment', require('./models/comment').Comment);
     mongoose.model('Location', require('./models/location').Location);
     mongoose.model('Region', require('./models/region').Region);
@@ -71,6 +71,7 @@ Promise.coroutine(function* () {
 
     var routes = require('./lib/routes');
     yield routes.init([
+        require('./routes/captchas'),
         require('./routes/comments'),
         require('./routes/locations'),
         require('./routes/regions'),

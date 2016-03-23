@@ -31,11 +31,12 @@ module.exports.get = function (req, res, next) {
 };
 
 module.exports.post = function (req, res, next) {
+    // TODO: need to be able to set position
     var checksum = require('checksum'),
         file = req.files.file,
         payload = {
             location_uuid: req.params.location_uuid,
-            author_uuid: req.user.uuid,
+            user_uuid: req.user.uuid,
             creator_uuid: req.user.uuid,
             publisher_uuid: req.user.uuid,
             rights_holder_uuid: req.user.uuid,
