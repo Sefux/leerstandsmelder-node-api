@@ -11,26 +11,26 @@ module.exports.post = function (req, res, next) {
 
         // API key and secret
 
-        if (req.params.key && req.params.secret) {
+        if (req.body.key && req.body.secret) {
             cred.api_key = yield mongoose.model('ApiKey').findOne({
-                key: req.params.key,
-                secret: req.params.secret
+                key: req.body.key,
+                secret: req.body.secret
             });
         }
 
         // Email & password
 
-        if (req.params.email) {
+        if (req.body.email) {
             let user = yield mongoose.model('User').findOne({email: req.params.email}),
-                valid = yield user.isValidPassword(req.params.password);
+                valid = yield user.isValidPassword(req.body.password);
             cred.user = valid ? user : null;
         }
 
         // Single access token
 
-        if (req.params.single_access_token) {
+        if (req.body.single_access_token) {
             cred.user = yield mongoose.model('User').findOne({
-                single_access_token: req.params.single_access_token,
+                single_access_token: req.body.single_access_token,
                 confirmed: false
             });
             yield cred.user.confirmUser();
@@ -40,7 +40,7 @@ module.exports.post = function (req, res, next) {
 
         if (!cred.api_key && cred.user) {
             let key = yield mongoose.model('ApiKey').findOne({user_uuid: cred.user.uuid});
-            cred.api_key = key ? yield mongoose.model('ApiKey').create({user_uuid: cred.user.uuid}) : key;
+            cred.api_key = key ? key : yield mongoose.model('ApiKey').create({user_uuid: cred.user.uuid});
         }
 
         // Send error and abort if key is inactive, no key is found or could not be created (no user)

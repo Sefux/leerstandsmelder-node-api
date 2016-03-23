@@ -11,6 +11,22 @@ class UsersController extends CommonController {
     constructor() {
         super();
 
+        function updateUUID(req) {
+            if (req.params.uuid === 'me' && req.user) {
+                req.params.uuid = req.user.uuid;
+            }
+            return Promise.resolve();
+        }
+
+        function preHandler(req) {
+            updateUUID();
+            if (req.user.uuid !== req.params.uuid) {
+                throw new restify.NotAuthorizedError();
+            }
+            return Promise.resolve();
+        }
+
+        this.coroutines.getResource.pre = updateUUID;
         this.coroutines.getResource.main = Promise.coroutine(function* (req, res, next, config) {
             var selectAttributes = 'uuid nickname';
 
@@ -32,17 +48,6 @@ class UsersController extends CommonController {
             return rHandler.handleDataResponse(user, 201, res, next);
         });
 
-        this.coroutines.confirmUserResource = {
-            main: Promise.coroutine(function* (req, res, next, config) {
-                var user = yield mongoose.model('User').findOne({single_access_token: req.params.token}).exec();
-
-                yield user.confirmUser();
-
-                rHandler.handleDataResponse(user, 201, res, next);
-            }),
-            pre: Promise.resolve
-        };
-
         this.coroutines.resetUserResource = {
             main: Promise.coroutine(function* (req, res, next, config) {
                 var user = yield mongoose.model('User').findOne({email: req.params.email}).exec();
@@ -54,17 +59,8 @@ class UsersController extends CommonController {
             pre: Promise.resolve
         };
 
-        this.coroutines.putResource.pre = function (req, res, next, config) {
-            if (req.user.uuid !== req.params.uuid) {
-                throw new restify.NotAuthorizedError();
-            }
-        };
-
-        this.coroutines.delResource.pre = function (req, res, next, config) {
-            if (req.user.uuid !== req.params.uuid) {
-                throw new restify.NotAuthorizedError();
-            }
-        };
+        this.coroutines.putResource.pre = preHandler;
+        this.coroutines.delResource.pre = preHandler;
     }
 }
 

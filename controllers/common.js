@@ -10,6 +10,9 @@ class CommonController {
         this.coroutines = {
             findResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
+                    if (req.params.uuid === 'me' && req.user) {
+                        req.params.uuid = req.user.uuid;
+                    }
                     var query = require('../lib/util/query-mapping')({}, req, config),
                         q = mongoose.model(config.resource).find(query);
                     q = config.select ? q.select(config.select) : q;

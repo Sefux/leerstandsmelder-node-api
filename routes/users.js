@@ -9,21 +9,21 @@ var access_tokens = require('../controllers/access-tokens'),
 module.exports = {
     '/users': {
         'post': {
-            controller: users.map('post', {resource: 'Post'}),
+            controller: users.map('post', {resource: 'User'}),
             scope: 'public'
         }
     },
     '/users/:uuid': {
         'get': {
-            controller: users.map('get', {resource: 'Post'}),
+            controller: users.map('get', {resource: 'User'}),
             scope: 'public'
         },
         'put': {
-            controller: users.map('put', {resource: 'Post'}),
+            controller: users.map('put', {resource: 'User'}),
             scope: 'owner'
         },
         'delete': {
-            controller: users.map('del', {resource: 'Post'}),
+            controller: users.map('del', {resource: 'User'}),
             overrideVerb: 'del',
             scope: 'admin'
         }
@@ -44,12 +44,6 @@ module.exports = {
         'get': {
             controller: res.map('find', {resource: 'Challenge', query: {user_mapping: 'user_uuid'}}),
             scope: 'user'
-        }
-    },
-    '/users/me/confirm': {
-        'post': {
-            controller: users.map('confirmUser'),
-            scope: 'public'
         }
     },
     '/users/me/reset': {
