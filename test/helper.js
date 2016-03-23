@@ -17,7 +17,6 @@ module.exports.init = function () {
         _mongoose.model('ApiKey', require('../models/api-key').ApiKey);
         _mongoose.model('AccessToken', require('../models/access-token').AccessToken);
         _mongoose.model('AclEntry', require('../models/acl-entry').AclEntry);
-        _mongoose.model('Challenge', require('../models/challenge').Challenge);
         _mongoose.model('Comment', require('../models/comment').Comment);
         _mongoose.model('Location', require('../models/location').Location);
         _mongoose.model('Region', require('../models/region').Region);
