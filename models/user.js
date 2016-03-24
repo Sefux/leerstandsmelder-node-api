@@ -81,11 +81,6 @@ User.methods.confirmUser = function () {
     return this.save();
 };
 
-User.methods.generateUUID = function () {
-    var uuid = require('../lib/util/uuid');
-    this.uuid = uuid.v4();
-};
-
 User.methods.generateSingleAccessToken = function () {
     var sha1 = require('sha1');
     this.single_access_token = sha1(this.email + Math.round(Math.random() * 1000000).toString());

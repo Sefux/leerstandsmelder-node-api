@@ -2,7 +2,7 @@
 
 var mongoose = require('mongoose'),
     chance = require('chance').Chance(),
-    uuid = require('../lib/util/uuid'),
+    uuid = require('uuid4'),
     acl = require('../lib/auth/acl-manager'),
     dburl = 'mongodb://127.0.0.1:27017/leerstandsmelder-api-test';
 
@@ -46,7 +46,7 @@ module.exports.getFixture = function (resource) {
                 postcode: chance.zip(),
                 lonlat: [chance.longitude(), chance.latitude()],
                 legacy_id: chance.word({length: 8}),
-                region_uuid: uuid.v4()
+                region_uuid: uuid()
             };
         default:
             throw new Error('no fixture available for ' + resource);

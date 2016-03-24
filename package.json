@@ -33,6 +33,7 @@
     "sha1": "^1.1.1",
     "speakingurl": "^9.0.0",
     "striptags": "^2.1.1",
+    "uuid4": "^1.0.0",
     "validator": "^5.1.0"
   },
   "devDependencies": {
