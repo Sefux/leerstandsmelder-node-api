@@ -50,9 +50,9 @@ class UsersController extends CommonController {
 
         this.coroutines.resetUserResource = {
             main: Promise.coroutine(function* (req, res, next, config) {
-                var user = yield mongoose.model('User').findOne({email: req.params.email}).exec();
+                var user = yield mongoose.model('User').findOne({email: req.body.email}).exec();
 
-                yield user.sendPasswordResetMail();
+                yield user.requestPasswordReset();
 
                 rHandler.handleDataResponse(user, 201, res, next);
             }),

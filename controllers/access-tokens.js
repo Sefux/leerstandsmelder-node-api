@@ -30,10 +30,9 @@ module.exports.post = function (req, res, next) {
 
         if (req.body.single_access_token) {
             cred.user = yield mongoose.model('User').findOne({
-                single_access_token: req.body.single_access_token,
-                confirmed: false
+                single_access_token: req.body.single_access_token
             });
-            if (cred.user) {
+            if (cred.user && !cred.user.confirmed) {
                 yield cred.user.confirmUser();
             }
         }

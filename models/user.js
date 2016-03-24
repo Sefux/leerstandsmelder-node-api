@@ -96,12 +96,13 @@ User.methods.sendConfirmationMail = function () {
     return mailer.sendConfirmationRequest(this);
 };
 
-User.methods.sendPasswordResetMail = function () {
-    var mailer = require('../lib/mailer/mailer');
-    this.generateSingleAccessToken();
-    return this.save()
+User.methods.requestPasswordReset = function () {
+    var mailer = require('../lib/mailer/mailer'),
+        _self = this;
+    _self.generateSingleAccessToken();
+    return _self.save()
         .then(function () {
-            return mailer.sendResetPassword(this);
+            return mailer.sendResetPassword(_self);
         });
 };
 
