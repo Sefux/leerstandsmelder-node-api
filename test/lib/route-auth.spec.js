@@ -44,7 +44,7 @@ describe('RouteAuth', () => {
                 template.confirmed = true;
                 req = {
                     body: template,
-                    path: '/user'
+                    url: '/user'
                 };
                 return users.coroutines.postResource.main(req, res, sinon.spy(), {resource: 'User'})
                     .then(() => {
@@ -56,7 +56,7 @@ describe('RouteAuth', () => {
                 template.confirmed = true;
                 req = {
                     body: template,
-                    path: '/user'
+                    url: '/user'
                 };
                 return users.coroutines.postResource.main(req, res, sinon.spy(), {resource: 'User'})
                     .then(() => {
@@ -70,7 +70,7 @@ describe('RouteAuth', () => {
                 req = {
                     body: util.getFixture('Location'),
                     user: currentUser,
-                    path: '/locations'
+                    url: '/locations'
                 };
                 return locations.coroutines.postResource.main(req, res, sinon.spy(), {resource: 'Location'})
                     .then(() => {
@@ -83,7 +83,7 @@ describe('RouteAuth', () => {
         req = {
             body: {},
             user: currentUser,
-            path: '/locations/' + currentLocation.uuid,
+            url: '/locations/' + currentLocation.uuid,
             method: 'get',
             route: {
                 path: '/locations/:uuid',
@@ -100,7 +100,7 @@ describe('RouteAuth', () => {
     it('anonymous user may GET public resource', () => {
         req = {
             body: {},
-            path: '/locations/' + currentLocation.uuid,
+            url: '/locations/' + currentLocation.uuid,
             method: 'get',
             route: {
                 path: '/locations/:uuid',
@@ -118,7 +118,7 @@ describe('RouteAuth', () => {
         req = {
             body: util.getFixture('Location'),
             user: currentUser,
-            path: '/locations',
+            url: '/locations',
             method: 'post',
             route: {
                 path: '/locations',
@@ -135,7 +135,7 @@ describe('RouteAuth', () => {
     it('anonymous may not POST resource', () => {
         req = {
             body: util.getFixture('Location'),
-            path: '/locations',
+            url: '/locations',
             method: 'post',
             route: {
                 path: '/locations',
@@ -158,7 +158,7 @@ describe('RouteAuth', () => {
             params: {
                 uuid: currentLocation.uuid
             },
-            path: '/locations/' + currentLocation.uuid,
+            url: '/locations/' + currentLocation.uuid,
             method: 'put',
             user: currentUser,
             route: {
@@ -181,7 +181,7 @@ describe('RouteAuth', () => {
             params: {
                 uuid: currentLocation.uuid
             },
-            path: '/locations/' + currentLocation.uuid,
+            url: '/locations/' + currentLocation.uuid,
             method: 'put',
             user: currentUserAlt,
             route: {
@@ -203,7 +203,7 @@ describe('RouteAuth', () => {
             params: {
                 uuid: currentLocation.uuid
             },
-            path: '/locations/' + currentLocation.uuid,
+            url: '/locations/' + currentLocation.uuid,
             method: 'delete',
             user: currentUser,
             route: {
@@ -224,7 +224,7 @@ describe('RouteAuth', () => {
             params: {
                 uuid: currentLocation.uuid
             },
-            path: '/locations/' + currentLocation.uuid,
+            url: '/locations/' + currentLocation.uuid,
             method: 'delete',
             user: currentUserAlt,
             route: {

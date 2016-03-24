@@ -63,7 +63,7 @@ class UsersController extends CommonController {
                 yield user.save();
                 delete req.body.password;
             }
-            q = mongoose.model('User').update({uuid: req.params.uuid}, req.body, {new: true});
+            q = mongoose.model('User').findOneAndUpdate({uuid: req.params.uuid}, req.body, {new: true});
             rHandler.handleDataResponse(yield q.exec(), 200, res, next);
         });
 

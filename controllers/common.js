@@ -68,11 +68,11 @@ class CommonController {
                     if (req.user && req.user.uuid) req.body.user_uuid = req.user.uuid;
                     var result = yield mongoose.model(config.resource).create(req.body);
                     yield aclManager.setAclEntry(
-                        req.path + '/' + result.uuid,
+                        req.url + '/' + result.uuid,
                         [req.user.uuid, 'admin'],
                         ['get', 'put', 'delete']
                     );
-                    yield aclManager.setAclEntry(req.path + '/' + result.uuid, ['user'], ['get']);
+                    yield aclManager.setAclEntry(req.url + '/' + result.uuid, ['user'], ['get']);
                     rHandler.handleDataResponse(result, 201, res, next);
                 }),
                 pre: Promise.resolve
@@ -89,9 +89,9 @@ class CommonController {
                 main: Promise.coroutine(function* (req, res, next, config) {
                     var result = yield mongoose.model(config.resource).findOneAndRemove({uuid: req.params.uuid});
                     // TODO: wildcard not implemented yet!
-                    yield aclManager.removeAclEntry(req.path, req.user.uuid, '*');
-                    yield aclManager.removeAclEntry(req.path, 'admin', '*');
-                    yield aclManager.removeAclEntry(req.path, 'user', '*');
+                    yield aclManager.removeAclEntry(req.url, req.user.uuid, '*');
+                    yield aclManager.removeAclEntry(req.url, 'admin', '*');
+                    yield aclManager.removeAclEntry(req.url, 'user', '*');
                     rHandler.handleDataResponse(result, 200, res, next);
                 }),
                 pre: Promise.resolve
