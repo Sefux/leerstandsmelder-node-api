@@ -68,16 +68,22 @@ module.exports.post = function (req, res, next) {
             });
         })
         .then((photo) => {
-            return aclManager.setAclEntry(req.path + '/' + result.uuid, [req.user.uuid, 'admin'], ['get', 'put', 'post', 'delete'])
-                .then(() => {
-                    return photo;
-                });
+            return aclManager.setAclEntry(
+                req.path + '/' + result.uuid,
+                [req.user.uuid, 'admin'],
+                ['get', 'put', 'delete']
+            ).then(() => {
+                return aclManager.setAclEntry(req.path + '/' + result.uuid, ['user'], ['get']);
+            }).then(() => {
+                return photo;
+            });
         })
         .then((photo) => {
             // TODO: we need a correct content type here, do not return the original multipart one
             // for now we do not return the created photo object, this is hacky
             // res.header('Content-Type', 'application/json');
-            res.send(200);
+            res.setHeader('Content-Type', 'application/json');
+            res.send(200, photo);
             next();
         })
         .catch((err) => {

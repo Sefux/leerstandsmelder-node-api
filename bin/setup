@@ -62,6 +62,18 @@ function initialSetup(callback) {
                         message: 'Port must be a number',
                         default: 8080,
                         required: true
+                    },
+                    secure: {
+                        description: 'Is the API server reachable over SSL?',
+                        type: 'boolean',
+                        default: false,
+                        required: true
+                    },
+                    proxiedToDefault: {
+                        description: 'Is the API server being proxied to port 80 or 443?',
+                        type: 'boolean',
+                        default: false,
+                        required: true
                     }
                 }
             }, function (err, data) {
@@ -147,6 +159,24 @@ function initialSetup(callback) {
             }, function (err, data) {
                 if (data) {
                     config.file_delivery = data;
+                }
+                cb(err);
+            });
+        },
+        function (cb) {
+            console.log('\nFRONTEND\n'.cyan);
+            prompt.get({
+                properties: {
+                    base_url: {
+                        description: 'Enter the base url',
+                        type: 'string',
+                        default: 'http://localhost:8080',
+                        required: true
+                    }
+                }
+            }, function (err, data) {
+                if (data) {
+                    config.frontend = data;
                 }
                 cb(err);
             });

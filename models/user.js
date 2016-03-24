@@ -125,6 +125,7 @@ module.exports.User = modelHelper.setup(
         if (typeof this.single_access_token === 'undefined' && !this.confirmed) {
             this.generateSingleAccessToken();
         }
+        // TODO: clean up the password encryption process
         if (this.modifiedPaths().indexOf('crypted_password') > -1) {
             var instance = this;
             return this.constructor.encryptPassword(this.crypted_password, this.password_salt)

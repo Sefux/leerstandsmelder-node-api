@@ -66,21 +66,14 @@ class CommonController {
             postResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
                     if (req.user && req.user.uuid) req.body.user_uuid = req.user.uuid;
-                    rHandler.handleDataResponse(
-                        yield mongoose.model(config.resource)
-                            .create(req.body)
-                            .then(function (result) {
-                                if (!req.user || !req.user.uuid) return result;
-                                return aclManager.setAclEntry(req.path + '/' + result.uuid, [req.user.uuid, 'admin'], ['get', 'put', 'post', 'delete'])
-                                    .then(() => {
-                                        return aclManager.setAclEntry(req.path + '/' + result.uuid, ['user'], ['get']);
-                                    })
-                                    .then(() => {
-                                        return result;
-                                    });
-                            }),
-                        201, res, next
+                    var result = yield mongoose.model(config.resource).create(req.body);
+                    yield aclManager.setAclEntry(
+                        req.path + '/' + result.uuid,
+                        [req.user.uuid, 'admin'],
+                        ['get', 'put', 'delete']
                     );
+                    yield aclManager.setAclEntry(req.path + '/' + result.uuid, ['user'], ['get']);
+                    rHandler.handleDataResponse(result, 201, res, next);
                 }),
                 pre: Promise.resolve
             },
@@ -94,23 +87,12 @@ class CommonController {
             },
             delResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
-                    rHandler.handleDataResponse(
-                        yield mongoose.model(config.resource)
-                            .findOneAndRemove({uuid: req.params.uuid})
-                            .then((result) => {
-                                return aclManager.removeAclEntry(req.path, req.user.uuid, '*')
-                                    .then(() => {
-                                        return aclManager.removeAclEntry(req.path, 'admin', '*');
-                                    })
-                                    .then(() => {
-                                        return aclManager.removeAclEntry(req.path, 'user', '*');
-                                    })
-                                    .then(() => {
-                                        return result;
-                                    });
-                            }),
-                        200, res, next
-                    );
+                    var result = yield mongoose.model(config.resource).findOneAndRemove({uuid: req.params.uuid});
+                    // TODO: wildcard not implemented yet!
+                    yield aclManager.removeAclEntry(req.path, req.user.uuid, '*');
+                    yield aclManager.removeAclEntry(req.path, 'admin', '*');
+                    yield aclManager.removeAclEntry(req.path, 'user', '*');
+                    rHandler.handleDataResponse(result, 200, res, next);
                 }),
                 pre: Promise.resolve
             }
