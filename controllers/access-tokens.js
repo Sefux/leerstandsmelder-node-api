@@ -33,7 +33,9 @@ module.exports.post = function (req, res, next) {
                 single_access_token: req.body.single_access_token,
                 confirmed: false
             });
-            yield cred.user.confirmUser();
+            if (cred.user) {
+                yield cred.user.confirmUser();
+            }
         }
 
         // We have a user but no key yet
