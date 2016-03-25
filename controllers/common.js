@@ -31,7 +31,7 @@ class CommonController {
                         return Promise.map(results, function (result) {
                                 return mongoose.model('User')
                                     .findOne({uuid: result.user_uuid})
-                                    .select('uuid nickname').exec()
+                                    .select('uuid nickname login').exec()
                                     .then(function (user) {
                                         result = result.toObject();
                                         result.user = user;

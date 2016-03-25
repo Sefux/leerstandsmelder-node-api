@@ -7,6 +7,7 @@ var restify = require('restify'),
     filterUUID = require('./lib/util/filter-uuid'),
     tokenAuth = require('./lib/auth/token-auth'),
     routeAuth = require('./lib/auth/route-auth'),
+    validateCaptcha = require('./lib/auth/validate-captcha'),
     userAliasParser = require('./lib/parsers/user-alias-parser'),
     acl = require('./lib/auth/acl-manager'),
     config = require('./lib/config'),
@@ -70,6 +71,7 @@ Promise.coroutine(function* () {
     server.use(restify.bodyParser());
     server.use(restify.queryParser());
     server.use(filterUUID());
+    server.use(validateCaptcha());
 
     var routes = require('./lib/routes');
     yield routes.init([
