@@ -5,7 +5,7 @@ var Promise = require('bluebird'),
     path = require('path'),
     fs = require('fs-extra'),
     aclManager = require('../lib/auth/acl-manager'),
-    mongoHandler = require('../lib/util/response-handlers');
+    responseHandlers = require('../lib/util/response-handlers');
 
 module.exports.get = function (req, res, next) {
     mongoose.model('Photo').findOne({uuid: req.params.uuid})
@@ -41,7 +41,7 @@ module.exports.post = function (req, res, next) {
             publisher_uuid: req.user.uuid,
             rights_holder_uuid: req.user.uuid,
             filename: file.name,
-            extension: path.extname(file.name),
+            extension: path.extname(file.name).replace('.', ''),
             mime_type: file.type,
             filehash: file.hash,
             size: file.size
@@ -69,11 +69,11 @@ module.exports.post = function (req, res, next) {
         })
         .then((photo) => {
             return aclManager.setAclEntry(
-                req.path + '/' + result.uuid,
+                req.path + '/' + photo.uuid,
                 [req.user.uuid, 'admin'],
                 ['get', 'put', 'delete']
             ).then(() => {
-                return aclManager.setAclEntry(req.path + '/' + result.uuid, ['user'], ['get']);
+                return aclManager.setAclEntry(req.path + '/' + photo.uuid, ['user'], ['get']);
             }).then(() => {
                 return photo;
             });
@@ -87,7 +87,7 @@ module.exports.post = function (req, res, next) {
             next();
         })
         .catch((err) => {
-            res.send(mongoHandler.handleError(err));
+            res.send(responseHandlers.handleErrorResponse(err, res, next));
             next();
         });
 };

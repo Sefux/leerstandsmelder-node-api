@@ -88,7 +88,6 @@ class CommonController {
             delResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
                     var result = yield mongoose.model(config.resource).findOneAndRemove({uuid: req.params.uuid});
-                    // TODO: wildcard not implemented yet!
                     yield aclManager.removeAclEntry(req.url, req.user.uuid, '*');
                     yield aclManager.removeAclEntry(req.url, 'admin', '*');
                     yield aclManager.removeAclEntry(req.url, 'user', '*');

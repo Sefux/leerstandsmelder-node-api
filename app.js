@@ -4,6 +4,7 @@ var restify = require('restify'),
     mongoose = require('mongoose'),
     preflightEnabler = require('se7ensky-restify-preflight'),
     urlExtParser = require('./lib/parsers/urlext-parser'),
+    filterUUID = require('./lib/util/filter-uuid'),
     tokenAuth = require('./lib/auth/token-auth'),
     routeAuth = require('./lib/auth/route-auth'),
     userAliasParser = require('./lib/parsers/user-alias-parser'),
@@ -68,6 +69,7 @@ Promise.coroutine(function* () {
     server.use(userAliasParser());
     server.use(restify.bodyParser());
     server.use(restify.queryParser());
+    server.use(filterUUID());
 
     var routes = require('./lib/routes');
     yield routes.init([
