@@ -57,6 +57,13 @@ class LocationsController extends CommonController {
                         if (photo) {
                             result.thumb_url = photo.thumb_url;
                         }
+                        return mongoose.model('Region')
+                            .findOne({uuid: result.region_uuid})
+                            .select('uuid title slug')
+                            .exec();
+                    })
+                    .then(function (region) {
+                        result.region = region;
                         output.push(result);
                     });
             })
