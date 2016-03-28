@@ -40,7 +40,6 @@ module.exports.ApiKey = modelHelper.setup(
     function (obj) {
         delete obj.user_uuid;
         delete obj.device_uuid;
-        delete obj.scopes;
         delete obj.active;
     }
 );

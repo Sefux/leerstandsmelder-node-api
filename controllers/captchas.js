@@ -10,11 +10,16 @@ class CaptchasController extends CommonController {
         super();
 
         this.coroutines.getResource.main = Promise.coroutine(function* (req, res, next, config) {
-            var captcha = yield mongoose.model('Captcha').findOneAndRemove({code: parseInt(req.params.code)});
-            if (captcha) {
-                res.send(200, true);
-            } else {
+            var code = parseInt(req.params.code);
+            if (code.isNaN()) {
                 res.send(404, false);
+            } else {
+                var captcha = yield mongoose.model('Captcha').findOneAndRemove({code: code});
+                if (captcha) {
+                    res.send(200, true);
+                } else {
+                    res.send(404, false);
+                }
             }
             next();
         });

@@ -28,6 +28,9 @@ class LocationsController extends CommonController {
 
             query = require('../lib/util/query-mapping')(geoquery, req, config);
             q = mongoose.model(config.resource).find(query);
+            if (req.params.sort) {
+                q = q.sort(req.params.sort);
+            }
 
             q = config.select ? q.select(config.select) : q;
             q = q.skip(page * pagesize).limit(pagesize);
