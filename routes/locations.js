@@ -54,7 +54,7 @@ module.exports = {
         'get': {
             controller: res.map('search', {
                 resource: 'Location',
-                select: 'uuid slug title lonlat street postcode city created updated'
+                select: 'uuid region_uuid slug title lonlat street postcode city created updated'
             }),
             scope: 'public'
         }

@@ -4,7 +4,6 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
     ApiKey = new Schema({
         user_uuid: String,
-        device_uuid: String,
         key: String,
         secret: String,
         scopes: { type: [String], default: ['user'] },

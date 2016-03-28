@@ -11,7 +11,7 @@ module.exports.get = function (req, res, next) {
     mongoose.model('Photo').findOne({uuid: req.params.uuid})
         .exec(function (err, photo) {
             if (err) {
-                res.send(mongoHandler.handleError(err));
+                res.send(responseHandlers.handleErrorResponse(err, res, next));
             } else {
                 var restify = require('restify');
                 if (photo) {

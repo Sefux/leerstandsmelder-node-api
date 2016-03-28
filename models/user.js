@@ -20,6 +20,7 @@ var mongoose = require('mongoose'),
         last_login: Date,
         failed_logins: { type: Number, default: 0 },
         single_access_token: String,
+        scopes: { type: [String], default: ['user'] },
         legacy_id: String
 
     }, {
