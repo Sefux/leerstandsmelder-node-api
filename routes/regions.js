@@ -36,7 +36,7 @@ module.exports = {
             controller: locations.map('find', {
                 resource: 'Location',
                 query: {id_mapping: 'region_uuid'},
-                select: 'uuid user_uuid slug title lonlat postcode street city buildingType owner created updated'
+                select: 'uuid user_uuid region_uuid slug title lonlat postcode street city buildingType owner created updated'
             }),
             scope: 'public'
         }
