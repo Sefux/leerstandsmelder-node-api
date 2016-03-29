@@ -57,7 +57,7 @@ class CommonController {
                     if (result.user_uuid) {
                         result.user = yield mongoose.model('User')
                             .findOne({uuid:result.user_uuid})
-                            .select('uuid nickname').exec();
+                            .select('uuid login nickname').exec();
                     }
                     rHandler.handleDataResponse(result, 200, res, next);
                 }),
