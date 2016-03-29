@@ -7,6 +7,13 @@ var mongoose = require('mongoose'),
 
 class CommonController {
     constructor() {
+
+        function deleteProtected(req) {
+            delete req.body.region_uuid;
+            delete req.body.user_uuid;
+            delete req.body.legacy_id;
+        }
+
         this.coroutines = {
             findResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
@@ -31,7 +38,7 @@ class CommonController {
                         return Promise.map(results, function (result) {
                                 return mongoose.model('User')
                                     .findOne({uuid: result.user_uuid})
-                                    .select('uuid nickname login').exec()
+                                    .select('uuid nickname').exec()
                                     .then(function (user) {
                                         result = result.toObject();
                                         result.user = user;
@@ -57,7 +64,7 @@ class CommonController {
                     if (result.user_uuid) {
                         result.user = yield mongoose.model('User')
                             .findOne({uuid:result.user_uuid})
-                            .select('uuid login nickname').exec();
+                            .select('uuid nickname').exec();
                     }
                     rHandler.handleDataResponse(result, 200, res, next);
                 }),

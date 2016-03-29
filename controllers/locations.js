@@ -47,7 +47,7 @@ class LocationsController extends CommonController {
             return Promise.map(data, function (result) {
                 return mongoose.model('User')
                     .findOne({uuid: result.user_uuid})
-                    .select('uuid login nickname').exec()
+                    .select('uuid nickname').exec()
                     .then(function (user) {
                         result = result.toObject();
                         result.user = user;

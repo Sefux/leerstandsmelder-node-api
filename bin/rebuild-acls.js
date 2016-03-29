@@ -43,10 +43,13 @@ Promise.coroutine(function* () {
                     })
                     .map((item) => {
                         var acls = ['admin'];
-                        if (item.user_uuid || item.author_uuid) {
-                            acls.push(item.user_uuid || item.author_uuid);
+                        if (item.user_uuid) {
+                            acls.push(item.user_uuid);
                         }
-                        return acl.setAclEntry(resource.path + '/' + item.uuid, acls, ['get', 'put', 'post', 'delete']);
+                        if (resource.res === 'Post') {
+                            acls.push('editor');
+                        }
+                        return acl.setAclEntry(resource.path + '/' + item.uuid, acls, ['get', 'put', 'delete']);
                     }, {concurrency: 1});
             }, {concurrency: 1});
         })

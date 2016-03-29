@@ -41,7 +41,7 @@ module.exports.post = function (req, res, next) {
 
         if (!cred.api_key && cred.user) {
             let key = yield mongoose.model('ApiKey').findOne({user_uuid: cred.user.uuid});
-            cred.api_key = key ? key : yield mongoose.model('ApiKey').create({user_uuid: cred.user.uuid});
+            cred.api_key = key ? key : yield mongoose.model('ApiKey').create({user_uuid: cred.user.uuid, scopes: cred.user.scopes});
         }
 
         // Send error and abort if key is inactive, no key is found or could not be created (no user)

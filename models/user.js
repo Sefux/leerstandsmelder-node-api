@@ -8,9 +8,8 @@ var mongoose = require('mongoose'),
     User = new Schema({
 
         uuid: { type: String, unique: true },
-        nickname: String,
-        login: { type: String, index: true, unique: true, required: true },
-        email: {type: String, unique: true},
+        nickname: { type: String, required: true },
+        email: {type: String, index: true, unique: true, required: true },
         crypted_password: { type: String, required: true },
         password_salt: { type: String, required: true },
         confirmed: { type: Boolean, default: false },
@@ -108,7 +107,7 @@ module.exports.User = modelHelper.setup(
         var now = Date.now(),
             sanitizer = require('sanitizer');
         this.updated = now;
-        this.login = sanitizer.sanitize(this.login);
+        this.nickname = sanitizer.sanitize(this.nickname);
         if (!this.uuid) {
             this.generateUUID();
         }
@@ -143,5 +142,6 @@ module.exports.User = modelHelper.setup(
         delete obj.failed_logins;
         delete obj.single_access_token;
         delete obj.legacy_id;
+        delete obj.scopes;
     }
 );

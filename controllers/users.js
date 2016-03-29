@@ -11,6 +11,15 @@ class UsersController extends CommonController {
     constructor() {
         super();
 
+        function deleteProtected(req) {
+            delete req.body.scopes;
+            delete req.body.single_access_token;
+            delete req.body.failed_logins;
+            delete req.body.crypted_password;
+            delete req.body.password_salt;
+            delete req.body.legacy_id;
+        }
+
         function updateUUID(req) {
             if (req.params.uuid === 'me' && req.user) {
                 req.params.uuid = req.user.uuid;
@@ -31,7 +40,7 @@ class UsersController extends CommonController {
             var selectAttributes = 'uuid nickname';
 
             if (req.user && req.user.uuid === req.params.uuid) {
-                selectAttributes = 'uuid login email';
+                selectAttributes = 'uuid nickname email';
             }
 
             var q = mongoose.model(config.resource)
@@ -41,8 +50,9 @@ class UsersController extends CommonController {
         });
 
         this.coroutines.postResource.main = Promise.coroutine(function* (req, res, next, config) {
-            var user = yield mongoose.model('User').create(req.body);
+            deleteProtected(req);
 
+            var user = yield mongoose.model('User').create(req.body);
             yield acl.setAclEntry(
                 '/users/' + user.uuid,
                 [user.uuid, 'admin'],
@@ -58,6 +68,11 @@ class UsersController extends CommonController {
         this.coroutines.putResource.pre = preHandler;
         this.coroutines.putResource.main = Promise.coroutine(function* (req, res, next, config) {
             var q, user = yield mongoose.model('User').findOne({uuid: req.params.uuid});
+            deleteProtected(req);
+            if (req.user.scopes.indexOf('admin') === -1) {
+                delete req.body.confirmed;
+                delete req.body.blocked;
+            }
             if (req.body.password) {
                 user.password = req.body.password;
                 yield user.save();
