@@ -48,7 +48,7 @@ Promise.coroutine(function* () {
                 if (location) {
                     redirect += '/' + (location.slug || location.uuid);
                     res.setHeader('Location', redirect);
-                    res.send(302);
+                    res.send(301);
                     next();
                 } else {
                     throw new Error();
