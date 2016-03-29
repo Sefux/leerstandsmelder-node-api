@@ -29,7 +29,7 @@ module.exports.getFixture = function (resource) {
     switch(resource) {
         case 'User':
             return {
-                login: chance.name(),
+                nickname: chance.name(),
                 email: chance.email(),
                 password: chance.word({length: 8})
             };

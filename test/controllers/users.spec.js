@@ -39,7 +39,7 @@ describe('UsersController', () => {
         next = () => {
             proxySend.calledOnce.should.be.true;
             proxySend.calledWith(201);
-            proxySend.args[0][1].login.should.equal(template.login);
+            proxySend.args[0][1].nickname.should.equal(template.nickname);
             proxySend.args[0][1].email.should.equal(template.email);
         };
         return users.coroutines.postResource.main(req, res, next);
@@ -53,7 +53,7 @@ describe('UsersController', () => {
         next = () => {
             proxySend.calledOnce.should.be.true;
             proxySend.calledWith(200);
-            proxySend.args[0][1].login.should.equal(userTemplate.login);
+            proxySend.args[0][1].nickname.should.equal(userTemplate.nickname);
             proxySend.args[0][1].email.should.equal(userTemplate.email);
             should.not.exist(proxySend.args[0][1].crypted_password);
             should.not.exist(proxySend.args[0][1].password_salt);
@@ -65,12 +65,12 @@ describe('UsersController', () => {
         req = {
             user: currentUser,
             params: {uuid: currentUser.uuid},
-            body: {login: 'asdfasdf'}
+            body: {nickname: chance.name()}
         };
         next = () => {
             proxySend.calledOnce.should.be.true;
             proxySend.calledWith(200);
-            proxySend.args[0][1].login.should.equal(req.body.login);
+            proxySend.args[0][1].nickname.should.equal(req.body.nickname);
         };
         return users.coroutines.putResource.main(req, res, next, {resource: 'User'});
     });
