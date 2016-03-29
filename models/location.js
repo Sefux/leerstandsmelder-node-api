@@ -9,7 +9,7 @@ var mongoose = require('mongoose'),
         user_uuid: {type: String, index: true, required: true},
 
         title: {type: String, required: true, index: true},
-        description: {type: String, index: true},
+        description: String,
         degree: String,
         owner: {type: String, index: true},
         rumor: Boolean,
