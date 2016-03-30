@@ -3,6 +3,7 @@
 var mongoose = require('mongoose'),
     restify = require('restify'),
     Promise = require('bluebird'),
+    workers = require('../lib/workers'),
     rHandler = require('../lib/util/response-handlers'),
     acl = require('../lib/auth/acl-manager'),
     CommonController = require('./common');
@@ -60,7 +61,7 @@ class UsersController extends CommonController {
             );
             yield acl.setAclEntry('/users/' + user.uuid, ['user'], ['get']);
             yield acl.setAclEntry('/users/me', [user.uuid], ['get', 'put', 'delete']);
-            yield user.sendConfirmationMail();
+            yield workers.sendConfirmationMail(user);
 
             return rHandler.handleDataResponse(user, 201, res, next);
         });
@@ -85,8 +86,7 @@ class UsersController extends CommonController {
         this.coroutines.resetUserResource = {
             main: Promise.coroutine(function* (req, res, next, config) {
                 var user = yield mongoose.model('User').findOne({email: req.body.email}).exec();
-
-                yield user.requestPasswordReset();
+                yield workers.sendResetMail(user);
 
                 rHandler.handleDataResponse(user, 201, res, next);
             }),

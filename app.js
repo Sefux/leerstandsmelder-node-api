@@ -10,6 +10,7 @@ var restify = require('restify'),
     validateCaptcha = require('./lib/auth/validate-captcha'),
     userAliasParser = require('./lib/parsers/user-alias-parser'),
     acl = require('./lib/auth/acl-manager'),
+    workers = require('./lib/workers'),
     config = require('./lib/config'),
     fs = require('fs-extra'),
     Promise = require('bluebird');
