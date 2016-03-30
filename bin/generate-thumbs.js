@@ -27,10 +27,13 @@ Promise.coroutine(function* () {
     return Promise.resolve(mongoose.model('Photo').find({}))
         .map(function (photo) {
             return Promise.promisify(function (cb) {
-                    setTimeout(cb, 1000);
-                })()
-                .then(function () {
-                    return workers.createThumbnails(photo, 0);
-                });
+                    gm('../assets/photos/' + photo.uuid)
+                        .resize('200', '200', '^>')
+                        .gravity('Center')
+                        .crop('200', '200')
+                        .write('../assets/photos/' + photo.uuid + '-thumb', function (err) {
+                            cb(err);
+                        });
+                })();
         }, {concurrency: 1});
 })();
