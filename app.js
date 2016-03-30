@@ -24,6 +24,8 @@ Promise.coroutine(function* () {
 
     yield config.load();
 
+    workers.startFrontend();
+
     if (typeof config.get !== 'object') {
         throw new Error('Server has not been configured yet. Please run bin/setup.');
     }
