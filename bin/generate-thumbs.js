@@ -5,7 +5,8 @@
 var Promise = require('bluebird'),
     mongoose = require('mongoose'),
     config = require('../lib/config'),
-    workers = require('../lib/workers');
+    gm = require('gm'),
+    path = require('path');
 
 mongoose.Promise = Promise;
 
@@ -27,13 +28,16 @@ Promise.coroutine(function* () {
     return Promise.resolve(mongoose.model('Photo').find({}))
         .map(function (photo) {
             return Promise.promisify(function (cb) {
-                    gm('../assets/photos/' + photo.uuid)
+                    gm(path.resolve('../assets/photos/' + photo.uuid))
                         .resize('200', '200', '^>')
                         .gravity('Center')
                         .crop('200', '200')
-                        .write('../assets/photos/' + photo.uuid + '-thumb', function (err) {
+                        .write(path.resolve('../assets/photos/' + photo.uuid + '-thumb'), function (err) {
                             cb(err);
                         });
-                })();
+                })()
+                .catch(function (err) {
+                    console.log(err.message);
+                });
         }, {concurrency: 1});
 })();
