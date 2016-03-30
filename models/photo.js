@@ -34,7 +34,7 @@ Photo.virtual('original_url').get(function () {
 });
 
 Photo.virtual('thumb_url').get(function () {
-    return `${config.get.file_delivery.base_url}/photos/${this.uuid}.${this.extension}`;
+    return `${config.get.file_delivery.base_url}/photos/${this.uuid}.${this.extension}?thumb=1`;
 });
 
 module.exports.Photo = require('../lib/util/model-helper').setup(Photo);

@@ -15,7 +15,8 @@ module.exports.get = function (req, res, next) {
             } else {
                 var restify = require('restify');
                 if (photo) {
-                    var readStream = fs.createReadStream(path.join('assets/photos', photo.uuid));
+                    var readStream = fs.createReadStream(path.join('assets/photos', photo.uuid +
+                        (req.params.thumb ? '-thumb' : '')));
                     readStream.on('error', function (err) {
                         console.log(`Error reading image file: ${err.message}`);
                         res.send(new restify.NotFoundError());
