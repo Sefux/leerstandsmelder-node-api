@@ -22,7 +22,7 @@ class CommonController {
                     }
                     var query = require('../lib/util/query-mapping')({}, req, config);
 
-                    var paths = mongoose.model('User').schema.paths;
+                    var paths = mongoose.model(config.resource).schema.paths;
                     if (paths.hasOwnProperty('hide')) {
                         query.hide = false;
                     }
@@ -64,8 +64,12 @@ class CommonController {
             },
             getResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
-                    var q = mongoose.model(config.resource)
-                        .findOne({$or: [{uuid: req.params.uuid}, {slug: req.params.uuid}]});
+                    var query = {$or: [{uuid: req.params.uuid}, {slug: req.params.uuid}]},
+                        paths = mongoose.model(config.resource).schema.paths;
+                    if (paths.hasOwnProperty('hide')) {
+                        query.hide = false;
+                    }
+                    var q = mongoose.model(config.resource).findOne(query);
                     q = config.select ? q.select(config.select) : q;
                     var result = yield q.exec();
                     result = result.toObject();

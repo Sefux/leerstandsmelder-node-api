@@ -17,6 +17,7 @@ class LocationsController extends CommonController {
 
             if (req.query.longitude && req.query.latitude) {
                 geoquery = {
+                    hide: false,
                     lonlat: {
                         $near: [parseFloat(req.query.longitude || 10.0014), parseFloat(req.query.latitude || 53.5653)],
                         $maxDistance: maxdist
@@ -85,14 +86,19 @@ class LocationsController extends CommonController {
                         $and: parts.map(function (part) {
                             var reg = new RegExp(part, 'i');
                             return {
-                                $or: [
-                                    {title: {$regex: reg}},
-                                    {description: {$regex: reg}},
-                                    {owner: {$regex: reg}},
-                                    {street: {$regex: reg}},
-                                    {city: {$regex: reg}},
-                                    {postcode: {$regex: reg}},
-                                    {street: {$regex: reg}}
+                                $and: [
+                                    { hide: false },
+                                    {
+                                        $or: [
+                                            {title: {$regex: reg}},
+                                            {description: {$regex: reg}},
+                                            {owner: {$regex: reg}},
+                                            {street: {$regex: reg}},
+                                            {city: {$regex: reg}},
+                                            {postcode: {$regex: reg}},
+                                            {street: {$regex: reg}}
+                                        ]
+                                    }
                                 ]
                             };
                         })
