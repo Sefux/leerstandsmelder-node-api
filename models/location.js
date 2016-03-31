@@ -28,6 +28,7 @@ var mongoose = require('mongoose'),
         slug_aliases: [String],
         legacy_id: String,
         legacy_slug: String,
+        hidden: {type: Boolean, default: false},
 
         created: Date,
         updated: Date
