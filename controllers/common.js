@@ -20,8 +20,14 @@ class CommonController {
                     if (req.params.uuid === 'me' && req.user) {
                         req.params.uuid = req.user.uuid;
                     }
-                    var query = require('../lib/util/query-mapping')({}, req, config),
-                        q = mongoose.model(config.resource).find(query);
+                    var query = require('../lib/util/query-mapping')({}, req, config);
+
+                    var paths = mongoose.model('User').schema.paths;
+                    if (paths.hasOwnProperty('hide')) {
+                        query.hide = false;
+                    }
+
+                    var q = mongoose.model(config.resource).find(query);
                     q = config.select ? q.select(config.select) : q;
                     if (req.params.skip) {
                         q = q.skip(parseInt(req.params.skip));
@@ -40,9 +46,11 @@ class CommonController {
                                     .findOne({uuid: result.user_uuid})
                                     .select('uuid nickname').exec()
                                     .then(function (user) {
-                                        result = result.toObject();
-                                        result.user = user;
-                                        output.push(result);
+                                        if (result) {
+                                            result = result.toObject();
+                                            result.user = user;
+                                            output.push(result);
+                                        }
                                     });
                             })
                             .then(function () {

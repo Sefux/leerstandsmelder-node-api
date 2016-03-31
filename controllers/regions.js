@@ -25,7 +25,9 @@ class RegionsController extends CommonController {
                     .then(function () {
                         return mongoose.model('Location').mapReduce({
                             map: function () {
-                                emit(this.region_uuid, 1);
+                                if (!this.hide) {
+                                    emit(this.region_uuid, 1);
+                                }
                             },
                             reduce: function (k, v) {
                                 return Array.sum(v);
@@ -35,11 +37,13 @@ class RegionsController extends CommonController {
                     .then(function (results) {
                         var output = [];
                         return Promise.map(results, function (item) {
-                                return mongoose.model('Region').findOne({uuid: item._id})
+                                return mongoose.model('Region').findOne({uuid: item._id, hide:false})
                                     .then(function (region) {
-                                        var out = region.toObject();
-                                        out.locations = item.value;
-                                        output.push(out);
+                                        if (region) {
+                                            var out = region.toObject();
+                                            out.locations = item.value;
+                                            output.push(out);
+                                        }
                                     });
                             }, {concurrency: 1})
                             .then(function () {
