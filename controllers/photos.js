@@ -4,6 +4,7 @@ var Promise = require('bluebird'),
     mongoose = require('mongoose'),
     path = require('path'),
     fs = require('fs-extra'),
+    workers = require('../lib/workers'),
     aclManager = require('../lib/auth/acl-manager'),
     responseHandlers = require('../lib/util/response-handlers');
 
@@ -80,9 +81,7 @@ module.exports.post = function (req, res, next) {
             });
         })
         .then((photo) => {
-            // TODO: we need a correct content type here, do not return the original multipart one
-            // for now we do not return the created photo object, this is hacky
-            // res.header('Content-Type', 'application/json');
+            workers.createThumbnails(photo);
             res.setHeader('Content-Type', 'application/json');
             res.send(200, photo);
             next();

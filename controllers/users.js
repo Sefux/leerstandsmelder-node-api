@@ -61,7 +61,7 @@ class UsersController extends CommonController {
             );
             yield acl.setAclEntry('/users/' + user.uuid, ['user'], ['get']);
             yield acl.setAclEntry('/users/me', [user.uuid], ['get', 'put', 'delete']);
-            yield workers.sendConfirmationMail(user);
+            yield workers.sendConfirmationMail(user.uuid);
 
             return rHandler.handleDataResponse(user, 201, res, next);
         });
@@ -86,7 +86,7 @@ class UsersController extends CommonController {
         this.coroutines.resetUserResource = {
             main: Promise.coroutine(function* (req, res, next, config) {
                 var user = yield mongoose.model('User').findOne({email: req.body.email}).exec();
-                yield workers.sendResetMail(user);
+                yield workers.sendResetMail(user.uuid);
 
                 rHandler.handleDataResponse(user, 201, res, next);
             }),
