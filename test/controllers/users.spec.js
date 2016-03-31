@@ -27,6 +27,7 @@ describe('UsersController', () => {
                 return util.mongoose.model('User').create(userTemplate)
                     .then((userObj) => {
                         currentUser = userObj;
+                        return currentUser.confirmUser();
                     });
             });
     });

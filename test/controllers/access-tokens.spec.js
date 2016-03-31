@@ -32,7 +32,7 @@ describe('AccessTokensController', () => {
                 return util.mongoose.model('User').create(userTemplateConfirmed);
             })
             .then((userObj) => {
-                userObj.confirmed = true;
+                userObj.confirmUser();
                 currentUserConfirmed = userObj;
                 return util.mongoose.model('ApiKey').create({user_uuid: currentUser.uuid});
             })

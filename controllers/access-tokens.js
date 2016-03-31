@@ -21,9 +21,11 @@ module.exports.post = function (req, res, next) {
         // Email & password
 
         if (req.body.email) {
-            let user = yield mongoose.model('User').findOne({email: req.body.email, confirmed: true, blocked: false}),
-                valid = yield user.isValidPassword(req.body.password);
-            cred.user = valid ? user : null;
+            let user = yield mongoose.model('User').findOne({email: req.body.email});
+            if (user) {
+                let valid = yield user.isValidPassword(req.body.password);
+                cred.user = valid ? user : null;
+            }
         }
 
         // Single access token
