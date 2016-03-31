@@ -1,6 +1,6 @@
 # Leerstandsmelder API
 
-[![Build Status](https://travis-ci.org/Leerstandsmelder/leerstandsmelder-node-api.svg?branch=master)](https://travis-ci.org/Leerstandsmelder/leerstandsmelder-node-api) [![dependency Status](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api.svg)](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api) [![devDependency Status](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api/dev-status.svg)](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api#info=devDependencies)
+[![Build Status](https://travis-ci.org/Leerstandsmelder/leerstandsmelder-node-api.svg?branch=master)](https://travis-ci.org/Leerstandsmelder/leerstandsmelder-node-api) [![dependency Status](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api.svg)](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api) [![devDependency Status](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api/dev-status.svg)](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api#info=devDependencies) [![bitHound Code](https://www.bithound.io/github/Leerstandsmelder/leerstandsmelder-node-api/badges/code.svg)](https://www.bithound.io/github/Leerstandsmelder/leerstandsmelder-node-api)
 
 API server for [Leerstandsmelder.de](http://www.leerstandsmelder.de) based on [restify](http://restify.com) and written in ES6 JavaScript for [Node.js](https://nodejs.org).
 
