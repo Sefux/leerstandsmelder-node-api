@@ -45,7 +45,7 @@ class UsersController extends CommonController {
             }
 
             var q = mongoose.model(config.resource)
-                .findOne({uuid: req.params.uuid})
+                .findOne({uuid: req.params.uuid, confirmed: true, blocked: false})
                 .select(selectAttributes);
             rHandler.handleDataResponse(yield q.exec(), 200, res, next);
         });
@@ -68,7 +68,7 @@ class UsersController extends CommonController {
 
         this.coroutines.putResource.pre = preHandler;
         this.coroutines.putResource.main = Promise.coroutine(function* (req, res, next, config) {
-            var q, user = yield mongoose.model('User').findOne({uuid: req.params.uuid});
+            var q, user = yield mongoose.model('User').findOne({uuid: req.params.uuid, confirmed: true, blocked: false});
             deleteProtected(req);
             if (req.user.scopes.indexOf('admin') === -1) {
                 delete req.body.confirmed;
@@ -79,13 +79,13 @@ class UsersController extends CommonController {
                 yield user.save();
                 delete req.body.password;
             }
-            q = mongoose.model('User').findOneAndUpdate({uuid: req.params.uuid}, req.body, {new: true});
+            q = mongoose.model('User').findOneAndUpdate({uuid: req.params.uuid, confirmed: true, blocked: false}, req.body, {new: true});
             rHandler.handleDataResponse(yield q.exec(), 200, res, next);
         });
 
         this.coroutines.resetUserResource = {
             main: Promise.coroutine(function* (req, res, next, config) {
-                var user = yield mongoose.model('User').findOne({email: req.body.email}).exec();
+                var user = yield mongoose.model('User').findOne({email: req.body.email, confirmed: true, blocked: false}).exec();
                 yield workers.sendResetMail(user.uuid);
 
                 rHandler.handleDataResponse(user, 201, res, next);

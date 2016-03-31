@@ -21,7 +21,7 @@ module.exports.post = function (req, res, next) {
         // Email & password
 
         if (req.body.email) {
-            let user = yield mongoose.model('User').findOne({email: req.body.email}),
+            let user = yield mongoose.model('User').findOne({email: req.body.email, confirmed: true, blocked: false}),
                 valid = yield user.isValidPassword(req.body.password);
             cred.user = valid ? user : null;
         }
@@ -30,7 +30,8 @@ module.exports.post = function (req, res, next) {
 
         if (req.body.single_access_token) {
             cred.user = yield mongoose.model('User').findOne({
-                single_access_token: req.body.single_access_token
+                single_access_token: req.body.single_access_token,
+                blocked: false
             });
             if (cred.user && !cred.user.confirmed) {
                 yield cred.user.confirmUser();
