@@ -13,6 +13,7 @@ var mongoose = require('mongoose'),
             index: '2dsphere'
         },
         zoom: {type:Number, default: 14},
+        moderate: {type:Boolean, default: false},
         hide: {type:Boolean, default: false},
         hide_message: String,
         slug: {type: String, index: true},
@@ -47,11 +48,7 @@ module.exports.Region = require('../lib/util/model-helper').setup(
         if (!this.uuid) {
             this.generateUUID();
         }
-        if (this.modifiedPaths().indexOf('title') > -1) {
-            this.updateSlug();
-            next();
-        } else {
-            next();
-        }
+        this.updateSlug();
+        next();
     }
 );

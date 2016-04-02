@@ -79,8 +79,13 @@ class UsersController extends CommonController {
                 yield user.save();
                 delete req.body.password;
             }
-            q = mongoose.model('User').findOneAndUpdate({uuid: req.params.uuid, confirmed: true, blocked: false}, req.body, {new: true});
-            rHandler.handleDataResponse(yield q.exec(), 200, res, next);
+            for (var key in req.body) {
+                if (user[key]) {
+                    user[key] = req.body[key];
+                }
+            }
+            yield user.save();
+            rHandler.handleDataResponse(user, 200, res, next);
         });
 
         this.coroutines.resetUserResource = {

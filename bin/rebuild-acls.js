@@ -12,10 +12,12 @@ mongoose.Promise = Promise;
 Promise.coroutine(function* () {
     yield config.load();
     var resources = [
-            { res: 'Comment', path: '/comments', model: require('../models/comment').Comment },
-            { res: 'Location', path: '/locations', model: require('../models/location').Location },
-            { res: 'Photo', path: '/photos', model: require('../models/photo').Photo },
-            { res: 'Post', path: '/posts', model: require('../models/post').Post }
+            {res: 'Comment', path: '/comments', model: require('../models/comment').Comment},
+            {res: 'Location', path: '/locations', model: require('../models/location').Location},
+            {res: 'Region', path: '/regions', model: require('../models/region').Region},
+            {res: 'Photo', path: '/photos', model: require('../models/photo').Photo},
+            {res: 'Post', path: '/posts', model: require('../models/post').Post},
+            {res: 'User', path: '/users', model: require('../models/user').User}
         ],
         dburl = 'mongodb://' +
         config.get.mongodb.host + ':' +
@@ -49,7 +51,11 @@ Promise.coroutine(function* () {
                         if (resource.res === 'Post') {
                             acls.push('editor');
                         }
-                        return acl.setAclEntry(resource.path + '/' + item.uuid, acls, ['get', 'put', 'delete']);
+                        if (resource.res === 'User') {
+                            return acl.setAclEntry('/users/me', acls, ['get', 'put', 'delete']);
+                        } else {
+                            return acl.setAclEntry(resource.path + '/' + item.uuid, acls, ['get', 'put', 'delete']);
+                        }
                     }, {concurrency: 1});
             }, {concurrency: 1});
         })

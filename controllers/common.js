@@ -20,14 +20,14 @@ class CommonController {
                     if (req.params.uuid === 'me' && req.user) {
                         req.params.uuid = req.user.uuid;
                     }
-                    var query = require('../lib/util/query-mapping')({}, req, config);
+                    let query = require('../lib/util/query-mapping')({}, req, config);
 
-                    var paths = mongoose.model(config.resource).schema.paths;
+                    let paths = mongoose.model(config.resource).schema.paths;
                     if (paths.hasOwnProperty('hide')) {
                         query.hide = false;
                     }
 
-                    var q = mongoose.model(config.resource).find(query);
+                    let q = mongoose.model(config.resource).find(query);
                     q = config.select ? q.select(config.select) : q;
                     if (req.params.skip) {
                         q = q.skip(parseInt(req.params.skip));
@@ -38,9 +38,9 @@ class CommonController {
                     if (req.params.sort) {
                         q = q.sort(req.params.sort);
                     }
-                    var results = yield q.exec();
+                    let results = yield q.exec();
                     if (results.length > 0 && results[0].user_uuid) {
-                        var output = [];
+                        let output = [];
                         return Promise.map(results, function (result) {
                                 return mongoose.model('User')
                                     .findOne({uuid: result.user_uuid})
@@ -64,14 +64,14 @@ class CommonController {
             },
             getResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
-                    var query = {$or: [{uuid: req.params.uuid}, {slug: req.params.uuid}]},
+                    let query = {$or: [{uuid: req.params.uuid}, {slug: req.params.uuid}]},
                         paths = mongoose.model(config.resource).schema.paths;
                     if (paths.hasOwnProperty('hide')) {
                         query.hide = false;
                     }
-                    var q = mongoose.model(config.resource).findOne(query);
+                    let q = mongoose.model(config.resource).findOne(query);
                     q = config.select ? q.select(config.select) : q;
-                    var result = yield q.exec();
+                    let result = yield q.exec();
                     result = result.toObject();
                     if (result.user_uuid) {
                         result.user = yield mongoose.model('User')
@@ -90,7 +90,7 @@ class CommonController {
                             req.body.hidden = true;
                         }
                     }
-                    var result = yield mongoose.model(config.resource).create(req.body);
+                    let result = yield mongoose.model(config.resource).create(req.body);
                     yield aclManager.setAclEntry(
                         req.url + '/' + result.uuid,
                         [req.user.uuid, 'admin'],
@@ -103,15 +103,24 @@ class CommonController {
             },
             putResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
-                    var q = mongoose.model(config.resource)
-                        .findOneAndUpdate({uuid: req.params.uuid}, req.body, {new: true});
-                    rHandler.handleDataResponse(yield q.exec(), 200, res, next);
+                    let data = yield mongoose.model(config.resource).findOne({uuid: req.params.uuid}).exec();
+                    if (data) {
+                        for (var key in req.body) {
+                            if (data[key]) {
+                                data[key] = req.body[key];
+                            }
+                        }
+                        yield data.save();
+                        rHandler.handleDataResponse(data, 200, res, next);
+                    } else {
+                        rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                    }
                 }),
                 pre: Promise.resolve
             },
             delResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
-                    var result = yield mongoose.model(config.resource).findOneAndRemove({uuid: req.params.uuid});
+                    let result = yield mongoose.model(config.resource).findOneAndRemove({uuid: req.params.uuid});
                     yield aclManager.removeAclEntry(req.url, req.user.uuid, '*');
                     yield aclManager.removeAclEntry(req.url, 'admin', '*');
                     yield aclManager.removeAclEntry(req.url, 'user', '*');
@@ -123,7 +132,7 @@ class CommonController {
     }
 
     map(verb, config) {
-        var instance = this;
+        let instance = this;
         return function executeRequest(req, res, next) {
             return Promise.resolve()
                 .then(() => {
