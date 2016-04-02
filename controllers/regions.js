@@ -16,7 +16,16 @@ class RegionsController extends CommonController {
                 q.near({
                     center: {coordinates: [parseFloat(req.params.lon), parseFloat(req.params.lat)], type: 'Point'}
                 });
-                q.limit(parseInt(limit));
+                q = config.select ? q.select(config.select) : q;
+                if (req.params.skip) {
+                    q = q.skip(parseInt(req.params.skip));
+                }
+                if (req.params.limit) {
+                    q = q.limit(parseInt(req.params.limit));
+                }
+                if (req.params.sort) {
+                    q = q.sort(req.params.sort);
+                }
                 q.exec().then(function (results) {
                     rHandler.handleDataResponse(results, 200, res, next);
                 });
@@ -36,6 +45,19 @@ class RegionsController extends CommonController {
                     })
                     .then(function (results) {
                         var output = [];
+
+                        function sortOn(property) {
+                            var sortOrder = 1;
+                            if (property[0] === "-") {
+                                sortOrder = -1;
+                                property = property.substr(1);
+                            }
+                            return function (a, b) {
+                                var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+                                return result * sortOrder;
+                            }
+                        }
+
                         return Promise.map(results, function (item) {
                                 return mongoose.model('Region').findOne({uuid: item._id, hide:false})
                                     .then(function (region) {
@@ -47,6 +69,9 @@ class RegionsController extends CommonController {
                                     });
                             }, {concurrency: 1})
                             .then(function () {
+                                if (req.params.sort) {
+                                    output.sort(sortOn(req.params.sort));
+                                }
                                 return output;
                             });
                     })
