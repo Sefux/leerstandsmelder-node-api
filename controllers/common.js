@@ -64,7 +64,7 @@ class CommonController {
             },
             getResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
-                    let query = {$or: [{uuid: req.params.uuid}, {slug: req.params.uuid}]},
+                    let query = {$or: [{uuid: req.params.uuid}, {slug: req.params.uuid.toLowerCase()}]},
                         paths = mongoose.model(config.resource).schema.paths;
                     if (paths.hasOwnProperty('hide')) {
                         query.hide = false;
