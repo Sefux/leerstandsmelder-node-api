@@ -24,7 +24,9 @@ class LocationsController extends CommonController {
                     }
                 }
             } else {
-                geoquery = {};
+                geoquery = {
+                    hidden: false
+                };
             }
 
             query = require('../lib/util/query-mapping')(geoquery, req, config);

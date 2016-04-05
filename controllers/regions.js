@@ -46,6 +46,7 @@ class RegionsController extends CommonController {
                     .then(function (results) {
                         var output = [];
 
+                        // function lifted from http://stackoverflow.com/a/4760279/578963
                         function sortOn(property) {
                             var sortOrder = 1;
                             if (property[0] === "-") {
