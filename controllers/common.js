@@ -1,6 +1,7 @@
 'use strict';
 
 var mongoose = require('mongoose'),
+    restify = require('restify'),
     Promise = require('bluebird'),
     aclManager = require('../lib/auth/acl-manager'),
     rHandler = require('../lib/util/response-handlers');
@@ -23,8 +24,8 @@ class CommonController {
                     let query = require('../lib/util/query-mapping')({}, req, config);
 
                     let paths = mongoose.model(config.resource).schema.paths;
-                    if (paths.hasOwnProperty('hide')) {
-                        query.hide = false;
+                    if (paths.hasOwnProperty('hidden')) {
+                        query.hidden = false;
                     }
 
                     let q = mongoose.model(config.resource).find(query);
@@ -65,14 +66,24 @@ class CommonController {
             getResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
                     let query = {$or: [{uuid: req.params.uuid}, {slug: req.params.uuid.toLowerCase()}]},
-                        paths = mongoose.model(config.resource).schema.paths;
-                    if (paths.hasOwnProperty('hide')) {
-                        query.hide = false;
-                    }
-                    let q = mongoose.model(config.resource).findOne(query);
+                        paths = mongoose.model(config.resource).schema.paths,
+                        q = mongoose.model(config.resource).findOne(query);
                     q = config.select ? q.select(config.select) : q;
                     let result = yield q.exec();
                     result = result.toObject();
+                    if (paths.hasOwnProperty('hidden') && result.hidden) {
+                        let region = yield mongoose.model('Region').findOne({uuid:result.region_uuid});
+                        if (!region) {
+                            return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                        }
+                        let isAdmin = req.api_key && (
+                                req.api_key.scopes.indexOf('admin') ||
+                                req.api_key.scopes.indexOf('region|' + region.uuid)
+                            );
+                        if (!isAdmin) {
+                            return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                        }
+                    }
                     if (result.user_uuid) {
                         result.user = yield mongoose.model('User')
                             .findOne({uuid:result.user_uuid})
@@ -85,6 +96,7 @@ class CommonController {
             postResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
                     if (req.user && req.user.uuid) req.body.user_uuid = req.user.uuid;
+                    // TODO: couple this with the moderation setting in regions
                     if (req.body.hasOwnProperty('region_uuid')) {
                         if (req.body.region_uuid === '685a415a-b1b9-4d1a-9c18-85a0fb30b7e8') {
                             req.body.hidden = true;

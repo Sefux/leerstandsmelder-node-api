@@ -1,7 +1,9 @@
 'use strict';
 
-var LocationsController = require('../controllers/locations'),
-    res = new LocationsController();
+var CommonController = require('../controllers/common'),
+    LocationsController = require('../controllers/locations'),
+    res = new LocationsController(),
+    common = new CommonController();
 
 module.exports = {
     '/locations': {
@@ -31,13 +33,13 @@ module.exports = {
     },
     '/locations/:uuid/photos': {
         'get': {
-            controller: res.map('find', {resource: 'Photo', query: {id_mapping: 'location_uuid'}}),
+            controller: common.map('find', {resource: 'Photo', query: {id_mapping: 'location_uuid'}}),
             scope: 'public'
         }
     },
     '/locations/:uuid/comments': {
         'get': {
-            controller: res.map('find', {resource: 'Comment', query: {id_mapping: 'subject_uuid'}}),
+            controller: common.map('find', {resource: 'Comment', query: {id_mapping: 'subject_uuid'}}),
             scope: 'public'
         }
     },

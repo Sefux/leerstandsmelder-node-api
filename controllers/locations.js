@@ -1,6 +1,7 @@
 'use strict';
 
 var mongoose = require('mongoose'),
+    restify = require('restify'),
     Promise = require('bluebird'),
     rHandler = require('../lib/util/response-handlers'),
     CommonController = require('./common');
@@ -15,18 +16,31 @@ class LocationsController extends CommonController {
                 pagesize = parseInt(req.query.pagesize || 1000),
                 geoquery, query, q;
 
+            let uuid = req.params.region_uuid || req.params.uuid,
+                region = yield mongoose.model('Region').findOne({$or: [{uuid: uuid}, {slug: uuid}]});
+
+            if (!region) {
+                return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+            }
+
+            var isAdmin = req.api_key && (
+                    req.api_key.scopes.indexOf('admin') ||
+                    req.api_key.scopes.indexOf('region|' + region.uuid)
+                );
+
             if (req.query.longitude && req.query.latitude) {
                 geoquery = {
-                    hidden: false,
                     lonlat: {
                         $near: [parseFloat(req.query.longitude || 10.0014), parseFloat(req.query.latitude || 53.5653)],
                         $maxDistance: maxdist
                     }
                 }
             } else {
-                geoquery = {
-                    hidden: false
-                };
+                geoquery = {};
+            }
+
+            if (!isAdmin) {
+                geoquery.hidden = false;
             }
 
             query = require('../lib/util/query-mapping')(geoquery, req, config);
