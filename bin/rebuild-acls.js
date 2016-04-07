@@ -54,7 +54,7 @@ Promise.coroutine(function* () {
                         if (resource.res === 'User') {
                             return acl.setAclEntry('/users/me', acls, ['get', 'put', 'delete'])
                                 .then(function () {
-                                    return acl.setAclEntry('/users/' + user.uuid, ['user'], ['get']);
+                                    return acl.setAclEntry('/users/' + item.uuid, ['user'], ['get']);
                                 });
                         } else {
                             return acl.setAclEntry(resource.path + '/' + item.uuid, acls, ['get', 'put', 'delete']);
