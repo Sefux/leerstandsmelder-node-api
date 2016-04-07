@@ -51,6 +51,9 @@ Promise.coroutine(function* () {
                         if (resource.res === 'Post') {
                             acls.push('editor');
                         }
+                        if (resource.res === 'Location') {
+                            acls.push('region-' + item.region_uuid);
+                        }
                         if (resource.res === 'User') {
                             acls.push(item.uuid);
                             return acl.setAclEntry('/users/me', acls, ['get', 'put', 'delete'])
