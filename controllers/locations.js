@@ -23,9 +23,10 @@ class LocationsController extends CommonController {
                 return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
             }
 
+            // TODO: put this in lib
             var isAdmin = req.api_key && (
                     req.api_key.scopes.indexOf('admin') ||
-                    req.api_key.scopes.indexOf('region|' + region.uuid)
+                    req.api_key.scopes.indexOf('region-' + region.uuid)
                 );
 
             if (req.query.longitude && req.query.latitude) {
