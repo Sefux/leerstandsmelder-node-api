@@ -25,7 +25,7 @@ var mongoose = require('mongoose'),
     });
 
 Post.virtual('abstract').get(function () {
-    return striptags(this.body).substring(0, 400);
+    return striptags(this.body).replace(/\[|\]\(.*\)/g, '').substring(0, 400);
 });
 
 Post.methods.updateSlug = function () {
