@@ -52,6 +52,7 @@ Promise.coroutine(function* () {
                             acls.push('editor');
                         }
                         if (resource.res === 'User') {
+                            acls.push(item.uuid);
                             return acl.setAclEntry('/users/me', acls, ['get', 'put', 'delete'])
                                 .then(function () {
                                     return acl.setAclEntry('/users/' + item.uuid, ['user'], ['get']);
