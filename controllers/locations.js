@@ -29,15 +29,15 @@ class LocationsController extends CommonController {
                     req.api_key.scopes.indexOf('region-' + region.uuid)
                 );
 
+            geoquery = {
+                region_uuid: region.uuid
+            };
+
             if (req.query.longitude && req.query.latitude) {
-                geoquery = {
-                    lonlat: {
-                        $near: [parseFloat(req.query.longitude || 10.0014), parseFloat(req.query.latitude || 53.5653)],
-                        $maxDistance: maxdist
-                    }
-                }
-            } else {
-                geoquery = {};
+                geoquery.lonlat = {
+                    $near: [parseFloat(req.query.longitude || 10.0014), parseFloat(req.query.latitude || 53.5653)],
+                    $maxDistance: maxdist
+                };
             }
 
             if (!isAdmin) {
@@ -51,6 +51,8 @@ class LocationsController extends CommonController {
             }
 
             q = config.select ? q.select(config.select) : q;
+            if (page < 0) page = 0;
+            if (pagesize < 0) pagesize = 25;
             q = q.skip(page * pagesize).limit(pagesize);
 
             var data = yield q.exec(),

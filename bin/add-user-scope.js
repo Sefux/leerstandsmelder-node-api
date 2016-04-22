@@ -28,6 +28,10 @@ Promise.coroutine(function* () {
 
     let user = yield mongoose.model('User').findOne({ email: argv.email });
     if (user) {
+        if (user.scopes.indexOf(argv.scope) === -1) {
+            user.scopes.push(argv.scope);
+        }
+        yield user.save();
         let api_key = yield mongoose.model('ApiKey')
             .findOne({user_uuid: user.uuid, active: true})
             .sort('-created').exec();
@@ -38,7 +42,7 @@ Promise.coroutine(function* () {
                 console.log('Scope ' + argv.scope + ' added to user.');
                 process.exit(0);
             } else {
-                console.log('No update necessary, user has scope' + argv.scope);
+                console.log('No update necessary, user has scope ' + argv.scope);
                 process.exit(0);
             }
             process.exit(0);

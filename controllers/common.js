@@ -70,7 +70,9 @@ class CommonController {
                         q = mongoose.model(config.resource).findOne(query);
                     q = config.select ? q.select(config.select) : q;
                     let result = yield q.exec();
-                    result = result.toObject();
+                    if (result) {
+                        result = result.toObject();
+                    }
                     if (paths.hasOwnProperty('hidden') && result.hidden) {
                         let region = yield mongoose.model('Region').findOne({uuid:result.region_uuid});
                         if (!region) {
@@ -85,7 +87,7 @@ class CommonController {
                             return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
                         }
                     }
-                    if (result.user_uuid) {
+                    if (result && result.user_uuid) {
                         result.user = yield mongoose.model('User')
                             .findOne({uuid:result.user_uuid})
                             .select('uuid nickname').exec();
@@ -96,7 +98,7 @@ class CommonController {
             },
             postResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
-                    if (req.user && req.user.uuid) req.body.user_uuid = req.user.uuid;
+                    if (req.user && req.user.uuid && !req.body.user_uuid) req.body.user_uuid = req.user.uuid;
                     // TODO: couple this with the moderation setting in regions
                     if (req.body.hasOwnProperty('region_uuid')) {
                         if (req.body.region_uuid === '685a415a-b1b9-4d1a-9c18-85a0fb30b7e8') {
@@ -119,9 +121,7 @@ class CommonController {
                     let data = yield mongoose.model(config.resource).findOne({uuid: req.params.uuid}).exec();
                     if (data) {
                         for (var key in req.body) {
-                            if (data[key]) {
-                                data[key] = req.body[key];
-                            }
+                            data[key] = req.body[key];
                         }
                         yield data.save();
                         rHandler.handleDataResponse(data, 200, res, next);
