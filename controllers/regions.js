@@ -30,6 +30,7 @@ class RegionsController extends CommonController {
                     rHandler.handleDataResponse(results, 200, res, next);
                 });
             } else {
+                throw new Error('error test');
                 return Promise.resolve()
                     .then(function () {
                         return mongoose.model('Location').mapReduce({

@@ -13,7 +13,8 @@ var restify = require('restify'),
     workers = require('./lib/workers'),
     config = require('./lib/config'),
     fs = require('fs-extra'),
-    Promise = require('bluebird');
+    Promise = require('bluebird'),
+    errorReporter = require('./lib/util/error-reporter');
 
 mongoose.Promise = Promise;
 Promise.promisifyAll(fs);
@@ -24,11 +25,15 @@ Promise.coroutine(function* () {
 
     yield config.load();
 
-    workers.startFrontend();
-
     if (typeof config.get !== 'object') {
         throw new Error('Server has not been configured yet. Please run bin/setup.');
     }
+
+    if (config.get.airbrake) {
+        errorReporter.init(config.get.airbrake);
+    }
+
+    workers.startFrontend();
 
     yield fs.mkdirpAsync(path.resolve('./assets/photos'));
     yield fs.mkdirpAsync(path.resolve('tmp'));
