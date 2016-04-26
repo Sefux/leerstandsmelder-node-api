@@ -19,19 +19,20 @@ class LocationsController extends CommonController {
             let uuid = req.params.region_uuid || req.params.uuid,
                 region = yield mongoose.model('Region').findOne({$or: [{uuid: uuid}, {slug: uuid}]});
 
-            if (!region) {
+            if (!region && !config.query.user_mapping) {
                 return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
             }
 
-            // TODO: put this in lib
-            var isAdmin = req.api_key && (
-                    req.api_key.scopes.indexOf('admin') ||
-                    req.api_key.scopes.indexOf('region-' + region.uuid)
-                );
+            geoquery = {};
 
-            geoquery = {
-                region_uuid: region.uuid
-            };
+            if (region) {
+                // TODO: put this in lib
+                var isAdmin = req.api_key && (
+                        req.api_key.scopes.indexOf('admin') ||
+                        req.api_key.scopes.indexOf('region-' + region.uuid)
+                    );
+                geoquery.region_uuid = region.uuid;
+            }
 
             if (req.query.longitude && req.query.latitude) {
                 geoquery.lonlat = {
