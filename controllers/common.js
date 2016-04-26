@@ -72,6 +72,8 @@ class CommonController {
                     let result = yield q.exec();
                     if (result) {
                         result = result.toObject();
+                    } else {
+                        return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
                     }
                     if (paths.hasOwnProperty('hidden') && result.hidden) {
                         let region = yield mongoose.model('Region').findOne({uuid:result.region_uuid});
@@ -134,10 +136,14 @@ class CommonController {
             delResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
                     let result = yield mongoose.model(config.resource).findOneAndRemove({uuid: req.params.uuid});
-                    yield aclManager.removeAclEntry(req.url, req.user.uuid, '*');
-                    yield aclManager.removeAclEntry(req.url, 'admin', '*');
-                    yield aclManager.removeAclEntry(req.url, 'user', '*');
-                    rHandler.handleDataResponse(result, 200, res, next);
+                    if (result) {
+                        yield aclManager.removeAclEntry(req.url, req.user.uuid, '*');
+                        yield aclManager.removeAclEntry(req.url, 'admin', '*');
+                        yield aclManager.removeAclEntry(req.url, 'user', '*');
+                        rHandler.handleDataResponse(result, 200, res, next);
+                    } else {
+                        rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                    }
                 }),
                 pre: Promise.resolve
             }

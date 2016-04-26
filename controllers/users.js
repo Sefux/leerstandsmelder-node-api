@@ -47,7 +47,12 @@ class UsersController extends CommonController {
             var q = mongoose.model(config.resource)
                 .findOne({uuid: req.params.uuid, confirmed: true, blocked: false})
                 .select(selectAttributes);
-            rHandler.handleDataResponse(yield q.exec(), 200, res, next);
+            let result = yield q.exec();
+            if (result) {
+                rHandler.handleDataResponse(result, 200, res, next);
+            } else {
+                rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+            }
         });
 
         this.coroutines.postResource.main = Promise.coroutine(function* (req, res, next, config) {
