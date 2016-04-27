@@ -20,7 +20,7 @@
     "bluebird": "^3.0.5",
     "captchapng": "0.0.1",
     "checksum": "^0.1.1",
-    "fs-extra": "^0.26.2",
+    "fs-extra": "^0.29.0",
     "gm": "^1.21.1",
     "kue": "^0.10.5",
     "mongoose": "^4.4.7",

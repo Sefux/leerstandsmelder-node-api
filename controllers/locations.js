@@ -14,7 +14,7 @@ class LocationsController extends CommonController {
             var maxdist = parseFloat(req.query.radius || 2000) / 6371,
                 page = parseInt(req.query.page || 0),
                 pagesize = parseInt(req.query.pagesize || 1000),
-                geoquery, query, q;
+                geoquery, query, q, isAdmin = false;
 
             let uuid = req.params.region_uuid || req.params.uuid,
                 region = yield mongoose.model('Region').findOne({$or: [{uuid: uuid}, {slug: uuid}]});
@@ -27,10 +27,10 @@ class LocationsController extends CommonController {
 
             if (region) {
                 // TODO: put this in lib
-                var isAdmin = req.api_key && (
-                        req.api_key.scopes.indexOf('admin') ||
-                        req.api_key.scopes.indexOf('region-' + region.uuid)
-                    );
+                isAdmin = req.api_key && (
+                    req.api_key.scopes.indexOf('admin') ||
+                    req.api_key.scopes.indexOf('region-' + region.uuid)
+                );
                 geoquery.region_uuid = region.uuid;
             }
 
