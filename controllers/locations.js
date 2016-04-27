@@ -128,7 +128,22 @@ class LocationsController extends CommonController {
                 }
                 var q = mongoose.model('Location').find(query);
                 q = config.select ? q.select(config.select) : q;
-                rHandler.handleDataResponse(yield q.exec(), 200, res, next);
+                let result = yield q.exec(),
+                    regions = {};
+                if (Array.isArray(result)) {
+                    for (let i = 0; i < result.length; i+=1) {
+                        let item = result[i].toObject();
+                        if (!regions.hasOwnProperty(item.region_uuid)) {
+                            let region = yield mongoose.model('Region').findOne({uuid: item.region_uuid});
+                            if (region) {
+                                regions[item.region_uuid] = region.slug;
+                            }
+                        }
+                        item.region_slug = regions[item.region_uuid];
+                        result[i] = item;
+                    }
+                }
+                rHandler.handleDataResponse(result, 200, res, next);
             })
         };
     }
