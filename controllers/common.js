@@ -103,7 +103,9 @@ class CommonController {
                     if (req.user && req.user.uuid && !req.body.user_uuid) req.body.user_uuid = req.user.uuid;
                     if (req.body.hasOwnProperty('region_uuid')) {
                         let region = yield mongoose.model('Region').findOne({uuid: req.body.region_uuid});
-                        req.body.hidden = region.moderate || false;
+                        if (region) {
+                            req.body.hidden = region.moderate || false;
+                        }
                     }
                     let result = yield mongoose.model(config.resource).create(req.body);
                     yield aclManager.setAclEntry(
