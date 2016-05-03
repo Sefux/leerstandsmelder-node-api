@@ -101,11 +101,9 @@ class CommonController {
             postResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
                     if (req.user && req.user.uuid && !req.body.user_uuid) req.body.user_uuid = req.user.uuid;
-                    // TODO: couple this with the moderation setting in regions
                     if (req.body.hasOwnProperty('region_uuid')) {
-                        if (req.body.region_uuid === '685a415a-b1b9-4d1a-9c18-85a0fb30b7e8') {
-                            req.body.hidden = true;
-                        }
+                        let region = yield mongoose.model(config.resource).findOne({uuid: req.body.region_uuid});
+                        req.body.hidden = region.moderate || false;
                     }
                     let result = yield mongoose.model(config.resource).create(req.body);
                     yield aclManager.setAclEntry(
