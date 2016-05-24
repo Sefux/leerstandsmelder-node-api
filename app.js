@@ -51,6 +51,7 @@ Promise.coroutine(function* () {
     mongoose.model('Captcha', require('./models/captcha').Captcha);
     mongoose.model('Comment', require('./models/comment').Comment);
     mongoose.model('Location', require('./models/location').Location);
+    mongoose.model('Message', require('./models/message').Message);
     mongoose.model('Region', require('./models/region').Region);
     mongoose.model('Photo', require('./models/photo').Photo);
     mongoose.model('Post', require('./models/post').Post);
@@ -86,6 +87,7 @@ Promise.coroutine(function* () {
         require('./routes/captchas'),
         require('./routes/comments'),
         require('./routes/locations'),
+        require('./routes/messages'),
         require('./routes/regions'),
         require('./routes/photos'),
         require('./routes/posts'),

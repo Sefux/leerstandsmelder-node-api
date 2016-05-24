@@ -10,7 +10,13 @@ module.exports = {
             scope: 'user'
         },
         'get': {
-            controller: res.map('find', {resource: 'Post'}),
+            controller: res.map('find', {resource: 'Post', query: {$or: [{static: false}, {static: {$exists: false}}]}}),
+            scope: 'public'
+        }
+    },
+    '/posts/static': {
+        'get': {
+            controller: res.map('find', {resource: 'Post', query: {static: true}}),
             scope: 'public'
         }
     },

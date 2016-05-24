@@ -19,6 +19,7 @@ module.exports.init = function () {
         _mongoose.model('AclEntry', require('../models/acl-entry').AclEntry);
         _mongoose.model('Comment', require('../models/comment').Comment);
         _mongoose.model('Location', require('../models/location').Location);
+        _mongoose.model('Message', require('../models/message').Message);
         _mongoose.model('Region', require('../models/region').Region);
         _mongoose.model('Photo', require('../models/photo').Photo);
         _mongoose.model('Post', require('../models/post').Post);
@@ -47,6 +48,11 @@ module.exports.getFixture = function (resource) {
                 lonlat: [chance.longitude(), chance.latitude()],
                 legacy_id: chance.word({length: 8}),
                 region_uuid: uuid()
+            };
+        case 'Message':
+            return {
+                body: chance.paragraph({sentences: 12}),
+                subject_uuid: uuid()
             };
         default:
             throw new Error('no fixture available for ' + resource);

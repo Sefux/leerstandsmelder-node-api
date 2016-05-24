@@ -4,9 +4,11 @@ var access_tokens = require('../controllers/access-tokens'),
     CommonController = require('../controllers/common'),
     UsersController = require('../controllers/users'),
     LocationsController = require('../controllers/locations'),
+    MessagesController = require('../controllers/messages'),
     res = new CommonController(),
     users = new UsersController(),
-    locations = new LocationsController();
+    locations = new LocationsController(),
+    messages = new MessagesController();
 
 module.exports = {
     '/users': {
@@ -51,6 +53,12 @@ module.exports = {
     '/users/me/locations': {
         'get': {
             controller: locations.map('find', {resource: 'Location', query: {user_mapping: 'user_uuid'}}),
+            scope: 'user'
+        }
+    },
+    '/users/me/messages': {
+        'get': {
+            controller: messages.map('find', {resource: 'Message'}),
             scope: 'user'
         }
     },
