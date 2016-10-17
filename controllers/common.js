@@ -31,36 +31,20 @@ class CommonController {
 
                     let q = mongoose.model(config.resource).find(query);
                     q = config.select ? q.select(config.select) : q;
-                    if (req.params.skip) {
-                        q = q.skip(parseInt(req.params.skip));
-                    }
-                    if (req.params.limit) {
-                        q = q.limit(parseInt(req.params.limit));
-                    }
-                    if (req.params.sort) {
-                        q = q.sort(req.params.sort);
-                    }
+                    q = req.params.skip ? q.skip(parseInt(req.params.skip)) : q;
+                    q = req.params.limit ? q.limit(parseInt(req.params.limit)) : q;
+                    q = req.params.sort ? q.sort(req.params.sort) : q;
+
                     let results = yield q.exec();
                     if (results.length > 0 && results[0].user_uuid) {
-                        let output = [];
-                        return Promise.map(results, function (result) {
-                                return mongoose.model('User')
-                                    .findOne({uuid: result.user_uuid})
-                                    .select('uuid nickname').exec()
-                                    .then(function (user) {
-                                        if (result) {
-                                            result = result.toObject();
-                                            result.user = user;
-                                            output.push(result);
-                                        }
-                                    });
-                            })
-                            .then(function () {
-                                rHandler.handleDataResponse(output, 200, res, next);
-                            });
-                    } else {
-                        rHandler.handleDataResponse(results, 200, res, next);
+                        yield Promise.map(results, function (result) {
+                            result = result.toObject();
+                            result.user = mongoose.model('User').findOne({uuid: result.user_uuid})
+                                .select('uuid nickname').exec();
+                            return result;
+                        });
                     }
+                    rHandler.handleDataResponse(results, 200, res, next);
                 }),
                 pre: Promise.resolve
             },
@@ -71,11 +55,10 @@ class CommonController {
                         q = mongoose.model(config.resource).findOne(query);
                     q = config.select ? q.select(config.select) : q;
                     let result = yield q.exec();
-                    if (result) {
-                        result = result.toObject();
-                    } else {
+                    if (!result) {
                         return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
                     }
+                    result = result.toObject();
                     if (paths.hasOwnProperty('hidden') && result.hidden) {
                         let region = yield mongoose.model('Region').findOne({uuid:result.region_uuid});
                         if (!region) {
