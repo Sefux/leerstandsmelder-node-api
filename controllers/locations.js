@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
     restify = require('restify'),
     Promise = require('bluebird'),
     rHandler = require('../lib/util/response-handlers'),
+    conditionalAdd = require('../lib/util/conditional-add'),
     CommonController = require('./common');
 
 class LocationsController extends CommonController {
@@ -22,23 +23,17 @@ class LocationsController extends CommonController {
                     req.api_key.scopes.indexOf('region-' + region.uuid)
                 );
 
-            let addIfExists = (obj, key, val) => {
-                if (typeof val !== 'undefined') {
-                    obj[key] = val;
-                }
-            };
-
             if (!region && !config.query.user_mapping) {
                 return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
             }
 
             query = require('../lib/util/query-mapping')({}, req, config);
-            addIfExists(query, 'hidden', isAdmin ? undefined : false);
-            addIfExists(query, 'region_uuid', region ? region.uuid : undefined);
-            addIfExists(query, 'lonlat', req.query.longitude && req.query.latitude ? {
+            query = conditionalAdd(query, 'hidden', false, !isAdmin);
+            query = conditionalAdd(query, 'region_uuid', region ? region.uuid : undefined);
+            query = conditionalAdd(query, 'lonlat', {
                 $near: [parseFloat(req.query.longitude || 10.0014), parseFloat(req.query.latitude || 53.5653)],
                 $maxDistance: maxdist
-            } : undefined);
+            }, (req.query.longitude !== undefined && req.query.latitude !== undefined));
 
             q = mongoose.model(config.resource).find(query);
             q = req.query.sort ? q.sort(req.params.sort) : q;
@@ -55,11 +50,9 @@ class LocationsController extends CommonController {
                     .select('uuid nickname').exec();
                 result.region = yield mongoose.model('Region').findOne({uuid: result.region_uuid})
                     .select('uuid title slug').exec();
-
                 let photo = yield mongoose.model('Photo').findOne({location_uuid: result.uuid})
                     .select('thumb_url uuid extension').exec();
-                addIfExists(result, 'thumb_url', photo ? photo.thumb_url : undefined);
-
+                result = conditionalAdd(result, 'thumb_url', photo ? photo.thumb_url : undefined);
                 return result;
             }));
 
