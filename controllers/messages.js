@@ -2,13 +2,14 @@
 
 var mongoose = require('mongoose'),
     Promise = require('bluebird'),
+    restify = require('restify'),
     CommonController = require('./common');
 
 class MessagesController extends CommonController {
     constructor() {
         super();
 
-        this.coroutines.findResource.main = Promise.coroutine(function* (req, res, next, config) {
+        this.coroutines.findResource.main = Promise.coroutine(function* (req, res, next) {
             var messages = yield mongoose.model('Message').find({$or: [{user_uuid: req.user.uuid}, {recipient_uuid: req.user.uuid}]})
                 .sort('-created').exec();
             for (let i in messages) {
@@ -27,11 +28,13 @@ class MessagesController extends CommonController {
             return next();
         });
 
-        this.coroutines.postResource.pre = Promise.coroutine(function* (req, res, next, config) {
+        /*
+        this.coroutines.postResource.pre = Promise.coroutine(function* (req) {
             req.body.user_uuid = req.user.uuid;
         });
+        */
 
-        this.coroutines.getResource.main = Promise.coroutine(function* (req, res, next, config) {
+        this.coroutines.getResource.main = Promise.coroutine(function* (req, res, next) {
             var message = yield mongoose.model('Message').findOne({uuid: req.params.uuid});
             if (req.user.uuid === message.user_uuid || req.user.uuid === message.recipient_uuid) {
                 res.send(200, message);

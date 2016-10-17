@@ -69,7 +69,7 @@ User.statics.generatePasswordSalt = function () {
 };
 
 User.statics.encryptPassword = function (password, salt) {
-    return Promise.promisify(require('crypto').pbkdf2)(password, salt, 80000, 256)
+    return Promise.promisify(require('crypto').pbkdf2)(password, salt, 80000, 256, 'SHA1')
         .then(function (hash_bytes) {
             return hash_bytes ? hash_bytes.toString('hex') : null;
         });

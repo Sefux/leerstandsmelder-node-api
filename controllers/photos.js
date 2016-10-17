@@ -61,9 +61,11 @@ module.exports.post = function (req, res, next) {
                     throw new Error('Failed to upload photo: ' + err.message);
                 };
             readStream.on('error', errorHandler);
-            writeStream.on('error', errorHandler);
             readStream.pipe(writeStream);
             return new Promise(function (resolve, reject) {
+                writeStream.on('error', function (err) {
+                    reject(err);
+                });
                 writeStream.on('finish', function () {
                     resolve(photo);
                 });

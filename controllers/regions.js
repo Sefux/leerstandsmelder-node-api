@@ -11,8 +11,7 @@ class RegionsController extends CommonController {
 
         this.coroutines.findResource.main = Promise.coroutine(function* (req, res, next, config) {
             if (req.params.lat && req.params.lon) {
-                var limit = req.params.limit || 1,
-                    q = mongoose.model('Region').where('lonlat');
+                var q = mongoose.model('Region').where('lonlat');
                 q.near({
                     center: {coordinates: [parseFloat(req.params.lon), parseFloat(req.params.lat)], type: 'Point'}
                 });
@@ -21,7 +20,7 @@ class RegionsController extends CommonController {
                     q = q.skip(parseInt(req.params.skip));
                 }
                 if (req.params.limit) {
-                    q = q.limit(parseInt(req.params.limit));
+                    q = q.limit(parseInt(req.params.limit) || 1);
                 }
                 if (req.params.sort) {
                     q = q.sort(req.params.sort);
@@ -30,55 +29,47 @@ class RegionsController extends CommonController {
                     rHandler.handleDataResponse(results, 200, res, next);
                 });
             } else {
-                return Promise.resolve()
-                    .then(function () {
-                        return mongoose.model('Location').mapReduce({
-                            map: function () {
-                                if (!this.hide) {
-                                    emit(this.region_uuid, 1);
-                                }
-                            },
-                            reduce: function (k, v) {
-                                return Array.sum(v);
+                var results = yield mongoose.model('Location').mapReduce({
+                    map: function () {
+                        if (!this.hide) {
+                            emit(this.region_uuid, 1); // jshint ignore:line
+                        }
+                    },
+                    reduce: function (k, v) {
+                        return Array.sum(v);
+                    }
+                });
+
+                var output = [];
+
+                yield Promise.map(results, function (item) {
+                    return mongoose.model('Region').findOne({uuid: item._id, hide:false})
+                        .then(function (region) {
+                            if (region) {
+                                var out = region.toObject();
+                                out.locations = item.value;
+                                output.push(out);
                             }
                         });
-                    })
-                    .then(function (results) {
-                        var output = [];
+                }, {concurrency: 1});
 
-                        // function lifted from http://stackoverflow.com/a/4760279/578963
-                        function sortOn(property) {
-                            var sortOrder = 1;
-                            if (property[0] === "-") {
-                                sortOrder = -1;
-                                property = property.substr(1);
-                            }
-                            return function (a, b) {
-                                var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-                                return result * sortOrder;
-                            }
+                if (req.params.sort) {
+                    // function lifted from http://stackoverflow.com/a/4760279/578963
+                    // FIXME: and apparently is not working too well...?
+                    output.sort(function sortOn(property) {
+                        var sortOrder = 1;
+                        if (req.params.sort[0] === "-") {
+                            sortOrder = -1;
+                            req.params.sort = req.params.sort.substr(1);
                         }
-
-                        return Promise.map(results, function (item) {
-                                return mongoose.model('Region').findOne({uuid: item._id, hide:false})
-                                    .then(function (region) {
-                                        if (region) {
-                                            var out = region.toObject();
-                                            out.locations = item.value;
-                                            output.push(out);
-                                        }
-                                    });
-                            }, {concurrency: 1})
-                            .then(function () {
-                                if (req.params.sort) {
-                                    output.sort(sortOn(req.params.sort));
-                                }
-                                return output;
-                            });
-                    })
-                    .then(function (results) {
-                        rHandler.handleDataResponse(results, 200, res, next);
+                        return function (a, b) {
+                            var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+                            return result * sortOrder;
+                        };
                     });
+                }
+
+                rHandler.handleDataResponse(output, 200, res, next);
             }
         });
 

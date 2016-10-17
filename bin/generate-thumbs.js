@@ -12,10 +12,7 @@ mongoose.Promise = Promise;
 
 Promise.coroutine(function* () {
     yield config.load();
-    var resources = [
-            {res: 'Photo', path: '/photos', model: require('../models/photo').Photo}
-        ],
-        dburl = 'mongodb://' +
+    var dburl = 'mongodb://' +
             config.get.mongodb.host + ':' +
             config.get.mongodb.port + '/' +
             config.get.mongodb.dbname;

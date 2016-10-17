@@ -9,11 +9,12 @@ var mongoose = require('mongoose'),
 class CommonController {
     constructor() {
 
-        function deleteProtected(req) {
+        // TODO: why is this unused?!
+        this.deleteProtected = function (req) {
             delete req.body.region_uuid;
             delete req.body.user_uuid;
             delete req.body.legacy_id;
-        }
+        };
 
         this.coroutines = {
             findResource: {

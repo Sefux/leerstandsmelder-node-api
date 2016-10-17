@@ -9,7 +9,7 @@ class CaptchasController extends CommonController {
     constructor() {
         super();
 
-        this.coroutines.getResource.main = Promise.coroutine(function* (req, res, next, config) {
+        this.coroutines.getResource.main = Promise.coroutine(function* (req, res, next) {
             var code = parseInt(req.params.code);
             if (code.isNaN()) {
                 res.send(404, false);
@@ -24,7 +24,7 @@ class CaptchasController extends CommonController {
             next();
         });
 
-        this.coroutines.postResource.main = Promise.coroutine(function* (req, res, next, config) {
+        this.coroutines.postResource.main = Promise.coroutine(function* (req, res, next) {
             var captcha = yield mongoose.model('Captcha').create({}),
                 img = new captchapng(160, 60, captcha.code);
             img.color(0, 0, 0, 0);

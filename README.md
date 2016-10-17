@@ -6,23 +6,17 @@ API server for [Leerstandsmelder.de](http://www.leerstandsmelder.de) based on [r
 
 This software is part of a complete relaunch of the platform, now making it open source and independent from Google's map service. The API has a pretty standard JSON-over-HTTP CRUD interface and adds an interface to basic geospatial queries through the 2D-index in MongoDB.
 
+You can find the accompanying frontend and API client in the [Leerstandsmelder GitHub repositories](https://github.com/Leerstandsmelder).
+
 ## Requirements
 
-* NodeJS 4.x
-* MongoDB 3.0.x
+* NodeJS 4.x or 6.x
+* MongoDB 3.x
+* Redis 3.x
 
-## Installing
+## Setup
 
-Install dependencies
-```shell
-npm install
-```
-
-Then create a config file
-```
-cd bin
-./setup
-```
+Install dependencies with ``npm install``, then create a config file by running ``./bin/setup.js``.
 
 ## Running
 
@@ -31,10 +25,41 @@ Start the server with
 node app.js
 ```
 
+### Management scripts
+
+``./bin/add-user-scope.js /path/to/dir/`` dumps the DB to the specified location (do not omit the trailing slash) 
+
+``./bin/backup.sh /path/to/dir/`` dumps the DB to the specified location (do not omit the trailing slash) 
+
+``./bin/rebuild-acls.js`` purges and rebuilds all ACLs (caution: maybe make a backup before running this...)
+
+``./bin/regenrate-slugs.js`` generates new slugs for all resources (again, caution: this might be based on altered existing URL structures and break all your links)
+
+### Redirecting legacy URLs
+
+There is a bundled redirect-server which can be mapped to legacy-style URLs and redirect them accordingly. Set it up in ``config.json`` and start it with
+
+```
+node ./legacy-redirect.js
+```
+
+Then map it with a regular expression as shown in this example for Nginx:
+
+```
+location ~* ^/[a-z,0-9,-]+/places/[a-z,0-9,-]+$ {
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_pass http://localhost:7070;
+    proxy_redirect off;
+    proxy_buffering off;
+}
+```
+
 ## Development
 
-Uses Mocha and Chai. Run tests with ``npm test``.
+The project uses ES6 JavaScript and are encouraged to lint the code using [JSHint](http://jshint.com/)
 
-## Todo
+### Testing ###
 
-Update this readme, write more tests, write some API docs...
+Uses Mocha and Chai. Run tests with ``npm test`` (tests are far from complete).

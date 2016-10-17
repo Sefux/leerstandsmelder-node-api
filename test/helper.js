@@ -1,10 +1,13 @@
 'use strict';
 
 var mongoose = require('mongoose'),
+    Promise = require('bluebird'),
     chance = require('chance').Chance(),
     uuid = require('uuid4'),
     acl = require('../lib/auth/acl-manager'),
     dburl = 'mongodb://127.0.0.1:27017/leerstandsmelder-api-test';
+
+mongoose.Promise = Promise;
 
 module.exports.mongoose = mongoose;
 module.exports.acl = acl;

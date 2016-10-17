@@ -55,7 +55,7 @@ class UsersController extends CommonController {
             }
         });
 
-        this.coroutines.postResource.main = Promise.coroutine(function* (req, res, next, config) {
+        this.coroutines.postResource.main = Promise.coroutine(function* (req, res, next) {
             deleteProtected(req);
 
             var user = yield mongoose.model('User').create(req.body);
@@ -72,8 +72,8 @@ class UsersController extends CommonController {
         });
 
         this.coroutines.putResource.pre = preHandler;
-        this.coroutines.putResource.main = Promise.coroutine(function* (req, res, next, config) {
-            var q, user = yield mongoose.model('User').findOne({uuid: req.params.uuid, confirmed: true, blocked: false});
+        this.coroutines.putResource.main = Promise.coroutine(function* (req, res, next) {
+            var user = yield mongoose.model('User').findOne({uuid: req.params.uuid, confirmed: true, blocked: false});
             deleteProtected(req);
             if (req.user.scopes.indexOf('admin') === -1) {
                 delete req.body.confirmed;
@@ -94,7 +94,7 @@ class UsersController extends CommonController {
         });
 
         this.coroutines.resetUserResource = {
-            main: Promise.coroutine(function* (req, res, next, config) {
+            main: Promise.coroutine(function* (req, res, next) {
                 var user = yield mongoose.model('User').findOne({email: req.body.email, blocked: false}).exec();
                 yield workers.sendResetMail(user.uuid);
 
