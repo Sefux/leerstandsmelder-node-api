@@ -22,23 +22,23 @@ class LocationsController extends CommonController {
                     req.api_key.scopes.indexOf('region-' + region.uuid)
                 );
 
+            let addIfExists = (obj, key, val) => {
+                if (typeof val !== 'undefined') {
+                    obj[key] = val;
+                }
+            };
+
             if (!region && !config.query.user_mapping) {
                 return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
             }
 
             query = require('../lib/util/query-mapping')({}, req, config);
-            if (!isAdmin) {
-                query.hidden = false;
-            }
-            if (region) {
-                query.region_uuid = region.uuid;
-            }
-            if (req.query.longitude && req.query.latitude) {
-                query.lonlat = {
-                    $near: [parseFloat(req.query.longitude || 10.0014), parseFloat(req.query.latitude || 53.5653)],
-                    $maxDistance: maxdist
-                };
-            }
+            addIfExists(query, 'hidden', isAdmin ? undefined : false);
+            addIfExists(query, 'region_uuid', region ? region.uuid : undefined);
+            addIfExists(query, 'lonlat', req.query.longitude && req.query.latitude ? {
+                $near: [parseFloat(req.query.longitude || 10.0014), parseFloat(req.query.latitude || 53.5653)],
+                $maxDistance: maxdist
+            } : undefined);
 
             q = mongoose.model(config.resource).find(query);
             q = req.query.sort ? q.sort(req.params.sort) : q;
@@ -53,13 +53,12 @@ class LocationsController extends CommonController {
                 result = result.toObject();
                 result.user = yield mongoose.model('User').findOne({uuid: result.user_uuid})
                     .select('uuid nickname').exec();
+                result.region = yield mongoose.model('Region').findOne({uuid: result.region_uuid})
+                    .select('uuid title slug').exec();
 
                 let photo = yield mongoose.model('Photo').findOne({location_uuid: result.uuid})
                     .select('thumb_url uuid extension').exec();
-                result.thumb_url = photo ? photo.thumb_url : undefined;
-
-                result.region = yield mongoose.model('Region').findOne({uuid: result.region_uuid})
-                    .select('uuid title slug').exec();
+                addIfExists(result, 'thumb_url', photo ? photo.thumb_url : undefined);
 
                 return result;
             }));
