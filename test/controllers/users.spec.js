@@ -35,7 +35,8 @@ describe('UsersController', () => {
     it('creates a user', () => {
         var template = util.getFixture('User');
         req = {
-            body: template
+            body: template,
+            query: { noconfirm: true }
         };
         next = () => {
             proxySend.calledOnce.should.be.true;

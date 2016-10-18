@@ -56,7 +56,7 @@ location ~* ^/[a-z,0-9,-]+/places/[a-z,0-9,-]+$ {
 
 ## Development
 
-The project uses ES6 JavaScript and are encouraged to lint the code using [JSHint](http://jshint.com/)
+The project uses ES6 JavaScript and you are encouraged to lint the code using [JSHint](http://jshint.com/) before pushing it or creating a pull request.
 
 ### Testing ###
 

@@ -66,7 +66,9 @@ class UsersController extends CommonController {
             );
             yield acl.setAclEntry('/users/' + user.uuid, ['user'], ['get']);
             yield acl.setAclEntry('/users/me', [user.uuid], ['get', 'put', 'delete']);
-            yield workers.sendConfirmationMail(user.uuid);
+            if (!req.query || !req.query.hasOwnProperty('noconfirm')) {
+                yield workers.sendConfirmationMail(user.uuid);
+            }
 
             return rHandler.handleDataResponse(user, 201, res, next);
         });
