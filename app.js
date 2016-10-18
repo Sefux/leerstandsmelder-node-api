@@ -10,7 +10,7 @@ var restify = require('restify'),
     validateCaptcha = require('./lib/auth/validate-captcha'),
     userAliasParser = require('./lib/parsers/user-alias-parser'),
     workers = require('./lib/workers'),
-    config = require('./lib/config'),
+    config = require('./config.json'),
     fs = require('fs-extra'),
     Promise = require('bluebird'),
     errorReporter = require('./lib/util/error-reporter');
@@ -22,25 +22,24 @@ Promise.coroutine(function* () {
     var path = require('path'),
         version = require("./package.json").version;
 
-    yield config.load();
-
-    if (typeof config.get !== 'object') {
+    if (typeof config !== 'object') {
         throw new Error('Server has not been configured yet. Please run bin/setup.');
     }
 
-    if (config.get.airbrake) {
-        errorReporter.init(config.get.airbrake);
+    if (config.airbrake) {
+        errorReporter.init(config.airbrake);
     }
 
     workers.startFrontend();
 
-    yield fs.mkdirpAsync(path.resolve('./assets/photos'));
+    yield fs.mkdirpAsync(path.resolve(path.join(config.file_storage.path, 'photos')));
+    yield fs.mkdirpAsync(path.resolve(path.join(config.file_storage.path, 'thumbs')));
     yield fs.mkdirpAsync(path.resolve('tmp'));
 
     var dburl = 'mongodb://' +
-        config.get.mongodb.host + ':' +
-        config.get.mongodb.port + '/' +
-        config.get.mongodb.dbname;
+        config.mongodb.host + ':' +
+        config.mongodb.port + '/' +
+        config.mongodb.dbname;
 
     mongoose.connect(dburl);
     mongoose.model('User', require('./models/user').User);
@@ -100,7 +99,7 @@ Promise.coroutine(function* () {
         });
     });
 
-    server.listen(config.get.api_server.port, config.get.api_server.host, function () {
+    server.listen(config.api_server.port, config.api_server.host, function () {
         console.log(`${server.name} listening at ${server.url}`);
     });
 })();

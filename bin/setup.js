@@ -163,7 +163,7 @@ function initialSetup(callback) {
                     path: {
                         description: 'Enter the upload path',
                         type: 'string',
-                        default: './uploads',
+                        default: './assets',
                         required: true
                     }
                 }

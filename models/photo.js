@@ -1,7 +1,7 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-    config = require('../lib/config'),
+    config = require('../config.json'),
     Schema = mongoose.Schema,
     Photo = new Schema({
 
@@ -30,11 +30,11 @@ var mongoose = require('mongoose'),
     });
 
 Photo.virtual('original_url').get(function () {
-    return `${config.get.file_delivery.base_url}/photos/${this.uuid}.${this.extension}`;
+    return `${config.file_delivery.base_url}/photos/${this.uuid}.${this.extension}`;
 });
 
 Photo.virtual('thumb_url').get(function () {
-    return `${config.get.file_delivery.base_url}/photos/${this.uuid}.${this.extension}?thumb=1`;
+    return `${config.file_delivery.base_url}/photos/${this.uuid}.${this.extension}?thumb=1`;
 });
 
 module.exports.Photo = require('../lib/util/model-helper').setup(Photo);

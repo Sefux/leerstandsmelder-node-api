@@ -1,7 +1,9 @@
 'use strict';
 
 var photos = require('../controllers/photos'),
+    ThumbnailsController = require('../controllers/thumbnails'),
     CommonController = require('../controllers/common'),
+    thumbnails = new ThumbnailsController(),
     res = new CommonController();
 
 module.exports = {
@@ -25,5 +27,11 @@ module.exports = {
             overrideVerb: 'del',
             scope: 'owner'
         }
+    },
+    '/thumbnails/:uuid/:type/:size': {
+        'get': {
+            controller: thumbnails.map('get', {resource: 'Photo'}),
+            scope: 'public'
+        },
     }
 };

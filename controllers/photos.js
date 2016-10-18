@@ -4,6 +4,7 @@ var Promise = require('bluebird'),
     mongoose = require('mongoose'),
     path = require('path'),
     fs = require('fs-extra'),
+    config = require('../config.json'),
     workers = require('../lib/workers'),
     aclManager = require('../lib/auth/acl-manager'),
     responseHandlers = require('../lib/util/response-handlers');
@@ -16,8 +17,7 @@ module.exports.get = function (req, res, next) {
             } else {
                 var restify = require('restify');
                 if (photo) {
-                    var readStream = fs.createReadStream(path.join('assets/photos', photo.uuid +
-                        (req.params.thumb ? '-thumb' : '')));
+                    var readStream = fs.createReadStream(path.join(config.file_storage.path, 'photos', photo.uuid));
                     readStream.on('error', function (err) {
                         console.log(`Error reading image file: ${err.message}`);
                         res.send(new restify.NotFoundError());
@@ -54,7 +54,7 @@ module.exports.post = function (req, res, next) {
             return mongoose.model('Photo').create(payload);
         })
         .then((photo) => {
-            var dest = path.join('assets', 'photos', photo.uuid),
+            var dest = path.join(config.file_storage.path, 'photos', photo.uuid),
                 readStream = fs.createReadStream(file.path),
                 writeStream = fs.createWriteStream(dest),
                 errorHandler = (err) => {
