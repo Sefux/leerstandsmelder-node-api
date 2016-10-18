@@ -1,3 +1,5 @@
+sudo: required
+dist: trusty
 language: node_js
 node_js:
   - "4"
@@ -10,3 +12,12 @@ before_script:
 script:
   - jshint
   - npm test
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    - llvm-toolchain-precise-3.6
+    packages:
+    - gcc-5
+    - g++-5
+    - clang-3.6
