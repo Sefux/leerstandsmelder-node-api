@@ -28,7 +28,7 @@ module.exports = {
             scope: 'owner'
         }
     },
-    '/thumbnails/:uuid/:type/:size': {
+    '/thumbnails/:type/:size/:uuid': {
         'get': {
             controller: thumbnails.map('get', {resource: 'Photo'}),
             scope: 'public'
