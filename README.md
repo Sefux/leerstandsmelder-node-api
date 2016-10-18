@@ -16,7 +16,7 @@ You can find the accompanying frontend and API client in the [Leerstandsmelder G
 
 ## Setup
 
-Install dependencies with ``npm install``, then create a config file by running ``./bin/setup.js``.
+Install dependencies with ``npm install``, copy ``config.default.json`` to ``config.json``. You can then create an admin user by running ``./bin/setup.js``.
 
 ## Running
 

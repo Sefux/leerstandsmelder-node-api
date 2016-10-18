@@ -1,0 +1,39 @@
+{
+  "mongodb": {
+    "host": "localhost",
+    "port": 27017,
+    "dbname": "leerstandsmelder-api",
+    "user": "",
+    "pass": ""
+  },
+  "mailer": {
+    "address": "service-noreply@leerstandsmelder.de",
+    "host": "mail.leerstandsmelder.de",
+    "port": 465,
+    "secure": true,
+    "user": "service-noreply@leerstandsmelder.de",
+    "pass": null,
+    "validateSSL": false
+  },
+  "api_server": {
+    "host": "localhost",
+    "port": 8080,
+    "secure": false,
+    "proxiedToDefault": false
+  },
+  "redirect_server": {
+    "host": "localhost",
+    "port": 7070,
+    "redirect_host": "http://localhost:7888"
+  },
+  "frontend": {
+    "base_url": "http://localhost:7888"
+  },
+  "file_storage": {
+    "type": "local",
+    "path": "./assets"
+  },
+  "file_delivery": {
+    "base_url": "http://localhost:8080"
+  }
+}

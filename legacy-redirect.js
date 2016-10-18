@@ -2,23 +2,22 @@
 
 var restify = require('restify'),
     mongoose = require('mongoose'),
-    config = require('./lib/config'),
+    config = require('./config.json'),
     Promise = require('bluebird'),
     version = require("./package.json").version;
 
 mongoose.Promise = Promise;
 
 Promise.coroutine(function* () {
-    yield config.load();
 
-    if (typeof config.get !== 'object') {
+    if (typeof config !== 'object') {
         throw new Error('Server has not been configured yet. Please run bin/setup.');
     }
 
     var dburl = 'mongodb://' +
-        config.get.mongodb.host + ':' +
-        config.get.mongodb.port + '/' +
-        config.get.mongodb.dbname;
+        config.mongodb.host + ':' +
+        config.mongodb.port + '/' +
+        config.mongodb.dbname;
 
     mongoose.connect(dburl);
     mongoose.model('Location', require('./models/location').Location);
@@ -34,7 +33,7 @@ Promise.coroutine(function* () {
     server.use(restify.authorizationParser());
 
     server.get('/:region_slug/places/:location_slug', function (req, res, next) {
-        var redirect = config.get.redirect_server.redirect_host;
+        var redirect = config.redirect_server.redirect_host;
         return mongoose.model('Region').findOne({slug: req.params.region_slug})
             .then(function (region) {
                 if (region) {
@@ -60,7 +59,7 @@ Promise.coroutine(function* () {
             });
     });
 
-    server.listen(config.get.redirect_server.port, config.get.redirect_server.host, function () {
+    server.listen(config.redirect_server.port, config.redirect_server.host, function () {
         console.log(`${server.name} listening at ${server.url}`);
     });
 })();

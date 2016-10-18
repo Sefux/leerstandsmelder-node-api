@@ -4,19 +4,18 @@
 
 var Promise = require('bluebird'),
     mongoose = require('mongoose'),
-    config = require('../lib/config');
+    config = require('../config.json');
 
 mongoose.Promise = Promise;
 
 Promise.coroutine(function* () {
-    yield config.load();
-    if (!config.get) {
+    if (!config) {
         throw new Error('Server has not been configured yet. Please run bin/setup.');
     }
     let dburl = 'mongodb://' +
-        config.get.mongodb.host + ':' +
-        config.get.mongodb.port + '/' +
-        config.get.mongodb.dbname;
+        config.mongodb.host + ':' +
+        config.mongodb.port + '/' +
+        config.mongodb.dbname;
     mongoose.connect(dburl);
     mongoose.model('User', require('../models/user').User);
     mongoose.model('ApiKey', require('../models/api-key').ApiKey);

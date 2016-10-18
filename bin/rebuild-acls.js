@@ -4,13 +4,12 @@
 
 var Promise = require('bluebird'),
     mongoose = require('mongoose'),
-    config = require('../lib/config'),
+    config = require('../config.json'),
     acl = require('../lib/auth/acl-manager');
 
 mongoose.Promise = Promise;
 
 Promise.coroutine(function* () {
-    yield config.load();
     var resources = [
             {res: 'Comment', path: '/comments', model: require('../models/comment').Comment},
             {res: 'Location', path: '/locations', model: require('../models/location').Location},
@@ -20,9 +19,9 @@ Promise.coroutine(function* () {
             {res: 'User', path: '/users', model: require('../models/user').User}
         ],
         dburl = 'mongodb://' +
-        config.get.mongodb.host + ':' +
-        config.get.mongodb.port + '/' +
-        config.get.mongodb.dbname;
+        config.mongodb.host + ':' +
+        config.mongodb.port + '/' +
+        config.mongodb.dbname;
 
     console.log('connecting to ' + dburl);
     return new Promise(function (resolve) {
