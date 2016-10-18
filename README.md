@@ -27,7 +27,7 @@ node app.js
 
 ### Management scripts
 
-``./bin/add-user-scope.js /path/to/dir/`` dumps the DB to the specified location (do not omit the trailing slash) 
+``./bin/add-user-scope.js --email=user@host.com --scope=SCOPE_TO_SET`` adds the specified scope (e.g. ``admin``, ``editor`` or a region admin with ``region-REGION_UUID``) to the API Key associated with the supplied email address.
 
 ``./bin/backup.sh /path/to/dir/`` dumps the DB to the specified location (do not omit the trailing slash) 
 
