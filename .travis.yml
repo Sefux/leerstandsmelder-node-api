@@ -9,6 +9,7 @@ services:
   - redis-server
 before_script:
   - npm install -g gulp
+  - cp config.default.json config.json
 script:
   - jshint
   - npm test
