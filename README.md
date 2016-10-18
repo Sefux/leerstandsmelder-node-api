@@ -33,8 +33,6 @@ node app.js
 
 ``./bin/rebuild-acls.js`` purges and rebuilds all ACLs (caution: maybe make a backup before running this...)
 
-``./bin/regenrate-slugs.js`` generates new slugs for all resources (again, caution: this might be based on altered existing URL structures and break all your links)
-
 ### Redirecting legacy URLs
 
 There is a bundled redirect-server which can be mapped to legacy-style URLs and redirect them accordingly. Set it up in ``config.json`` and start it with
