@@ -33,8 +33,12 @@ Photo.virtual('original_url').get(function () {
     return `${config.file_delivery.base_url}/photos/${this.uuid}.${this.extension}`;
 });
 
-Photo.virtual('thumb_url').get(function () {
-    return `${config.file_delivery.base_url}/photos/${this.uuid}.${this.extension}?thumb=1`;
+Photo.virtual('thumb_square_url').get(function () {
+    return `${config.file_delivery.base_url}/thumbnails/square/200/${this.uuid}.jpg`;
+});
+
+Photo.virtual('thumb_large_url').get(function () {
+    return `${config.file_delivery.base_url}/thumbnails/norm/x800/${this.uuid}.jpg`;
 });
 
 module.exports.Photo = require('../lib/util/model-helper').setup(Photo);

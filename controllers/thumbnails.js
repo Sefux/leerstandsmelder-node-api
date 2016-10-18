@@ -39,10 +39,18 @@ class ThumbnailsController extends CommonController {
                     height = size.length === 2 ? Math.min(1000, Math.max(0, parseInt(size[1]))) : width,
                     imgpipe = sharp();
 
-                imgpipe.resize(width, height, {
-                    kernel: sharp.kernel.lanczos2,
-                    interpolator: sharp.interpolator.nohalo
-                }).crop(sharp.strategy.entropy);
+                if (req.params.type === 'square') {
+                    imgpipe.resize(width, width || null, {
+                        kernel: sharp.kernel.lanczos2,
+                        interpolator: sharp.interpolator.nohalo
+                    }).crop(sharp.strategy.entropy);
+                } else {
+                    imgpipe.resize(width || null, height || null, {
+                        kernel: sharp.kernel.lanczos2,
+                        interpolator: sharp.interpolator.nohalo
+                    });
+                }
+
                 imgpipe.clone().jpeg().quality(80).toFile(thumbFile, (err) => {
                     if (err) {
                         throw err;
