@@ -12,7 +12,7 @@ class UsersController extends CommonController {
     constructor() {
         super();
 
-        this.deleteProtected = function (req) {
+        function deleteProtected(req) {
             delete req.body.scopes;
             delete req.body.single_access_token;
             delete req.body.failed_logins;
@@ -56,7 +56,7 @@ class UsersController extends CommonController {
         });
 
         this.coroutines.postResource.main = Promise.coroutine(function* (req, res, next) {
-            this.deleteProtected(req);
+            deleteProtected(req);
 
             var user = yield mongoose.model('User').create(req.body);
             yield acl.setAclEntry(
@@ -76,7 +76,7 @@ class UsersController extends CommonController {
         this.coroutines.putResource.pre = preHandler;
         this.coroutines.putResource.main = Promise.coroutine(function* (req, res, next) {
             var user = yield mongoose.model('User').findOne({uuid: req.params.uuid, confirmed: true, blocked: false});
-            this.deleteProtected(req);
+            deleteProtected(req);
             if (req.user.scopes.indexOf('admin') === -1) {
                 delete req.body.confirmed;
                 delete req.body.blocked;

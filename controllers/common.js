@@ -9,7 +9,7 @@ var mongoose = require('mongoose'),
 class CommonController {
     constructor() {
 
-        this.deleteProtected = function (req) {
+        function deleteProtected(req) {
             delete req.body.region_uuid;
             delete req.body.user_uuid;
             delete req.body.legacy_id;
@@ -103,6 +103,7 @@ class CommonController {
             },
             putResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
+                    deleteProtected(req);
                     let data = yield mongoose.model(config.resource).findOne({uuid: req.params.uuid}).exec();
                     if (data) {
                         for (var key in req.body) {

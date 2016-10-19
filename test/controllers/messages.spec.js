@@ -126,6 +126,6 @@ describe('MessagesController', () => {
             proxySend.calledOnce.should.be.true;
             proxySend.calledWith(200);
         };
-        return messages.coroutines.delResource.main(req, res, next, {resource: 'Message'});
+        return messages.coroutines.deleteResource.main(req, res, next, {resource: 'Message'});
     });
 });

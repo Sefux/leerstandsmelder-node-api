@@ -87,6 +87,6 @@ describe('UsersController', () => {
             proxySend.calledOnce.should.be.true;
             proxySend.calledWith(200);
         };
-        return users.coroutines.delResource.main(req, res, next, {resource: 'User'});
+        return users.coroutines.deleteResource.main(req, res, next, {resource: 'User'});
     });
 });

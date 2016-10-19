@@ -87,6 +87,6 @@ describe('LocationsController', () => {
             proxySend.calledOnce.should.be.true;
             proxySend.calledWith(200);
         };
-        return controller.coroutines.delResource.main(req, res, next, {resource: 'Location'});
+        return controller.coroutines.deleteResource.main(req, res, next, {resource: 'Location'});
     });
 });
