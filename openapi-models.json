@@ -93,7 +93,7 @@
       }
     },
     "Comment": {
-      "type": "object",
+      "id": "Comment",
       "properties": {
         "uuid": {
           "type": "string"

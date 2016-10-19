@@ -1,25 +1,24 @@
 'use strict';
 
-var AclEntriesController = require('../controllers/acl-entries'),
-    swagger = require('swagger-node-restify'),
+var swagger = require('swagger-node-restify'),
+    AclEntriesController = require('../controllers/acl-entries'),
     res = new AclEntriesController();
 
 module.exports = {
-    "/acl/:resource/:uuid": {
+    '/acl/:resource/:uuid': {
         'get': {
             controller: res.map('get', {resource: 'AclEntry'}),
             scope: 'user',
-            'spec': {
-                "description" : "Request an ACL entry for a resource",
-                "notes" : "",
-                "summary" : "Request ACL Entry",
-                "parameters" : [
-                    swagger.pathParam("resource", "Resource UUID", "string"),
-                    swagger.pathParam("uuid", "User UUID", "string")
+            spec: {
+                description: 'Request an ACL entry for a resource',
+                summary: 'Request ACL Entry',
+                params: [
+                    swagger.pathParam('resource', 'Resource UUID', 'string'),
+                    swagger.pathParam('uuid', 'User UUID', 'string')
                 ],
-                "type" : "AclEntry",
-                "errorResponses" : [swagger.errors.notFound('AclEntry')],
-                "nickname" : "getAclEntry"
+                errorResponses: [swagger.errors.notFound('AclEntry')],
+                nickname: 'getAclEntry',
+                responseClass: 'AclEntry'
             }
         }
     }
