@@ -30,8 +30,7 @@ module.exports = {
             scope: 'owner'
         },
         'delete': {
-            controller: res.map('del', {resource: 'Post'}),
-            overrideVerb: 'del',
+            controller: res.map('delete', {resource: 'Post'}),
             scope: 'owner'
         }
     },

@@ -26,8 +26,7 @@ module.exports = {
             scope: 'admin'
         },
         'delete': {
-            controller: res.map('del', {resource: 'Region'}),
-            overrideVerb: 'del',
+            controller: res.map('delete', {resource: 'Region'}),
             scope: 'admin'
         }
     },

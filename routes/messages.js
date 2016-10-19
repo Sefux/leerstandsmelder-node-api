@@ -16,8 +16,7 @@ module.exports = {
             scope: 'user'
         },
         'delete': {
-            controller: res.map('del', {resource: 'Message', query: {user_mapping: 'user_uuid'}}),
-            overrideVerb: 'del',
+            controller: res.map('delete', {resource: 'Message', query: {user_mapping: 'user_uuid'}}),
             scope: 'owner'
         }
     }

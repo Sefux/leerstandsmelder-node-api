@@ -2,6 +2,7 @@
 
 var restify = require('restify'),
     mongoose = require('mongoose'),
+    swagger = require('swagger-node-restify'),
     preflightEnabler = require('se7ensky-restify-preflight'),
     urlExtParser = require('./lib/parsers/urlext-parser'),
     filterUUID = require('./lib/util/filter-uuid'),
@@ -58,6 +59,9 @@ Promise.coroutine(function* () {
         name: `Leerstandsmelder API Server v${version}`,
         version: version
     });
+    restify.defaultResponseHeaders = function() {
+        this.header('Content-type', 'application/json; encoding=utf-8');
+    };
     server.pre(restify.pre.userAgentConnection());
     server.pre(urlExtParser());
 
@@ -92,12 +96,27 @@ Promise.coroutine(function* () {
         require('./routes/users')
     ]);
 
+    swagger.setAppHandler(server);
+    swagger.configureSwaggerPaths("", "/api-docs", "");
+    swagger.addModels({ models: require('./openapi-models.json') });
+
     yield Promise.map(Object.keys(routes.paths), function (rPath) {
         return Promise.map(Object.keys(routes.paths[rPath]), function (method) {
-            var routeType = routes.paths[rPath][method].overrideVerb || method;
-            server[routeType](rPath, routes.paths[rPath][method].controller);
+            var routeType = routes.paths[rPath][method].overrideVerb || method,
+                route = {
+                    spec: routes.paths[rPath][method].spec || {},
+                    action: routes.paths[rPath][method].controller
+                };
+
+            route.spec.path = rPath;
+            route.spec.nickname = method + route.spec.type;
+            swagger["add" + routeType.toUpperCase()](route);
         });
     });
+
+    let apiConf = config.api_server,
+        apiUrl = `${apiConf.secure ? "https" : "http"}://${apiConf.host}:${apiConf.port}`;
+    swagger.configure(apiUrl, version);
 
     server.listen(config.api_server.port, config.api_server.host, function () {
         console.log(`${server.name} listening at ${server.url}`);

@@ -18,4 +18,4 @@ class AclEntriesController extends CommonController {
     }
 }
 
-module.exports.AclEntriesController = AclEntriesController;
+module.exports = AclEntriesController;

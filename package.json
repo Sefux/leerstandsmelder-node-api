@@ -36,6 +36,7 @@
     "sharp": "^0.16.1",
     "speakingurl": "^10.0.0",
     "striptags": "^2.1.1",
+    "swagger-node-restify": "^0.1.2",
     "uuid4": "^1.0.0",
     "validator": "^6.1.0",
     "yargs": "^6.2.0"

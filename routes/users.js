@@ -27,8 +27,7 @@ module.exports = {
             scope: 'owner'
         },
         'delete': {
-            controller: users.map('del', {resource: 'User'}),
-            overrideVerb: 'del',
+            controller: users.map('delete', {resource: 'User'}),
             scope: 'admin'
         }
     },

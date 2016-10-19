@@ -1,0 +1,166 @@
+{
+  "AccessToken": {
+    "type": "object",
+    "required": [
+      "api_key"
+    ],
+    "properties": {
+      "api_key": {
+        "type": "string"
+      },
+      "token": {
+        "type": "string"
+      },
+      "scopes": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "issued": {
+        "type": "date"
+      },
+      "hours_valid": {
+        "type": "integer",
+        "format": "int32"
+      }
+    }
+  },
+  "AclEntry": {
+    "type": "object",
+    "required": [
+      "resource_key",
+      "role_key"
+    ],
+    "properties": {
+      "resource_key": {
+        "type": "string"
+      },
+      "role_key": {
+        "type": "string"
+      },
+      "actions": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "ApiKey": {
+    "type": "object",
+    "properties": {
+      "user_uuid": {
+        "type": "string"
+      },
+      "key": {
+        "type": "string"
+      },
+      "secret": {
+        "type": "string"
+      },
+      "scopes": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "default": ["user"]
+      },
+      "created": {
+        "type": "date"
+      },
+      "updated": {
+        "type": "date"
+      },
+      "active": {
+        "type": "boolean",
+        "default": true
+      }
+    }
+  },
+  "Captcha": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "created": {
+        "type": "date"
+      }
+    }
+  },
+  "Comment": {
+    "type": "object",
+    "properties": {
+      "uuid": {
+        "type": "string"
+      },
+      "user_uuid": {
+        "type": "string"
+      }
+    }
+  },
+  "Location": {
+    "type": "object",
+    "properties": {
+      "uuid": {
+        "type": "string"
+      },
+      "user_uuid": {
+        "type": "string"
+      }
+    }
+  },
+  "Message": {
+    "type": "object",
+    "properties": {
+      "uuid": {
+        "type": "string"
+      },
+      "user_uuid": {
+        "type": "string"
+      }
+    }
+  },
+  "Photo": {
+    "type": "object",
+    "properties": {
+      "uuid": {
+        "type": "string"
+      },
+      "user_uuid": {
+        "type": "string"
+      }
+    }
+  },
+  "Post": {
+    "type": "object",
+    "properties": {
+      "uuid": {
+        "type": "string"
+      },
+      "user_uuid": {
+        "type": "string"
+      }
+    }
+  },
+  "Region": {
+    "type": "object",
+    "properties": {
+      "uuid": {
+        "type": "string"
+      },
+      "user_uuid": {
+        "type": "string"
+      }
+    }
+  },
+  "User": {
+    "type": "object",
+    "properties": {
+      "uuid": {
+        "type": "string"
+      }
+    }
+  }
+}
