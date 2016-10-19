@@ -27,7 +27,77 @@ var mongoose = require('mongoose'),
         toJSON: {virtuals: true},
         autoindex: process.env.NODE_ENV !== 'production',
         id: false
-    });
+    }),
+    SwaggerSpec = {
+        required: [
+            'location_uuid',
+            'user_uuid',
+            'creator_uuid',
+            'publisher_uuid',
+            'rights_holder_uuid',
+            'filename',
+            'extension',
+            'mime_type',
+            'filehash',
+            'size'
+        ],
+        properties: {
+            uuid: {
+                type: 'string'
+            },
+            original_url: {
+                type: 'string'
+            },
+            thumb_square_url: {
+                type: 'string'
+            },
+            thumb_large_url: {
+                type: 'string'
+            },
+            location_uuid: {
+                type: 'string'
+            },
+            user_uuid: {
+                type: 'string'
+            },
+            creator_uuid: {
+                type: 'string'
+            },
+            publisher_uuid: {
+                type: 'string'
+            },
+            rights_holder_uuid: {
+                type: 'string'
+            },
+            filename: {
+                type: 'string'
+            },
+            extension: {
+                type: 'string'
+            },
+            mime_type: {
+                type: 'string'
+            },
+            filehash: {
+                type: 'string'
+            },
+            size: {
+                type: 'integer'
+            },
+            legacy_id: {
+                type: 'string'
+            },
+            position: {
+                type: 'integer'
+            },
+            created: {
+                date: 'date'
+            },
+            updated: {
+                date: 'date'
+            }
+        }
+    };
 
 Photo.virtual('original_url').get(function () {
     return `${config.file_delivery.base_url}/photos/${this.uuid}.${this.extension}`;
@@ -42,3 +112,4 @@ Photo.virtual('thumb_large_url').get(function () {
 });
 
 module.exports.Photo = require('../lib/util/model-helper').setup(Photo);
+module.exports.SwaggerSpec = SwaggerSpec;

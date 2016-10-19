@@ -25,7 +25,30 @@ var mongoose = require('mongoose'),
     }, {
         autoindex: process.env.NODE_ENV !== 'production',
         id: false
-    });
+    }),
+    SwaggerSpec = {
+        required: [
+            'nickname',
+            'email'
+        ],
+        properties: {
+            uuid: {
+                type: 'string'
+            },
+            nickname: {
+                type: 'string'
+            },
+            email: {
+                type: 'string'
+            },
+            created: {
+                type: 'date'
+            },
+            updated: {
+                type: 'date'
+            }
+        }
+    };
 
 User.plugin(uniqueValidator, { message: 'errors.users.email_exists' });
 
@@ -145,3 +168,4 @@ module.exports.User = modelHelper.setup(
         delete obj.scopes;
     }
 );
+module.exports.SwaggerSpec = SwaggerSpec;

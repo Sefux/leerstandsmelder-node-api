@@ -3,6 +3,7 @@
 var restify = require('restify'),
     mongoose = require('mongoose'),
     swagger = require('swagger-node-restify'),
+    swaggerModels = {},
     preflightEnabler = require('se7ensky-restify-preflight'),
     urlExtParser = require('./lib/parsers/urlext-parser'),
     filterUUID = require('./lib/util/filter-uuid'),
@@ -42,18 +43,27 @@ Promise.coroutine(function* () {
         config.mongodb.port + '/' +
         config.mongodb.dbname;
 
+    function addModel(name, data) {
+        mongoose.model(name, data[name]);
+        if (data.SwaggerSpec) {
+            let spec = data.SwaggerSpec;
+            spec.id = name;
+            swaggerModels[name] = data.SwaggerSpec;
+        }
+    }
+
     mongoose.connect(dburl);
-    mongoose.model('User', require('./models/user').User);
-    mongoose.model('ApiKey', require('./models/api-key').ApiKey);
-    mongoose.model('AccessToken', require('./models/access-token').AccessToken);
-    mongoose.model('AclEntry', require('./models/acl-entry').AclEntry);
-    mongoose.model('Captcha', require('./models/captcha').Captcha);
-    mongoose.model('Comment', require('./models/comment').Comment);
-    mongoose.model('Location', require('./models/location').Location);
-    mongoose.model('Message', require('./models/message').Message);
-    mongoose.model('Region', require('./models/region').Region);
-    mongoose.model('Photo', require('./models/photo').Photo);
-    mongoose.model('Post', require('./models/post').Post);
+    addModel('User', require('./models/user'));
+    addModel('ApiKey', require('./models/api-key'));
+    addModel('AccessToken', require('./models/access-token'));
+    addModel('AclEntry', require('./models/acl-entry'));
+    addModel('Captcha', require('./models/captcha'));
+    addModel('Comment', require('./models/comment'));
+    addModel('Location', require('./models/location'));
+    addModel('Message', require('./models/message'));
+    addModel('Region', require('./models/region'));
+    addModel('Photo', require('./models/photo'));
+    addModel('Post', require('./models/post'));
 
     var server = restify.createServer({
         name: `Leerstandsmelder API Server v${version}`,
@@ -98,7 +108,7 @@ Promise.coroutine(function* () {
 
     swagger.setAppHandler(server);
     swagger.configureSwaggerPaths("", "/api-docs", "");
-    swagger.addModels(require('./openapi-models.json'));
+    swagger.addModels({ models: swaggerModels });
 
     yield Promise.map(Object.keys(routes.paths), function (rPath) {
         return Promise.map(Object.keys(routes.paths[rPath]), function (method) {

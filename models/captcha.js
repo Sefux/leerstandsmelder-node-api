@@ -11,7 +11,17 @@ var mongoose = require('mongoose'),
     }, {
         autoindex: process.env.NODE_ENV !== 'production',
         id: false
-    });
+    }),
+    SwaggerSpec = {
+        properties: {
+            code: {
+                type: 'string'
+            },
+            created: {
+                type: 'date'
+            }
+        }
+    };
 
 // TODO: needs a background job purging expired captchas
 Captcha.methods.purgeIfExpired = function () {
@@ -33,3 +43,4 @@ module.exports.Captcha = require('../lib/util/model-helper').setup(
         next();
     }
 );
+module.exports.SwaggerSpec = SwaggerSpec;

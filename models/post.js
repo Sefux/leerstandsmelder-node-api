@@ -23,7 +23,49 @@ var mongoose = require('mongoose'),
         toJSON: {virtuals: true},
         autoindex: process.env.NODE_ENV !== 'production',
         id: false
-    });
+    }),
+    SwaggerSpec = {
+        required: [
+            'title',
+            'body'
+        ],
+        properties: {
+            uuid: {
+                type: 'string'
+            },
+            title: {
+                type: 'string'
+            },
+            body: {
+                type: 'string'
+            },
+            static: {
+                type: 'boolean',
+                defaultValue: false
+            },
+            slug: {
+                type: 'string'
+            },
+            slug_aliases: {
+                type: 'array',
+                items: {
+                    type: 'string'
+                }
+            },
+            legacy_id: {
+                type: 'string'
+            },
+            legacy_slug: {
+                type: 'string'
+            },
+            created: {
+                type: 'date'
+            },
+            updated: {
+                type: 'date'
+            }
+        }
+    };
 
 Post.virtual('abstract').get(function () {
     return striptags(this.body).replace(/\[|\]\(.*\)/g, '').substring(0, 400);
@@ -52,3 +94,4 @@ module.exports.Post = require('../lib/util/model-helper').setup(
         }
     }
 );
+module.exports.SwaggerSpec = SwaggerSpec;

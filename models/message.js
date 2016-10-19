@@ -15,6 +15,34 @@ var mongoose = require('mongoose'),
     }, {
         autoindex: process.env.NODE_ENV !== 'production',
         id: false
-    });
+    }),
+    SwaggerSpec = {
+        required: [
+            'user_uuid',
+            'recipient_uuid',
+            'body'
+        ],
+        properties: {
+            uuid: {
+                type: 'string'
+            },
+            user_uuid: {
+                type: 'string'
+            },
+            recipient_uuid: {
+                type: 'string'
+            },
+            subject_uuid: {
+                type: 'string'
+            },
+            body: {
+                type: 'string'
+            },
+            created: {
+                date: 'date'
+            }
+        }
+    };
 
 module.exports.Message = require('../lib/util/model-helper').setup(Message);
+module.exports.SwaggerSpec = SwaggerSpec;

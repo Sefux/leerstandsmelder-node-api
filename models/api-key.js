@@ -13,7 +13,30 @@ var mongoose = require('mongoose'),
     }, {
         autoindex: process.env.NODE_ENV !== 'production',
         id: false
-    });
+    }),
+    SwaggerSpec = {
+        properties: {
+            key: {
+                type: 'string'
+            },
+            secret: {
+                type: 'string'
+            },
+            scopes: {
+                type: 'array',
+                items: {
+                    type: 'string'
+                },
+                defaultValue: ['user']
+            },
+            created: {
+                type: 'date'
+            },
+            updated: {
+                type: 'date'
+            }
+        }
+    };
 
 ApiKey.methods.isScopeAllowed = function (scope) {
     return this.scopes.indexOf(scope) > -1;
@@ -38,7 +61,7 @@ module.exports.ApiKey = modelHelper.setup(
     null,
     function (obj) {
         delete obj.user_uuid;
-        delete obj.device_uuid;
         delete obj.active;
     }
 );
+module.exports.SwaggerSpec = SwaggerSpec;

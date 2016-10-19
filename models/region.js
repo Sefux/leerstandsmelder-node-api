@@ -8,6 +8,7 @@ var mongoose = require('mongoose'),
         uuid: {type: String, unique: true},
 
         title: {type: String, required: true},
+        // TODO: should this be required?
         lonlat: {
             type: [Number],  // [<longitude>, <latitude>]
             index: '2dsphere'
@@ -27,7 +28,62 @@ var mongoose = require('mongoose'),
     }, {
         autoindex: process.env.NODE_ENV !== 'production',
         id: false
-    });
+    }),
+    SwaggerSpec = {
+        required: [
+            'title'
+        ],
+        properties: {
+            uuid: {
+                type: 'string'
+            },
+            title: {
+                type: 'string'
+            },
+            lonlat: {
+                type: 'array',
+                items: {
+                    type: 'float'
+                }
+            },
+            zoom: {
+                type: 'integer',
+                defaultValue: 14
+            },
+            moderate: {
+                type: 'boolean',
+                defaultValue: false
+            },
+            hide: {
+                type: 'boolean',
+                defaultValue: false
+            },
+            hide_message: {
+                type: 'string'
+            },
+            slug: {
+                type: 'string'
+            },
+            slug_aliases: {
+                type: 'array',
+                items: {
+                    type: 'string'
+                }
+            },
+            legacy_id: {
+                type: 'string'
+            },
+            legacy_slug: {
+                type: 'string'
+            },
+            created: {
+                type: 'date'
+            },
+            updated: {
+                type: 'date'
+            }
+        }
+    };
 
 Region.virtual('num_locations').get(function () {
     return mongoose.model('Location').count({region_uuid: this.uuid});
@@ -52,3 +108,4 @@ module.exports.Region = require('../lib/util/model-helper').setup(
         next();
     }
 );
+module.exports.SwaggerSpec = SwaggerSpec;

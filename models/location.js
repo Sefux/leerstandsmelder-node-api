@@ -18,6 +18,7 @@ var mongoose = require('mongoose'),
         street: {type: String, index: true},
         city: {type: String, index: true},
         postcode: {type: String, index: true},
+        // TODO: should this be required?
         lonlat: {
             type: [Number],  // [<longitude>, <latitude>]
             index: '2dsphere'
@@ -37,7 +38,94 @@ var mongoose = require('mongoose'),
     }, {
         autoindex: process.env.NODE_ENV !== 'production',
         id: false
-    });
+    }),
+    SwaggerSpec = {
+        required: [
+            'user_uuid',
+            'title',
+            'region_uuid'
+        ],
+        properties: {
+            uuid: {
+                type: 'string'
+            },
+            user_uuid: {
+                type: 'string'
+            },
+            title: {
+                type: 'string'
+            },
+            description: {
+                type: 'string'
+            },
+            degree: {
+                type: 'string'
+            },
+            owner: {
+                type: 'string'
+            },
+            rumor: {
+                type: 'boolean'
+            },
+            emptySince: {
+                type: 'string'
+            },
+            buildingType: {
+                type: 'string'
+            },
+            street: {
+                type: 'string'
+            },
+            city: {
+                type: 'string'
+            },
+            postcode: {
+                type: 'string'
+            },
+            lonlat: {
+                type: 'array',
+                items: {
+                    type: 'float'
+                }
+            },
+            region_uuid: {
+                type: 'string'
+            },
+            active: {
+                type: 'boolean',
+                defaultValue: true
+            },
+            demolished: {
+                type: 'boolean',
+                defaultValue: false
+            },
+            slug: {
+                type: 'string'
+            },
+            slug_aliases: {
+                type: 'array',
+                items: {
+                    type: 'string'
+                }
+            },
+            legacy_id: {
+                type: 'string'
+            },
+            legacy_slug: {
+                type: 'string'
+            },
+            hidden: {
+                type: 'boolean',
+                defaultValue: false
+            },
+            created: {
+                type: 'date'
+            },
+            updated: {
+                type: 'date'
+            }
+        }
+    };
 
 Location.methods.updateSlug = function () {
     this.slug = slug(this.title + ' ' + this.uuid.substr(0,5));
@@ -62,3 +150,4 @@ module.exports.Location = require('../lib/util/model-helper').setup(
         }
     }
 );
+module.exports.SwaggerSpec = SwaggerSpec;

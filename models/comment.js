@@ -16,6 +16,37 @@ var mongoose = require('mongoose'),
     }, {
         autoindex: process.env.NODE_ENV !== 'production',
         id: false
-    });
+    }),
+    SwaggerSpec = {
+        required: [
+            'user_uuid',
+            'subject_uuid',
+            'body'
+        ],
+        properties: {
+            uuid: {
+                type: 'string'
+            },
+            user_uuid: {
+                type: 'string'
+            },
+            subject_uuid: {
+                type: 'string'
+            },
+            body: {
+                type: 'string'
+            },
+            legacy_id: {
+                type: 'string'
+            },
+            created: {
+                type: 'date'
+            },
+            updated: {
+                type: 'date'
+            }
+        }
+    };
 
 module.exports.Comment = require('../lib/util/model-helper').setup(Comment);
+module.exports.SwaggerSpec = SwaggerSpec;

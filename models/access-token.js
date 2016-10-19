@@ -11,7 +11,23 @@ var mongoose = require('mongoose'),
     }, {
         autoindex: process.env.NODE_ENV !== 'production',
         id: false
-    });
+    }),
+    SwaggerSpec = {
+        required: [
+            'api_key'
+        ],
+        properties: {
+            token: {
+                type: 'string'
+            },
+            issued: {
+                type: 'date'
+            },
+            hours_valid: {
+                type: 'integer'
+            }
+        }
+    };
 
 AccessToken.methods.isValid = function () {
     var expiration = new Date();
@@ -35,3 +51,4 @@ module.exports.AccessToken = modelHelper.setup(
         delete obj.scopes;
     }
 );
+module.exports.SwaggerSpec = SwaggerSpec;
