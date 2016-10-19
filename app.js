@@ -98,7 +98,7 @@ Promise.coroutine(function* () {
 
     swagger.setAppHandler(server);
     swagger.configureSwaggerPaths("", "/api-docs", "");
-    swagger.addModels({ models: require('./openapi-models.json') });
+    swagger.addModels(require('./openapi-models.json'));
 
     yield Promise.map(Object.keys(routes.paths), function (rPath) {
         return Promise.map(Object.keys(routes.paths[rPath]), function (method) {
@@ -108,8 +108,12 @@ Promise.coroutine(function* () {
                     action: routes.paths[rPath][method].controller
                 };
 
-            route.spec.path = rPath;
-            route.spec.nickname = method + route.spec.type;
+            if (!route.spec.path) {
+                route.spec.path = rPath;
+            }
+            if (!route.spec.nickname) {
+                route.spec.nickname = method + route.spec.type;
+            }
             swagger["add" + routeType.toUpperCase()](route);
         });
     });
