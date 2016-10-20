@@ -54,6 +54,13 @@ location ~* ^/[a-z,0-9,-]+/places/[a-z,0-9,-]+$ {
 }
 ```
 
+## Documentation
+
+The API is documented using [Swagger](http://swagger.io/) and is served at ``/api-docs`` at the respective API host. You can start a webserver to view the documentation by running
+```
+gulp swagger
+```
+
 ## Development
 
 The project uses ES6 JavaScript and you are encouraged to lint the code using [JSHint](http://jshint.com/) before pushing it or creating a pull request.

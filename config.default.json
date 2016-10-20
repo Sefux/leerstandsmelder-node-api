@@ -35,5 +35,8 @@
   },
   "file_delivery": {
     "base_url": "http://localhost:8080"
+  },
+  "swagger": {
+    "ui_port": 9292
   }
 }
