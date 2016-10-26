@@ -29,7 +29,7 @@ module.exports = {
             controller: res.map('find', {resource: 'Region'}),
             scope: 'public',
             spec: {
-                path: '/posts',
+                path: '/regions',
                 description: 'Get list of Regions',
                 summary: 'Find Regions',
                 nickname: 'findRegions',
@@ -71,7 +71,7 @@ module.exports = {
             controller: res.map('delete', {resource: 'Region'}),
             scope: 'admin',
             spec: {
-                path: '/posts/{uuid}',
+                path: '/regions/{uuid}',
                 description: 'Delete a region',
                 summary: 'Delete Region',
                 params: [swagger.pathParam('uuid', 'UUID of the region', 'string')],
