@@ -10,7 +10,7 @@ class RegionsController extends CommonController {
         super();
 
         this.coroutines.findResource.main = Promise.coroutine(function* (req, res, next, config) {
-            let limit = parseInt(req.params.limit) || 1,
+            let limit = parseInt(req.params.limit) || 0,
                 skip = limit * parseInt(req.params.skip || 0);
             if (req.params.lat && req.params.lon) {
                 let q = mongoose.model('Region').where('lonlat');
@@ -71,7 +71,7 @@ class RegionsController extends CommonController {
                     });
                 }
 
-                rHandler.handleDataResponse(output.slice(skip * limit, limit), 200, res, next);
+                rHandler.handleDataResponse(output.slice(skip * limit, limit || output.length), 200, res, next);
             }
         });
 
