@@ -28,23 +28,28 @@ class CommonController {
                         query.hidden = false;
                     }
 
-                    let limit = Math.abs(parseInt(req.params.limit || 5)),
+                    let limit = Math.abs(parseInt(req.query.limit || 5)),
+                        skip = Math.abs(parseInt(req.query.skip || 0)) * limit,
                         q = mongoose.model(config.resource).find(query);
-                    q = config.select ? q.select(config.select) : q;
-                    q = req.params.skip ? q.skip(Math.abs(parseInt(req.params.skip || 0)) * limit) : q;
-                    q = req.params.limit ? q.limit(limit) : q;
-                    q = req.params.sort ? q.sort(req.params.sort) : q;
 
-                    let results = yield q.exec();
-                    if (results.length > 0 && results[0].user_uuid) {
-                        yield Promise.map(results, function (result) {
+                    q = config.select ? q.select(config.select) : q;
+                    q = req.query.skip ? q.skip(skip) : q;
+                    q = req.query.limit ? q.limit(limit) : q;
+                    q = req.query.sort ? q.sort(req.query.sort) : q;
+
+                    var data = {page: Math.ceil(skip / limit), pagesize: limit};
+                    data.results = yield q.exec();
+                    data.total = yield mongoose.model(config.resource).count(q._conditions);
+
+                    if (data.results.length > 0 && data.results[0].user_uuid) {
+                        yield Promise.map(data.results, Promise.coroutine(function* (result) {
                             result = result.toObject();
-                            result.user = mongoose.model('User').findOne({uuid: result.user_uuid})
+                            result.user = yield mongoose.model('User').findOne({uuid: result.user_uuid})
                                 .select('uuid nickname').exec();
                             return result;
-                        });
+                        }));
                     }
-                    rHandler.handleDataResponse(results, 200, res, next);
+                    rHandler.handleDataResponse(data, 200, res, next);
                 }),
                 pre: Promise.resolve
             },

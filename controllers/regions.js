@@ -10,26 +10,32 @@ class RegionsController extends CommonController {
         super();
 
         this.coroutines.findResource.main = Promise.coroutine(function* (req, res, next, config) {
-            let limit = parseInt(req.params.limit) || 0,
-                skip = limit * parseInt(req.params.skip || 0);
-            if (req.params.lat && req.params.lon) {
+            let limit = parseInt(req.query.limit || 0),
+                skip = limit * parseInt(req.query.skip || 0),
+                lat = req.params.lat || req.query.lat,
+                lon = req.params.lon || req.query.lon;
+            if (lat && lon) {
                 let q = mongoose.model('Region').where('lonlat');
                 q.near({
-                    center: {coordinates: [parseFloat(req.params.lon), parseFloat(req.params.lat)], type: 'Point'}
+                    center: {coordinates: [lon, lat], type: 'Point'}
                 });
                 q = config.select ? q.select(config.select) : q;
-                if (req.params.sort) {
-                    q = q.sort(req.params.sort);
+                if (req.query.sort) {
+                    q = q.sort(req.query.sort);
                 }
-                if (req.params.limit) {
+                if (req.query.limit) {
                     q = q.limit(limit);
                 }
-                if (req.params.skip) {
+                if (req.query.skip) {
                     q = q.skip(skip);
                 }
-                q.exec().then(function (results) {
-                    rHandler.handleDataResponse(results, 200, res, next);
-                });
+                let results = yield q.exec(),
+                    data = {page: Math.ceil(skip / limit), pagesize: limit};
+
+                data.results = yield q.exec();
+                data.total = yield mongoose.model(config.resource).count(q._conditions);
+
+                rHandler.handleDataResponse(results, 200, res, next);
             } else {
                 var results = yield mongoose.model('Location').mapReduce({
                     map: function () {
@@ -55,14 +61,14 @@ class RegionsController extends CommonController {
                         });
                 }, {concurrency: 1});
 
-                if (req.params.sort) {
+                if (req.query.sort) {
                     // function lifted from http://stackoverflow.com/a/4760279/578963
                     // FIXME: and apparently is not working too well...?
                     output.sort(function sortOn(property) {
                         var sortOrder = 1;
-                        if (req.params.sort[0] === "-") {
+                        if (req.query.sort[0] === "-") {
                             sortOrder = -1;
-                            req.params.sort = req.params.sort.substr(1);
+                            req.query.sort = req.query.sort.substr(1);
                         }
                         return function (a, b) {
                             var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
@@ -71,7 +77,12 @@ class RegionsController extends CommonController {
                     });
                 }
 
-                rHandler.handleDataResponse(output.slice(skip * limit, limit || output.length), 200, res, next);
+                let total = output.length,
+                    data = {page: Math.ceil(skip / limit), pagesize: limit};
+                data.total = total;
+                data.results = output.slice(skip * limit, limit || total);
+
+                rHandler.handleDataResponse(data, 200, res, next);
             }
         });
 

@@ -12,8 +12,7 @@ class LocationsController extends CommonController {
         super();
 
         this.coroutines.findResource.main = Promise.coroutine(function* (req, res, next, config) {
-            let query, q,
-                maxdist = parseFloat(req.query.radius || 2000) / 6371,
+            let query, q, maxdist = parseFloat(req.query.radius || 2000) / 6371,
                 limit = Math.min(Math.max(parseInt(req.query.limit || 1000), 0), 1000),
                 skip = Math.max(parseInt(req.query.skip || 0), 0) * limit,
                 uuid = req.params.region_uuid || req.params.uuid,
@@ -36,7 +35,7 @@ class LocationsController extends CommonController {
             }, (req.query.longitude !== undefined && req.query.latitude !== undefined));
 
             q = mongoose.model(config.resource).find(query);
-            q = req.query.sort ? q.sort(req.params.sort) : q;
+            q = req.query.sort ? q.sort(req.query.sort) : q;
             q = config.select ? q.select(config.select) : q;
             q = q.skip(skip).limit(limit);
 
