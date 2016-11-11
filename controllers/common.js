@@ -28,10 +28,11 @@ class CommonController {
                         query.hidden = false;
                     }
 
-                    let q = mongoose.model(config.resource).find(query);
+                    let limit = Math.abs(parseInt(req.params.limit || 5)),
+                        q = mongoose.model(config.resource).find(query);
                     q = config.select ? q.select(config.select) : q;
-                    q = req.params.skip ? q.skip(parseInt(req.params.skip)) : q;
-                    q = req.params.limit ? q.limit(parseInt(req.params.limit)) : q;
+                    q = req.params.skip ? q.skip(Math.abs(parseInt(req.params.skip || 0)) * limit) : q;
+                    q = req.params.limit ? q.limit(limit) : q;
                     q = req.params.sort ? q.sort(req.params.sort) : q;
 
                     let results = yield q.exec();

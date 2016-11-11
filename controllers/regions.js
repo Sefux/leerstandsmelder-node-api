@@ -10,20 +10,22 @@ class RegionsController extends CommonController {
         super();
 
         this.coroutines.findResource.main = Promise.coroutine(function* (req, res, next, config) {
+            let limit = parseInt(req.params.limit) || 1,
+                skip = limit * parseInt(req.params.skip || 0);
             if (req.params.lat && req.params.lon) {
-                var q = mongoose.model('Region').where('lonlat');
+                let q = mongoose.model('Region').where('lonlat');
                 q.near({
                     center: {coordinates: [parseFloat(req.params.lon), parseFloat(req.params.lat)], type: 'Point'}
                 });
                 q = config.select ? q.select(config.select) : q;
-                if (req.params.skip) {
-                    q = q.skip(parseInt(req.params.skip));
-                }
-                if (req.params.limit) {
-                    q = q.limit(parseInt(req.params.limit) || 1);
-                }
                 if (req.params.sort) {
                     q = q.sort(req.params.sort);
+                }
+                if (req.params.limit) {
+                    q = q.limit(limit);
+                }
+                if (req.params.skip) {
+                    q = q.skip(skip);
                 }
                 q.exec().then(function (results) {
                     rHandler.handleDataResponse(results, 200, res, next);
@@ -69,7 +71,7 @@ class RegionsController extends CommonController {
                     });
                 }
 
-                rHandler.handleDataResponse(output, 200, res, next);
+                rHandler.handleDataResponse(output.slice(skip * limit, limit), 200, res, next);
             }
         });
 
