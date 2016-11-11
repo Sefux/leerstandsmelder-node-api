@@ -28,8 +28,8 @@ class CommonController {
                         query.hidden = false;
                     }
 
-                    let limit = Math.abs(parseInt(req.query.limit || 5)),
-                        skip = Math.abs(parseInt(req.query.skip || 0)) * limit,
+                    let limit = Math.abs(parseInt(req.query.limit) || 5),
+                        skip = Math.abs(parseInt(req.query.skip) || 0),
                         q = mongoose.model(config.resource).find(query);
 
                     q = config.select ? q.select(config.select) : q;
@@ -37,7 +37,7 @@ class CommonController {
                     q = req.query.limit ? q.limit(limit) : q;
                     q = req.query.sort ? q.sort(req.query.sort) : q;
 
-                    var data = {page: Math.ceil(skip / limit), pagesize: limit};
+                    var data = {page: Math.floor(skip / limit), pagesize: limit};
                     data.results = yield q.exec();
                     data.total = yield mongoose.model(config.resource).count(q._conditions);
 

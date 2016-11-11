@@ -11,7 +11,7 @@ class RegionsController extends CommonController {
 
         this.coroutines.findResource.main = Promise.coroutine(function* (req, res, next, config) {
             let limit = parseInt(req.query.limit || 0),
-                skip = limit * parseInt(req.query.skip || 0),
+                skip = parseInt(req.query.skip || 0),
                 lat = req.params.lat || req.query.lat,
                 lon = req.params.lon || req.query.lon;
             if (lat && lon) {
@@ -30,7 +30,7 @@ class RegionsController extends CommonController {
                     q = q.skip(skip);
                 }
                 let results = yield q.exec(),
-                    data = {page: Math.ceil(skip / limit), pagesize: limit};
+                    data = {page: Math.floor(skip / limit), pagesize: limit};
 
                 data.results = yield q.exec();
                 data.total = yield mongoose.model(config.resource).count(q._conditions);
@@ -78,9 +78,9 @@ class RegionsController extends CommonController {
                 }
 
                 let total = output.length,
-                    data = {page: Math.ceil(skip / limit), pagesize: limit};
+                    data = {page: Math.floor(skip / limit), pagesize: limit};
                 data.total = total;
-                data.results = output.slice(skip * limit, limit || total);
+                data.results = output.slice(skip, limit || total);
 
                 rHandler.handleDataResponse(data, 200, res, next);
             }
