@@ -14,8 +14,8 @@ class LocationsController extends CommonController {
         this.coroutines.findResource.main = Promise.coroutine(function* (req, res, next, config) {
             let query, q,
                 maxdist = parseFloat(req.query.radius || 2000) / 6371,
-                page = Math.max(parseInt(req.query.page || 0), 0),
-                pagesize = Math.min(Math.max(parseInt(req.query.pagesize || 1000), 0), 1000),
+                limit = Math.min(Math.max(parseInt(req.query.limit || 1000), 0), 1000),
+                skip = Math.max(parseInt(req.query.skip || 0), 0) * limit,
                 uuid = req.params.region_uuid || req.params.uuid,
                 region = yield mongoose.model('Region').findOne({$or: [{uuid: uuid}, {slug: uuid}]}),
                 isAdmin = req.api_key && (
@@ -38,9 +38,9 @@ class LocationsController extends CommonController {
             q = mongoose.model(config.resource).find(query);
             q = req.query.sort ? q.sort(req.params.sort) : q;
             q = config.select ? q.select(config.select) : q;
-            q = q.skip(page * pagesize).limit(pagesize);
+            q = q.skip(skip).limit(limit);
 
-            var data = { page: page, pagesize: pagesize };
+            var data = { page: Math.ceil(skip / limit), pagesize: limit };
             data.results = yield q.exec();
             data.total = yield mongoose.model(config.resource).count(q._conditions);
 
