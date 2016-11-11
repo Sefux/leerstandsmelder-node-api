@@ -32,7 +32,9 @@ Promise.coroutine(function* () {
         errorReporter.init(config.airbrake);
     }
 
-    workers.startFrontend();
+    if (config.workers.use_frontend) {
+        workers.startFrontend(config.workers.frontend_port);
+    }
 
     yield fs.mkdirpAsync(path.resolve(path.join(config.file_storage.path, 'photos')));
     yield fs.mkdirpAsync(path.resolve(path.join(config.file_storage.path, 'thumbs')));

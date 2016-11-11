@@ -38,5 +38,9 @@
   },
   "swagger": {
     "ui_port": 9292
+  },
+  "workers": {
+    "use_frontend": false,
+    "frontend_port": 4444
   }
 }
