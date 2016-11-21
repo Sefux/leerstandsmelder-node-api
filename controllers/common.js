@@ -106,8 +106,8 @@ class CommonController {
                         let region = yield mongoose.model('Region').findOne({uuid: req.body.region_uuid});
                         if (region) {
                             req.body.hidden = region.moderate || false;
+                            defaultAcl = defaultAcl.concat(['region-' + region.uuid]);
                         }
-                        defaultAcl = defaultAcl.concat(['region-' + region.uuid]);
                     }
                     let result = yield mongoose.model(config.resource).create(req.body);
                     yield aclManager.setAclEntry(
