@@ -90,16 +90,18 @@ class CommonController {
             postResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
                     if (req.user && req.user.uuid && !req.body.user_uuid) req.body.user_uuid = req.user.uuid;
+                    let defaultAcl = [req.user.uuid, 'admin'];
                     if (req.body.hasOwnProperty('region_uuid')) {
                         let region = yield mongoose.model('Region').findOne({uuid: req.body.region_uuid});
                         if (region) {
                             req.body.hidden = region.moderate || false;
+                            defaultAcl = defaultAcl.concat(['region-' + region.uuid]);
                         }
                     }
                     let result = yield mongoose.model(config.resource).create(req.body);
                     yield aclManager.setAclEntry(
                         req.url + '/' + result.uuid,
-                        [req.user.uuid, 'admin'],
+                        defaultAcl,
                         ['get', 'put', 'delete']
                     );
                     yield aclManager.setAclEntry(req.url + '/' + result.uuid, ['user'], ['get']);
