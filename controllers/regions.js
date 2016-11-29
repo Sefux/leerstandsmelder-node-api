@@ -35,7 +35,7 @@ class RegionsController extends CommonController {
                 data.results = yield q.exec();
                 data.total = yield mongoose.model(config.resource).count(q._conditions);
 
-                rHandler.handleDataResponse(results, 200, res, next);
+                rHandler.handleDataResponse(data, 200, res, next);
             } else {
                 var results = yield mongoose.model('Location').mapReduce({
                     map: function () {
