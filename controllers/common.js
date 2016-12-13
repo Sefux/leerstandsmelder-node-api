@@ -37,19 +37,20 @@ class CommonController {
                     q = req.query.limit ? q.limit(limit) : q;
                     q = req.query.sort ? q.sort(req.query.sort) : q;
 
-                    var data = {page: Math.floor(skip / limit), pagesize: limit};
-                    data.results = yield q.exec();
+                    var data = {page: Math.floor(skip / limit), pagesize: limit},
+                        results = yield q.exec();
                     data.total = yield mongoose.model(config.resource).count(q._conditions);
 
-                    if (data.results.length > 0 && data.results[0].user_uuid) {
-                        data.results = yield Promise.map(data.results, Promise.coroutine(function* (result) {
-                            result = result.toObject();
+                    data.results = yield Promise.map(results, Promise.coroutine(function* (result) {
+                        result = result.toObject();
+                        if (result.user_uuid) {
                             result.user = yield mongoose.model('User').findOne({uuid: result.user_uuid})
                                 .select('uuid nickname').exec();
                             result.user = result.user ? result.user.toObject() : undefined;
-                            return result;
-                        }));
-                    }
+                        }
+                        return result;
+                    }));
+
                     rHandler.handleDataResponse(data, 200, res, next);
                 }),
                 pre: Promise.resolve
