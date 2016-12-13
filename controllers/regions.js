@@ -20,29 +20,26 @@ class RegionsController extends CommonController {
                 if (req.params.skip) {
                     q = q.skip(parseInt(req.params.skip));
                 }
-                if (req.params.limit) {
+                if (limit) {
                     q = q.limit(parseInt(req.params.limit));
                 }
                 if (req.params.sort) {
                     q = q.sort(req.params.sort);
                 }
-                q.exec().then(function (results) {
-                    rHandler.handleDataResponse(results, 200, res, next);
-                });
+                let results = yield q.exec();
+                rHandler.handleDataResponse(results, 200, res, next);
             } else {
                 return Promise.resolve()
-                    .then(function () {
-                        return mongoose.model('Location').mapReduce({
-                            map: function () {
-                                if (!this.hide) {
-                                    emit(this.region_uuid, 1);
-                                }
-                            },
-                            reduce: function (k, v) {
-                                return Array.sum(v);
-                            }
-                        });
-                    })
+                    .then(Promise.coroutine(function* () {
+                        let regions = yield mongoose.model('Region').find({}).exec(),
+                            results = [];
+                        yield Promise.map(regions, Promise.coroutine(function* (region) {
+                            let item = { _id: region.uuid };
+                            item.value = yield mongoose.model('Location').count({region_uuid: region.uuid}).exec();
+                            results.push(item);
+                        }));
+                        return results;
+                    }))
                     .then(function (results) {
                         var output = [];
 
@@ -56,7 +53,7 @@ class RegionsController extends CommonController {
                             return function (a, b) {
                                 var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
                                 return result * sortOrder;
-                            }
+                            };
                         }
 
                         return Promise.map(results, function (item) {
