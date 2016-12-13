@@ -42,10 +42,11 @@ class CommonController {
                     data.total = yield mongoose.model(config.resource).count(q._conditions);
 
                     if (data.results.length > 0 && data.results[0].user_uuid) {
-                        yield Promise.map(data.results, Promise.coroutine(function* (result) {
+                        data.results = yield Promise.map(data.results, Promise.coroutine(function* (result) {
                             result = result.toObject();
                             result.user = yield mongoose.model('User').findOne({uuid: result.user_uuid})
                                 .select('uuid nickname').exec();
+                            result.user = result.user ? result.user.toObject() : undefined;
                             return result;
                         }));
                     }
@@ -82,6 +83,7 @@ class CommonController {
                         result.user = yield mongoose.model('User')
                             .findOne({uuid:result.user_uuid})
                             .select('uuid nickname').exec();
+                        result.user = result.user ? result.user.toObject() : undefined;
                     }
                     rHandler.handleDataResponse(result, 200, res, next);
                 }),
