@@ -13,7 +13,7 @@ class CommonController {
             delete req.body.region_uuid;
             delete req.body.user_uuid;
             delete req.body.legacy_id;
-        };
+        }
 
         this.coroutines = {
             findResource: {

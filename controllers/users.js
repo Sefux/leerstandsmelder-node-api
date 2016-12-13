@@ -19,7 +19,7 @@ class UsersController extends CommonController {
             delete req.body.crypted_password;
             delete req.body.password_salt;
             delete req.body.legacy_id;
-        };
+        }
 
         function updateUUID(req) {
             if (req.params.uuid === 'me' && req.user) {
