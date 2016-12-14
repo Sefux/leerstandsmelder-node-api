@@ -54,6 +54,44 @@ class UsersController extends CommonController {
                 rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
             }
         });
+        this.coroutines.findResource.main = Promise.coroutine(function* (req, res, next, config) {
+                if (req.params.uuid === 'me' && req.user) {
+                    req.params.uuid = req.user.uuid;
+                }
+                let query = require('../lib/util/query-mapping')({}, req, config);
+
+                let paths = mongoose.model(config.resource).schema.paths;
+                if (paths.hasOwnProperty('hidden')) {
+                    query.hidden = false;
+                }
+
+                let limit = Math.abs(parseInt(req.query.limit) || 5),
+                    skip = Math.abs(parseInt(req.query.skip) || 0),
+                    q = mongoose.model(config.resource).find(query);
+
+                q = config.select ? q.select(config.select) : q;
+                q = req.query.skip ? q.skip(skip) : q;
+                q = req.query.limit ? q.limit(limit) : q;
+                q = req.query.sort ? q.sort(req.query.sort) : q;
+
+                var data = {page: Math.floor(skip / limit), pagesize: limit},
+                    results = yield q.exec();
+                data.total = yield mongoose.model(config.resource).count(q._conditions);
+
+                data.results = yield Promise.map(results, Promise.coroutine(function* (result) {
+                    result = result.toObject();
+
+                    result.api_keys = yield mongoose.model('ApiKey').findOne({user_uuid: result.uuid})
+                        .select('created updated scopes').exec();
+                    result.api_keys = result.api_keys ? result.api_keys.toObject() : undefined;
+
+                    return result;
+                }));
+
+                rHandler.handleDataResponse(data, 200, res, next);
+            });
+        this.coroutines.findResource.pre = Promise.resolve;
+
 
         this.coroutines.postResource.main = Promise.coroutine(function* (req, res, next) {
             deleteProtected(req);

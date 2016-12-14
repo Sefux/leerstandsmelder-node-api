@@ -29,6 +29,17 @@ module.exports = {
                 nickname: 'createUser',
                 responseClass: 'User'
             }
+        },
+        'get': {
+            controller: users.map('find', {resource: 'User'}),
+            scope: 'admin',
+            spec: {
+                path: '/users',
+                description: 'Get list of Users',
+                summary: 'Find Users',
+                nickname: 'findUsers',
+                responseClass: 'User'
+            }
         }
     },
     '/users/:uuid': {
