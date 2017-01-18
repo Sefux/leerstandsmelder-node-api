@@ -12,7 +12,7 @@ var mongoose = require('mongoose'),
         description: String,
         degree: String,
         owner: {type: String, index: true},
-        rumor: Boolean,
+        demolition_rumor: {type:Boolean, default: false},
         emptySince: String,
         buildingType: String,
         street: {type: String, index: true},
@@ -64,8 +64,9 @@ var mongoose = require('mongoose'),
             owner: {
                 type: 'string'
             },
-            rumor: {
-                type: 'boolean'
+            demolition_rumor: {
+                type: 'boolean',
+                defaultValue: false
             },
             emptySince: {
                 type: 'string'
