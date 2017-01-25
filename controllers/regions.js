@@ -29,13 +29,12 @@ class RegionsController extends CommonController {
                 if (req.query.skip) {
                     q = q.skip(skip);
                 }
-                let results = yield q.exec(),
-                    data = {page: Math.floor(skip / limit), pagesize: limit};
+                let data = {page: Math.floor(skip / limit), pagesize: limit};
 
                 data.results = yield q.exec();
                 data.total = yield mongoose.model(config.resource).count(q._conditions);
 
-                rHandler.handleDataResponse(results, 200, res, next);
+                rHandler.handleDataResponse(data, 200, res, next);
             } else {
                 var results = yield mongoose.model('Location').mapReduce({
                     map: function () {

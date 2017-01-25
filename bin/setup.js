@@ -99,11 +99,3 @@ function loadConfig(callback) {
         callback(err && err.code !== 'ENOENT' ? err : null, data ? JSON.parse(data) : null);
     });
 }
-
-function saveConfig(config, callback) {
-    var fs = require('fs'),
-        path = require('path');
-    fs.writeFile(path.join(__dirname, '..', 'config.json'), JSON.stringify(config, null, '\t'), function (err) {
-        callback(err);
-    });
-}

@@ -14,6 +14,9 @@ var mongoose = require('mongoose'),
         password_salt: { type: String, required: true },
         confirmed: { type: Boolean, default: false },
         blocked: { type: Boolean, default: false },
+        message_me: { type: Boolean, default: false },
+        notify: { type: Boolean, default: false },
+        share_email: { type: Boolean, default: false },
         created: Date,
         updated: Date,
         last_login: Date,
@@ -46,7 +49,19 @@ var mongoose = require('mongoose'),
             },
             updated: {
                 type: 'date'
-            }
+            },
+            message_me: {
+                type: 'boolean',
+                defaultValue: false
+            },
+            notify: {
+                type: 'boolean',
+                defaultValue: false
+            },
+            share_email: {
+                type: 'boolean',
+                defaultValue: false
+            },
         }
     };
 

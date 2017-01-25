@@ -6,11 +6,12 @@ var mongoose = require('mongoose'),
 
         uuid: {type: String, unique: true},
         user_uuid: {type: String, required: true},
-        recipient_uuid: {type: String, required: true},
+        recipient_uuid: String,
         subject_uuid: String,
         body: {type: String, required: true},
 
-        created: Date
+        created: Date,
+        read: Date
 
     }, {
         autoindex: process.env.NODE_ENV !== 'production',

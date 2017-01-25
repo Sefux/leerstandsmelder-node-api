@@ -13,7 +13,7 @@ class CommonController {
             delete req.body.region_uuid;
             delete req.body.user_uuid;
             delete req.body.legacy_id;
-        };
+        }
 
         this.coroutines = {
             findResource: {
@@ -37,18 +37,20 @@ class CommonController {
                     q = req.query.limit ? q.limit(limit) : q;
                     q = req.query.sort ? q.sort(req.query.sort) : q;
 
-                    var data = {page: Math.floor(skip / limit), pagesize: limit};
-                    data.results = yield q.exec();
+                    var data = {page: Math.floor(skip / limit), pagesize: limit},
+                        results = yield q.exec();
                     data.total = yield mongoose.model(config.resource).count(q._conditions);
 
-                    if (data.results.length > 0 && data.results[0].user_uuid) {
-                        yield Promise.map(data.results, Promise.coroutine(function* (result) {
-                            result = result.toObject();
+                    data.results = yield Promise.map(results, Promise.coroutine(function* (result) {
+                        result = result.toObject();
+                        if (result.user_uuid) {
                             result.user = yield mongoose.model('User').findOne({uuid: result.user_uuid})
                                 .select('uuid nickname').exec();
-                            return result;
-                        }));
-                    }
+                            result.user = result.user ? result.user.toObject() : undefined;
+                        }
+                        return result;
+                    }));
+
                     rHandler.handleDataResponse(data, 200, res, next);
                 }),
                 pre: Promise.resolve
@@ -82,6 +84,7 @@ class CommonController {
                         result.user = yield mongoose.model('User')
                             .findOne({uuid:result.user_uuid})
                             .select('uuid nickname').exec();
+                        result.user = result.user ? result.user.toObject() : undefined;
                     }
                     rHandler.handleDataResponse(result, 200, res, next);
                 }),
@@ -90,16 +93,18 @@ class CommonController {
             postResource: {
                 main: Promise.coroutine(function* (req, res, next, config) {
                     if (req.user && req.user.uuid && !req.body.user_uuid) req.body.user_uuid = req.user.uuid;
+                    let defaultAcl = [req.user.uuid, 'admin'];
                     if (req.body.hasOwnProperty('region_uuid')) {
                         let region = yield mongoose.model('Region').findOne({uuid: req.body.region_uuid});
                         if (region) {
                             req.body.hidden = region.moderate || false;
+                            defaultAcl = defaultAcl.concat(['region-' + region.uuid]);
                         }
                     }
                     let result = yield mongoose.model(config.resource).create(req.body);
                     yield aclManager.setAclEntry(
                         req.url + '/' + result.uuid,
-                        [req.user.uuid, 'admin'],
+                        defaultAcl,
                         ['get', 'put', 'delete']
                     );
                     yield aclManager.setAclEntry(req.url + '/' + result.uuid, ['user'], ['get']);

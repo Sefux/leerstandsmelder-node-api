@@ -43,15 +43,16 @@ class LocationsController extends CommonController {
             data.results = yield q.exec();
             data.total = yield mongoose.model(config.resource).count(q._conditions);
 
-            yield Promise.map(data.results, Promise.coroutine(function* (result) {
+            data.results = yield Promise.map(data.results, Promise.coroutine(function* (result) {
                 result = result.toObject();
                 result.user = yield mongoose.model('User').findOne({uuid: result.user_uuid})
                     .select('uuid nickname').exec();
+                result.user = result.user ? result.user.toObject() : undefined;
                 result.region = yield mongoose.model('Region').findOne({uuid: result.region_uuid})
                     .select('uuid title slug').exec();
-                let photo = yield mongoose.model('Photo').findOne({location_uuid: result.uuid})
-                    .select('thumb_large_url uuid extension').exec();
-                result = conditionalAdd(result, 'thumb_large_url', photo ? photo.thumb_large_url : undefined);
+                result.region = result.region ? result.region.toObject() : undefined;
+                let photo = yield mongoose.model('Photo').findOne({location_uuid: result.uuid}).exec();
+                result = conditionalAdd(result, 'photo', photo ? photo.toObject() : undefined);
                 return result;
             }));
 
