@@ -14,7 +14,7 @@ var mongoose = require('mongoose'),
         owner: {type: String, index: true},
         rumor: Boolean,
         emptySince: String,
-        buildingType: String,
+        artworkType: String,
         street: {type: String, index: true},
         city: {type: String, index: true},
         postcode: {type: String, index: true},
@@ -70,7 +70,7 @@ var mongoose = require('mongoose'),
             emptySince: {
                 type: 'string'
             },
-            buildingType: {
+            artworkType: {
                 type: 'string'
             },
             street: {

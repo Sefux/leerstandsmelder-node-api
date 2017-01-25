@@ -53,7 +53,7 @@ module.exports = {
         },
         'put': {
             controller: res.map('put', {resource: 'Region'}),
-            scope: 'admin',
+            scope: 'public',
             spec: {
                 path: '/regions/{uuid}',
                 description: 'Update a region',
@@ -85,7 +85,7 @@ module.exports = {
             controller: locations.map('find', {
                 resource: 'Location',
                 select: 'uuid user_uuid region_uuid slug title lonlat postcode ' +
-                    'street city buildingType owner hidden active created updated'
+                    'street city artworkType owner hidden active created updated'
             }),
             scope: 'public',
             spec: {

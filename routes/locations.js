@@ -9,7 +9,7 @@ var swagger = require('swagger-node-restify'),
 module.exports = {
     '/locations': {
         'get': {
-            controller: res.map('find', {resource: 'Location', select: 'uuid user_uuid title lonlat postcode city street owner buildingType created updated'}),
+            controller: res.map('find', {resource: 'Location', select: 'uuid user_uuid title lonlat postcode city street owner artworkType created updated'}),
             scope: 'public',
             spec: {
                 path: '/locations',

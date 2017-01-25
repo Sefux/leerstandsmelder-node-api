@@ -68,7 +68,7 @@ Promise.coroutine(function* () {
     addModel('Post', require('./models/post'));
 
     var server = restify.createServer({
-        name: `Leerstandsmelder API Server v${version}`,
+        name: `MAPOZ API Server v${version}`,
         version: version
     });
     restify.defaultResponseHeaders = function() {

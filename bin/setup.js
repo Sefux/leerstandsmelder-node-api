@@ -11,28 +11,28 @@ prompt.start();
 
 async.waterfall([
     function (cb) {
-        console.log('\nWelcome to the Leerstandsmelder API Server setup.'.yellow);
+        console.log('\nWelcome to the MAP-OZ API Server setup.');
         loadConfig(cb);
     },
     function (cb) {
         createAdminUser(cb);
     }
-], function (err) {
+], function (err,cb) {
     console.log('\n');
     if (err) {
-        console.log('Leerstandsmelder API Server setup failed.'.red, err);
+        console.log('MAP-OZ API Server setup failed.', err);
         process.exit(1);
     } else {
-        console.log('Leerstandsmelder API Server setup successful.'.green);
+        console.log('MAP-OZ API Server setup successful.');
         process.exit(0);
     }
 });
 
-function createAdminUser(callback) {
+function createAdminUser(cb) {
     var mongoose = require('mongoose');
     async.waterfall([
         function (cb) {
-            console.log('\nCREATE ADMIN USER\n'.cyan);
+            console.log('\nCREATE ADMIN USER\n');
             prompt.get({
                 properties: {
                     login: {
@@ -70,7 +70,7 @@ function createAdminUser(callback) {
             mongoose.connect('mongodb://' + config.mongodb.host + ':' + config.mongodb.port + '/' + config.mongodb.dbname);
             mongoose.model('User', require('../models/user').User);
             var user = {
-                login: data.login,
+                nickname: data.login,
                 email: data.email,
                 password: data.password,
                 confirmed: true
@@ -83,9 +83,11 @@ function createAdminUser(callback) {
             mongoose.model('ApiKey', require('../models/api-key').ApiKey);
             mongoose.model('ApiKey').create({user_uuid: user.uuid, scopes: ['user', 'admin']}, cb);
         }
-    ], function (err, apikey) {
-        console.log(apikey);
-        callback(err);
+    ], function (err, apikey, cb) {
+        console.log('apikey',apikey);
+        console.log('err',err);
+
+        //cb(err);
     });
 }
 
@@ -93,6 +95,7 @@ function loadConfig(callback) {
     var fs = require('fs'),
         path = require('path');
     fs.readFile(path.join(__dirname, '..', 'config.json'), function (err, data) {
+        console.log('load config');
         callback(err && err.code !== 'ENOENT' ? err : null, data ? JSON.parse(data) : null);
     });
 }

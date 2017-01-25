@@ -50,8 +50,8 @@ class LocationsController extends CommonController {
                 result.region = yield mongoose.model('Region').findOne({uuid: result.region_uuid})
                     .select('uuid title slug').exec();
                 let photo = yield mongoose.model('Photo').findOne({location_uuid: result.uuid})
-                    .select('thumb_url uuid extension').exec();
-                result = conditionalAdd(result, 'thumb_url', photo ? photo.thumb_url : undefined);
+                    .select('thumb_large_url uuid extension').exec();
+                result = conditionalAdd(result, 'thumb_large_url', photo ? photo.thumb_large_url : undefined);
                 return result;
             }));
 

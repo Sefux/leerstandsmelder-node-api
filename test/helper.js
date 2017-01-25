@@ -5,7 +5,7 @@ var mongoose = require('mongoose'),
     chance = require('chance').Chance(),
     uuid = require('uuid4'),
     acl = require('../lib/auth/acl-manager'),
-    dburl = 'mongodb://127.0.0.1:27017/leerstandsmelder-api-test';
+    dburl = 'mongodb://127.0.0.1:27017/mapoz-api';
 
 mongoose.Promise = Promise;
 
@@ -44,7 +44,7 @@ module.exports.getFixture = function (resource) {
                 degree: chance.word({length: 8}),
                 rumor: chance.integer({min: 0, max: 3}),
                 emptySince: chance.date(),
-                buildingType: chance.word({length: 8}),
+                artworkType: chance.word({length: 8}),
                 street: chance.address(),
                 city: chance.city(),
                 postcode: chance.zip(),
