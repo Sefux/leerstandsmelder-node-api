@@ -22,7 +22,7 @@ class UsersController extends CommonController {
         }
 
         function updateUUID(req) {
-            if (req.params.uuid === 'me' && req.user) {
+            if (req.params.uuid === 'me' && req.user && !req.user.scopes.indexOf('admin')) {
                 req.params.uuid = req.user.uuid;
             }
             return Promise.resolve();
