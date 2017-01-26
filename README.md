@@ -1,5 +1,6 @@
 # Leerstandsmelder API
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4710609f84ea4e9f9796ed1ca45f6e72)](https://www.codacy.com/app/dasantonym/leerstandsmelder-node-api?utm_source=github.com&utm_medium=referral&utm_content=Leerstandsmelder/leerstandsmelder-node-api&utm_campaign=badger)
 [![Build Status](https://travis-ci.org/Leerstandsmelder/leerstandsmelder-node-api.svg?branch=master)](https://travis-ci.org/Leerstandsmelder/leerstandsmelder-node-api) [![dependency Status](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api.svg)](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api) [![devDependency Status](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api/dev-status.svg)](https://david-dm.org/Leerstandsmelder/leerstandsmelder-node-api#info=devDependencies) [![bitHound Code](https://www.bithound.io/github/Leerstandsmelder/leerstandsmelder-node-api/badges/code.svg)](https://www.bithound.io/github/Leerstandsmelder/leerstandsmelder-node-api)
 
 API server for [Leerstandsmelder.de](http://www.leerstandsmelder.de) based on [restify](http://restify.com) and written in ES6 JavaScript for [Node.js](https://nodejs.org).
