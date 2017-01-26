@@ -32,7 +32,9 @@ module.exports = {
         },
         'get': {
             controller: users.map('find', {resource: 'User'}),
-            scope: 'admin',
+            //TODO: get all users has to work for admins. secure this again
+            //scope: 'admin',
+            scope: 'user',
             spec: {
                 path: '/users',
                 description: 'Get list of Users',
