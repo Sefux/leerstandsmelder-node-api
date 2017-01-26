@@ -48,6 +48,12 @@ class CommonController {
                                 .select('uuid nickname').exec();
                             result.user = result.user ? result.user.toObject() : undefined;
                         }
+                        if (result.subject_uuid) {
+                            result.location = yield mongoose.model('Location')
+                                .findOne({uuid:result.subject_uuid})
+                                .select('uuid title city').exec();
+                            result.location = result.location ? result.location.toObject() : undefined;
+                        }
                         return result;
                     }));
 
@@ -85,6 +91,12 @@ class CommonController {
                             .findOne({uuid:result.user_uuid})
                             .select('uuid nickname').exec();
                         result.user = result.user ? result.user.toObject() : undefined;
+                    }
+                    if (result && result.subject_uuid) {
+                        result.location = yield mongoose.model('Location')
+                            .findOne({uuid:result.subject_uuid})
+                            .select('uuid title city').exec();
+                        result.location = result.location ? result.location.toObject() : undefined;
                     }
                     rHandler.handleDataResponse(result, 200, res, next);
                 }),
