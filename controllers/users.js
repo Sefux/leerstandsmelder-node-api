@@ -51,15 +51,18 @@ class UsersController extends CommonController {
             var q = mongoose.model(config.resource)
                 .findOne({uuid: req.params.uuid, confirmed: true, blocked: false})
                 .select(selectAttributes);
-            let result = yield q.exec();
-            /*
+            var result = yield q.exec();
+
+
             //TODO: as admin i want to see/edited user rights/ACL
 	        if (req.user.scopes.indexOf('admin')) {
-                //var res = result.toObject();
-                result.api_keys = yield mongoose.model('ApiKey').findOne({user_uuid: result.uuid})
+                result = result.toObject();
+                result.api_keys = yield mongoose.model('ApiKey').find({user_uuid: result.uuid, active: true})
                     .select('created updated scopes').exec();
 	        }
-            */
+
+
+
             if (result) {
                 rHandler.handleDataResponse(result, 200, res, next);
             } else {
@@ -92,11 +95,8 @@ class UsersController extends CommonController {
 
                 data.results = yield Promise.map(results, Promise.coroutine(function* (result) {
                     result = result.toObject();
-
-                    result.api_keys = yield mongoose.model('ApiKey').findOne({user_uuid: result.uuid})
+                    result.api_keys = yield mongoose.model('ApiKey').find({user_uuid: result.uuid})
                         .select('created updated scopes').exec();
-                    result.api_keys = result.api_keys ? result.api_keys.toObject() : undefined;
-
                     return result;
                 }));
 
