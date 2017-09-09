@@ -103,6 +103,7 @@ Promise.coroutine(function* () {
         require('./routes/locations'),
         require('./routes/messages'),
         require('./routes/regions'),
+        require('./routes/ping'),
         require('./routes/photos'),
         require('./routes/posts'),
         require('./routes/users')

@@ -22,7 +22,19 @@ module.exports = {
                 nickname: 'createComment',
                 responseClass: 'Comment'
             }
+        },
+        'get': {
+            controller: res.map('find', {resource: 'Comment'}),
+            scope: 'user',
+            spec: {
+                path: '/comments',
+                description: 'Get list of latest Comments',
+                summary: 'Find Comments',
+                nickname: 'findComments',
+                responseClass: 'List[Comment]'
+            }
         }
+
     },
     '/comments/:uuid': {
         'get': {

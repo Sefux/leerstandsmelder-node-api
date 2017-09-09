@@ -85,7 +85,7 @@ module.exports = {
             controller: locations.map('find', {
                 resource: 'Location',
                 select: 'uuid user_uuid region_uuid slug title lonlat postcode ' +
-                    'street city artworkType owner hidden active created updated'
+                    'street city artworkType description owner hidden active created updated'
             }),
             scope: 'public',
             spec: {

@@ -22,7 +22,7 @@ class UsersController extends CommonController {
         }
 
         function updateUUID(req) {
-            if (req.params.uuid === 'me' && req.user) {
+            if (req.params.uuid === 'me' && req.user && !req.user.scopes.indexOf('admin')) {
                 req.params.uuid = req.user.uuid;
             }
             return Promise.resolve();
@@ -30,7 +30,7 @@ class UsersController extends CommonController {
 
         function preHandler(req) {
             updateUUID(req);
-            if (req.user.uuid !== req.params.uuid) {
+            if (req.user.uuid !== req.params.uuid && !req.user.scopes.indexOf('admin')) {
                 throw new restify.NotAuthorizedError();
             }
             return Promise.resolve();
@@ -41,13 +41,28 @@ class UsersController extends CommonController {
             var selectAttributes = 'uuid nickname';
 
             if (req.user && req.user.uuid === req.params.uuid) {
-                selectAttributes = 'uuid nickname email';
+                selectAttributes = 'uuid nickname email message_me notify';
             }
+
+	        if (req.user.scopes.indexOf('admin') ) {
+		        selectAttributes = 'uuid nickname confirmed blocked email message_me notify share_email created updated last_login failed_logins';
+	        }
 
             var q = mongoose.model(config.resource)
                 .findOne({uuid: req.params.uuid, confirmed: true, blocked: false})
                 .select(selectAttributes);
-            let result = yield q.exec();
+            var result = yield q.exec();
+
+
+            //TODO: as admin i want to see/edited user rights/ACL
+	        if (req.user.scopes.indexOf('admin')) {
+                result = result.toObject();
+                result.api_keys = yield mongoose.model('ApiKey').find({user_uuid: result.uuid, active: true})
+                    .select('created updated scopes').exec();
+	        }
+
+
+
             if (result) {
                 rHandler.handleDataResponse(result, 200, res, next);
             } else {
@@ -80,11 +95,8 @@ class UsersController extends CommonController {
 
                 data.results = yield Promise.map(results, Promise.coroutine(function* (result) {
                     result = result.toObject();
-
-                    result.api_keys = yield mongoose.model('ApiKey').findOne({user_uuid: result.uuid})
+                    result.api_keys = yield mongoose.model('ApiKey').find({user_uuid: result.uuid})
                         .select('created updated scopes').exec();
-                    result.api_keys = result.api_keys ? result.api_keys.toObject() : undefined;
-
                     return result;
                 }));
 
@@ -125,9 +137,10 @@ class UsersController extends CommonController {
                 delete req.body.password;
             }
             for (var key in req.body) {
-                if (user[key]) {
+                //TODO: use model.path, otherwise model changes will not work
+                //if (user[key]) {
                     user[key] = req.body[key];
-                }
+                //}
             }
             yield user.save();
             rHandler.handleDataResponse(user, 200, res, next);
