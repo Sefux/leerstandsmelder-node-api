@@ -2,28 +2,28 @@
   "mongodb": {
     "host": "localhost",
     "port": 27017,
-    "dbname": "leerstandsmelder-api",
+    "dbname": "mapoz-api",
     "user": "",
     "pass": ""
   },
   "mailer": {
-    "address": "service-noreply@leerstandsmelder.de",
-    "host": "mail.leerstandsmelder.de",
+    "address": "service-noreply@city-of-oz.hamburg",
+    "host": "mail.city-of-oz.hamburg",
     "port": 465,
     "secure": true,
-    "user": "service-noreply@leerstandsmelder.de",
+    "user": "service-noreply@city-of-oz.hamburg",
     "pass": null,
     "validateSSL": false
   },
   "api_server": {
     "host": "localhost",
-    "port": 8080,
+    "port": 8089,
     "secure": false,
     "proxiedToDefault": false
   },
   "redirect_server": {
     "host": "localhost",
-    "port": 7070,
+    "port": 7079,
     "redirect_host": "http://localhost:7888"
   },
   "frontend": {
@@ -34,7 +34,7 @@
     "path": "./assets"
   },
   "file_delivery": {
-    "base_url": "http://localhost:8080"
+    "base_url": "http://localhost:8089"
   },
   "swagger": {
     "ui_port": 9292
