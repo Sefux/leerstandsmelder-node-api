@@ -14,21 +14,21 @@ Promise.coroutine(function* () {
         throw new Error('Server has not been configured yet. Please run bin/setup.');
     }
     var transport = nodemailer.createTransport({
-        host: serverConfig.get.mailer.host,
-        port: serverConfig.get.mailer.port,
-        secure: serverConfig.get.mailer.secure,
+        host: serverConfig.mailer.host,
+        port: serverConfig.mailer.port,
+        secure: serverConfig.mailer.secure,
         auth: {
-            user: serverConfig.get.mailer.user,
-            pass: serverConfig.get.mailer.pass
+            user: serverConfig.mailer.user,
+            pass: serverConfig.mailer.pass
         },
         tls: {
-            rejectUnauthorized: serverConfig.get.mailer.validateSSL
+            rejectUnauthorized: serverConfig.mailer.validateSSL
         }
     });
     
     // setup email data with unicode symbols
     let mailOptions = {
-        from: serverConfig.get.mailer.address, // sender address
+        from: serverConfig.mailer.address, // sender address
         to: 'sfuchs@projektkater.de', // list of receivers
         subject: 'Hello ✔', // Subject line
         text: 'Hello world?', // plain text body
