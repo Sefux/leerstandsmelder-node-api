@@ -6,8 +6,8 @@ var swagger = require('swagger-node-restify'),
 
 module.exports = {
     '/captchas': {
-        'post': {
-            controller: res.map('post', {resource: 'Captcha'}),
+        'get': {
+            controller: res.map('get', {resource: 'Captcha'}),
             scope: 'public',
             spec: {
                 path: '/captchas',
@@ -22,8 +22,8 @@ module.exports = {
         }
     },
     '/captchas/:code': {
-        'get': {
-            controller: res.map('get', {resource: 'Captcha'}),
+        'post': {
+            controller: res.map('post', {resource: 'Captcha'}),
             scope: 'public',
             spec: {
                 path: '/captchas/{code}',
