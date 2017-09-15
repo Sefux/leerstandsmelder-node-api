@@ -35,7 +35,7 @@ Promise.coroutine(function* () {
         html: '<b>Hello world?</b>' // html body
     };
     // send mail with defined transport object
-    transporter.sendMail(mailOptions, (error, info) => {
+    transport.sendMail(mailOptions, (error, info) => {
         if (error) {
             return console.log(error);
         }
