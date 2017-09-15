@@ -1,6 +1,6 @@
 Hallo,
 
-Klicke diesen Link, um dein Passwort bei leerstandsmelder.de zurückzusetzen:
+Klicke diesen Link, um dein Passwort bei map.city-of-oz.hamburg zurückzusetzen:
 
 !RESET_URL!
 
@@ -8,4 +8,4 @@ Falls Du dein Password nicht ändern wolltest, lösche einfach diese E-Mail.
 
 --
 
-http://www.leerstandsmelder.de
+http://map.city-of-oz.hamburg
