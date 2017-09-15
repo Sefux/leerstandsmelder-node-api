@@ -4,6 +4,7 @@
 
 var Promise = require('bluebird'),
     mongoose = require('mongoose'),
+    nodemailer = require('nodemailer'),
     serverConfig = require('../config.json');
 
 mongoose.Promise = Promise;
