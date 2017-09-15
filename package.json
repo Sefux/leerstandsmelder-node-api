@@ -1,17 +1,17 @@
 {
-  "name": "leerstandsmelder-node-api",
+  "name": "mapoz-node-api",
   "version": "0.1.0",
-  "description": "Leerstandsmelder Node.JS API server",
+  "description": "MapOZ Node.JS API server",
   "main": "app.js",
   "node": ">=4.0",
   "scripts": {
     "test": "./node_modules/.bin/mocha $(find test -path '*.spec.*') --recursive --no-timeouts"
   },
-  "author": "Gängeviertel e.V. <info@das-gaengeviertel.info>",
+  "author": "Verein Gängeviertel e.V. <info@das-gaengeviertel.info>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Leerstandsmelder/leerstandsmelder-node-api.git"
+    "url": "git://github.com/sefux/mapoz-node-api.git"
   },
   "dependencies": {
     "airbrake": "^1.0.1",
