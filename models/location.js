@@ -8,7 +8,7 @@ var mongoose = require('mongoose'),
         uuid: {type: String, unique: true},
         user_uuid: {type: String, index: true, required: true},
 
-        title: {type: String, required: true, index: true},
+        title: {type: String, required: false, index: true},
         description: String,
         degree: String,
         owner: {type: String, index: true},
@@ -129,7 +129,8 @@ var mongoose = require('mongoose'),
     };
 
 Location.methods.updateSlug = function () {
-    this.slug = slug(this.title + ' ' + this.uuid.substr(0,5));
+    this.title = this.street;
+    this.slug = slug(this.street + ' ' + this.uuid.substr(0,5));
 };
 
 module.exports.Location = require('../lib/util/model-helper').setup(
@@ -143,12 +144,12 @@ module.exports.Location = require('../lib/util/model-helper').setup(
         if (!this.uuid) {
             this.generateUUID();
         }
-        if (this.modifiedPaths().indexOf('title') > -1) {
+        //if (this.modifiedPaths().indexOf('title') > -1) {
             this.updateSlug();
             next();
-        } else {
+        /*} else {
             next();
-        }
+        }*/
     }
 );
 module.exports.SwaggerSpec = SwaggerSpec;
