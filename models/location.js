@@ -13,7 +13,7 @@ var mongoose = require('mongoose'),
         degree: String,
         owner: {type: String, index: true},
         demolition_rumor: {type:Boolean, default: false},
-        emptySince: String,
+        artworkSince: String,
         artworkType: String,
         street: {type: String, index: true},
         city: {type: String, index: true},
@@ -68,7 +68,7 @@ var mongoose = require('mongoose'),
                 type: 'boolean',
                 defaultValue: false
             },
-            emptySince: {
+            artworkSince: {
                 type: 'string'
             },
             artworkType: {

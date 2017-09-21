@@ -43,7 +43,7 @@ module.exports.getFixture = function (resource) {
                 description: chance.paragraph({sentences: 12}),
                 degree: chance.word({length: 8}),
                 rumor: chance.integer({min: 0, max: 3}),
-                emptySince: chance.date(),
+                artworkSince: chance.date(),
                 artworkType: chance.word({length: 8}),
                 street: chance.address(),
                 city: chance.city(),
