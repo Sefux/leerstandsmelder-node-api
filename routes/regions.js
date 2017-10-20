@@ -3,8 +3,10 @@
 var swagger = require('swagger-node-restify'),
     RegionsController = require('../controllers/regions'),
     LocationsController = require('../controllers/locations'),
+    CommentsController = require('../controllers/comments'),
     res = new RegionsController(),
-    locations = new LocationsController();
+    locations = new LocationsController(),
+    comments = new CommentsController();
 
 module.exports = {
     '/regions': {
@@ -94,6 +96,22 @@ module.exports = {
                 summary: 'Find Region Locations',
                 nickname: 'findRegionLocations',
                 responseClass: 'List[Location]'
+            }
+        }
+    },
+    '/regions/:uuid/comments': {
+        'get': {
+            controller: comments.map('find', {
+                resource: 'Comment',
+                select: 'uuid user_uuid subject_uuid body hidden created updated'
+            }),
+            scope: 'public',
+            spec: {
+                path: '/regions/{uuid}/comments',
+                description: 'Get list of Comments for a Region',
+                summary: 'Find Region Comments',
+                nickname: 'findRegionComments',
+                responseClass: 'List[Comments]'
             }
         }
     }
