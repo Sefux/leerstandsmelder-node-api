@@ -11,7 +11,7 @@ You can find the accompanying frontend and API client in the [Leerstandsmelder G
 
 ## Requirements
 
-* NodeJS 4.x or 6.x
+* NodeJS 6.x or 8.x
 * MongoDB 3.x
 * Redis 3.x
 
