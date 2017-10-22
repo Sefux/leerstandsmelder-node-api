@@ -78,11 +78,11 @@ describe('RouteAuth', () => {
     });
 
     before(() => {
-      return util.tearDown()
-        .then(() => {
-          return util.init();
-        });
-    })
+      return util.init();
+    });
+    after(() => {
+      return util.tearDown();
+    });
 
     it('regular user may GET public resource', () => {
         req = {

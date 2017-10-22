@@ -38,10 +38,10 @@ describe('LocationsController', () => {
     });
 
     before(() => {
-      return util.tearDown()
-        .then(() => {
-          return util.init();
-        });
+      return util.init();
+    });
+    after(() => {
+      return util.tearDown();
     });
 
     it('creates a location', () => {
