@@ -1,6 +1,6 @@
 {
   "name": "leerstandsmelder-node-api",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Leerstandsmelder Node.JS API server",
   "main": "app.js",
   "node": ">=4.0",
