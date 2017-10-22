@@ -13,8 +13,6 @@ describe('LocationsController', () => {
         proxySend, req, res, next, locationTemplate,
         controller = new LocationsController();
 
-    util.init();
-
     beforeEach(() => {
         locationTemplate = util.getFixture('Location');
         proxySend = sinon.spy();
@@ -37,6 +35,13 @@ describe('LocationsController', () => {
             .catch((err) => {
                 console.log(err.message);
             });
+    });
+
+    before(() => {
+      return util.tearDown()
+        .then(() => {
+          return util.init();
+        });
     });
 
     it('creates a location', () => {

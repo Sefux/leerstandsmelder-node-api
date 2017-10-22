@@ -13,8 +13,6 @@ describe('UsersController', () => {
         users = new UsersController(),
         userTemplate;
 
-    util.init();
-
     beforeEach(() => {
         userTemplate = util.getFixture('User');
         proxySend = sinon.spy();
@@ -30,6 +28,13 @@ describe('UsersController', () => {
                         return currentUser.confirmUser();
                     });
             });
+    });
+
+    before(() => {
+      return util.tearDown()
+        .then(() => {
+          return util.init();
+        });
     });
 
     it('creates a user', () => {

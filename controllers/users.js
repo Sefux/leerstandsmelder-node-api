@@ -2,6 +2,7 @@
 
 var mongoose = require('mongoose'),
     restify = require('restify'),
+    restifyErrors = require('restify-errors'),
     Promise = require('bluebird'),
     workers = require('../lib/workers'),
     rHandler = require('../lib/util/response-handlers'),
@@ -31,7 +32,7 @@ class UsersController extends CommonController {
         function preHandler(req) {
             updateUUID(req);
             if (req.user.uuid !== req.params.uuid && !req.user.scopes.indexOf('admin')) {
-                throw new restify.NotAuthorizedError();
+                throw restifyErrors.makeErrFromCode(403);
             }
             return Promise.resolve();
         }
@@ -66,7 +67,7 @@ class UsersController extends CommonController {
             if (result) {
                 rHandler.handleDataResponse(result, 200, res, next);
             } else {
-                rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                rHandler.handleErrorResponse(restifyErrors.makeErrFromCode(404), res, next);
             }
         });
         this.coroutines.findResource.main = Promise.coroutine(function* (req, res, next, config) {

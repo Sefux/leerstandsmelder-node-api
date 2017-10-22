@@ -1,32 +1,48 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    Promise = require('bluebird'),
+process.env.NODE_ENV = 'test';
+
+var Promise = require('bluebird'),
     chance = require('chance').Chance(),
     uuid = require('uuid4'),
     acl = require('../lib/auth/acl-manager'),
     dburl = 'mongodb://127.0.0.1:27017/leerstandsmelder-api-test';
 
-mongoose.Promise = Promise;
-
-module.exports.mongoose = mongoose;
 module.exports.acl = acl;
 
+module.exports.mongoose = require('mongoose');
+module.exports.mongoose.Promise = Promise;
+
 module.exports.init = function () {
-    var _mongoose = module.exports.mongoose;
-    if (!_mongoose.connection || _mongoose.connection.readyState === 0) {
-        _mongoose.connect(dburl);
-        _mongoose.model('User', require('../models/user').User);
-        _mongoose.model('ApiKey', require('../models/api-key').ApiKey);
-        _mongoose.model('AccessToken', require('../models/access-token').AccessToken);
-        _mongoose.model('AclEntry', require('../models/acl-entry').AclEntry);
-        _mongoose.model('Comment', require('../models/comment').Comment);
-        _mongoose.model('Location', require('../models/location').Location);
-        _mongoose.model('Message', require('../models/message').Message);
-        _mongoose.model('Region', require('../models/region').Region);
-        _mongoose.model('Photo', require('../models/photo').Photo);
-        _mongoose.model('Post', require('../models/post').Post);
+  var _mongoose = module.exports.mongoose
+    if (_mongoose && (!_mongoose.connection || _mongoose.connection.readyState === 0)) {
+        return _mongoose.connect(dburl, {useMongoClient: true})
+          .then(() => {
+            _mongoose.model('User', require('../models/user').User);
+            _mongoose.model('ApiKey', require('../models/api-key').ApiKey);
+            _mongoose.model('AccessToken', require('../models/access-token').AccessToken);
+            _mongoose.model('AclEntry', require('../models/acl-entry').AclEntry);
+            _mongoose.model('Comment', require('../models/comment').Comment);
+            _mongoose.model('Location', require('../models/location').Location);
+            _mongoose.model('Message', require('../models/message').Message);
+            _mongoose.model('Region', require('../models/region').Region);
+            _mongoose.model('Photo', require('../models/photo').Photo);
+            _mongoose.model('Post', require('../models/post').Post);
+          });
     }
+    return Promise.resolve()
+};
+
+module.exports.tearDown = function () {
+  var _mongoose = module.exports.mongoose
+  if (_mongoose && _mongoose.connection && _mongoose.connection.readyState !== 0) {
+    return new Promise(resolve => {
+      _mongoose.disconnect(function () {
+        resolve();
+      });
+    });
+  }
+  return Promise.resolve()
 };
 
 module.exports.getFixture = function (resource) {

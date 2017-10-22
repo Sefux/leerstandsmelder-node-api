@@ -14,8 +14,6 @@ describe('MessagesController', () => {
         senderTemplate, receiverTemplate, messageTemplate,
         messages = new MessagesController();
 
-    util.init();
-
     let checkMessage = (user, msg, template) => {
         msg.user_uuid.should.equal(user.uuid);
         msg.recipient_uuid.should.equal(template.recipient_uuid);
@@ -57,6 +55,13 @@ describe('MessagesController', () => {
                         presetMessage = msgObj;
                     });
             });
+    });
+
+    before(() => {
+      return util.tearDown()
+        .then(() => {
+          return util.init();
+        });
     });
 
     it('creates a message', () => {

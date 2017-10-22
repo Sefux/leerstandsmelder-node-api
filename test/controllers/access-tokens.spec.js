@@ -15,8 +15,6 @@ describe('AccessTokensController', () => {
         controller = accessTokenController,
         userTemplateConfirmed = util.getFixture('User');
 
-    util.init();
-
     beforeEach(() => {
         proxySend = sinon.spy();
         res = {send: proxySend};
@@ -43,6 +41,13 @@ describe('AccessTokensController', () => {
             .then((apiKeyObj) => {
                 currentApiKeyConfirmed = apiKeyObj;
             });
+    });
+
+    before(() => {
+      return util.tearDown()
+        .then(() => {
+          return util.init();
+        });
     });
 
     it('authenticates with api key credentials', () => {

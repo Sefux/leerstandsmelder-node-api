@@ -8,7 +8,7 @@
   },
   "mailer": {
     "address": "service-noreply@leerstandsmelder.de",
-    "host": "mail.leerstandsmelder.de",
+    "host": null,
     "port": 465,
     "secure": true,
     "user": "service-noreply@leerstandsmelder.de",

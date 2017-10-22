@@ -1,11 +1,11 @@
 {
   "name": "leerstandsmelder-node-api",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Leerstandsmelder Node.JS API server",
   "main": "app.js",
   "node": ">=4.0",
   "scripts": {
-    "test": "./node_modules/.bin/mocha $(find test -path '*.spec.*') --recursive --no-timeouts"
+    "test": "./node_modules/.bin/mocha $(find test -path '*.spec.*') --recursive --timeout=10000"
   },
   "author": "Gängeviertel e.V. <info@das-gaengeviertel.info>",
   "license": "MIT",
@@ -14,45 +14,45 @@
     "url": "git://github.com/Leerstandsmelder/leerstandsmelder-node-api.git"
   },
   "dependencies": {
-    "airbrake": "^1.0.1",
+    "airbrake": "^2.1.1",
     "assert-plus": "^1.0.0",
     "async": "^2.1.2",
     "bluebird": "^3.0.5",
     "captchapng": "0.0.1",
     "checksum": "^0.1.1",
     "connect": "^3.5.0",
-    "fs-extra": "^0.30.0",
+    "fs-extra": "^4.0.2",
     "gulp-open": "^2.0.0",
     "kue": "^0.11.1",
     "mongoose": "^4.4.7",
     "mongoose-unique-validator": "^1.0.2",
     "mysql": "^2.9.0",
-    "nodemailer": "^2.3.0",
+    "nodemailer": "^4.2.0",
     "prompt": "^1.0.0",
-    "request": "^2.64.0",
-    "restify": "^4.0.3",
+    "request": "^2.83.0",
+    "restify": "^6.2.3",
     "sanitizer": "^0.1.2",
     "se7ensky-restify-preflight": "^0.1.7",
     "secure-random": "^1.1.1",
     "serve-static": "^1.11.1",
     "sha1": "^1.1.1",
-    "sharp": "^0.16.1",
-    "speakingurl": "^10.0.0",
-    "striptags": "^2.1.1",
+    "sharp": "^0.18.4",
+    "speakingurl": "^14.0.1",
+    "striptags": "^3.1.0",
     "swagger-node-restify": "git://github.com/dasantonym/swagger-node-restify.git",
-    "swagger-ui": "^2.2.6",
+    "swagger-ui": "^3.4.0",
     "uuid4": "^1.0.0",
-    "validator": "^6.1.0",
-    "yargs": "^6.2.0"
+    "validator": "^9.0.0",
+    "yargs": "^9.0.1"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
+    "chai": "^4.1.2",
     "chance": "^1.0.1",
     "gulp": "^3.9.1",
     "gulp-jshint": "^2.0.1",
     "jshint": "^2.9.3",
     "jshint-stylish": "^2.2.1",
-    "mocha": "^3.1.2",
-    "sinon": "^1.17.3"
+    "mocha": "^4.0.1",
+    "sinon": "^4.0.1"
   }
 }

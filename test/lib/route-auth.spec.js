@@ -18,8 +18,6 @@ describe('RouteAuth', () => {
         locations = new LocationsController(),
         users = new UsersController();
 
-    util.init();
-
     beforeEach(() => {
         var resourceProxy = sinon.spy();
         proxyNext = sinon.spy();
@@ -78,6 +76,13 @@ describe('RouteAuth', () => {
                     });
             });
     });
+
+    before(() => {
+      return util.tearDown()
+        .then(() => {
+          return util.init();
+        });
+    })
 
     it('regular user may GET public resource', () => {
         req = {
@@ -146,7 +151,7 @@ describe('RouteAuth', () => {
             .then(() => {
                 proxyNext.calledOnce.should.be.true;
                 proxyNext.args[0].length.should.equal(1);
-                proxyNext.args[0][0].restCode.should.equal('NotAuthorized');
+                proxyNext.args[0][0].statusCode.should.equal(403);
             });
     });
 
@@ -193,7 +198,7 @@ describe('RouteAuth', () => {
             .then(() => {
                 proxyNext.calledOnce.should.be.true;
                 proxyNext.args[0].length.should.equal(1);
-                proxyNext.args[0][0].restCode.should.equal('NotAuthorized');
+                proxyNext.args[0][0].statusCode.should.equal(403);
             });
     });
 
@@ -236,7 +241,7 @@ describe('RouteAuth', () => {
             .then(() => {
                 proxyNext.calledOnce.should.be.true;
                 proxyNext.args[0].length.should.equal(1);
-                proxyNext.args[0][0].restCode.should.equal('NotAuthorized');
+                proxyNext.args[0][0].statusCode.should.equal(403);
             });
     });
 });
