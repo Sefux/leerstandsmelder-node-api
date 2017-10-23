@@ -5,7 +5,7 @@
   "main": "app.js",
   "node": ">=6.0",
   "scripts": {
-    "test": "./node_modules/.bin/mocha $(find test -path '*.spec.*') --recursive --timeout=10000"
+    "test": "gulp lint && mocha $(find test -path '*.spec.*') --recursive --timeout=10000"
   },
   "author": "Gängeviertel e.V. <info@das-gaengeviertel.info>",
   "license": "MIT",

@@ -1,10 +1,8 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-    restify = require('restify'),
     restifyErrors = require('restify-errors'),
     Promise = require('bluebird'),
-    workers = require('../lib/workers'),
     rHandler = require('../lib/util/response-handlers'),
     acl = require('../lib/auth/acl-manager'),
     CommonController = require('./common');

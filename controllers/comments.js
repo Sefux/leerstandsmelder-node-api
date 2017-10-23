@@ -52,8 +52,8 @@ class CommentsController extends CommonController {
                 result.commentCount = result.comments.length;
                 return result;
             }));
-            
-            data.results = data.results.filter(function(item){ return item.commentCount > 0});
+
+            data.results = data.results.filter(function(item){ return item.commentCount > 0; });
 
             rHandler.handleDataResponse(data, 200, res, next);
         });
