@@ -54,7 +54,9 @@ Promise.coroutine(function* () {
         }
     }
 
-    mongoose.connect(dburl);
+    mongoose.connect(dburl, {
+        useMongoClient: true
+    });
     addModel('User', require('./models/user'));
     addModel('ApiKey', require('./models/api-key'));
     addModel('AccessToken', require('./models/access-token'));
