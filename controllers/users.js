@@ -13,7 +13,6 @@ class UsersController extends CommonController {
         super();
 
         function deleteProtected(req) {
-            delete req.body.scopes;
             delete req.body.single_access_token;
             delete req.body.failed_logins;
             delete req.body.crypted_password;
@@ -108,6 +107,11 @@ class UsersController extends CommonController {
 
         this.coroutines.postResource.main = Promise.coroutine(function* (req, res, next) {
             deleteProtected(req);
+            if (req.user.scopes.indexOf('admin') === -1) {
+                delete req.body.confirmed;
+                delete req.body.blocked;
+                delete req.body.scopes;
+            }
 
             var user = yield mongoose.model('User').create(req.body);
             yield acl.setAclEntry(
@@ -129,10 +133,12 @@ class UsersController extends CommonController {
         this.coroutines.putResource.main = Promise.coroutine(function* (req, res, next) {
             var user = yield mongoose.model('User').findOne({uuid: req.params.uuid, confirmed: true, blocked: false});
             deleteProtected(req);
-            if (req.user.scopes.indexOf('admin') === -1) {
+            if (req.user.scopes.indexOf('admin') === -1 && req.user.scopes.indexOf('editor') === -1) {
                 delete req.body.confirmed;
                 delete req.body.blocked;
+                delete req.body.scopes;
             }
+            
             if (req.body.password) {
                 user.password = req.body.password;
                 yield user.save();
@@ -145,6 +151,29 @@ class UsersController extends CommonController {
                 //}
             }
             yield user.save();
+
+            //find scope difference
+            var difference = req.body.scopes.filter(function(scope) {
+              for (var i in req.body.api_keys[0].scopes) {
+                if (scope === req.body.api_keys[0].scopes[i]) { return false; }
+              };
+              return true;
+            });
+            if(req.body.scopes && difference.length > 0) {
+                //update user scopes
+                let api_key = yield mongoose.model('ApiKey')
+                    .findOne({user_uuid: req.params.uuid, active: true})
+                    .sort('-created').exec();
+                if (api_key) {
+                    for (var i in difference) {
+                        if (api_key.scopes.indexOf(difference[i]) === -1) {
+                            api_key.scopes.push(difference[i]);
+                            api_key.save();
+                        }
+                    };
+                }
+                
+            }
             rHandler.handleDataResponse(user, 200, res, next);
         });
 
