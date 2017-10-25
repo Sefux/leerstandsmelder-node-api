@@ -87,8 +87,9 @@ class UsersController extends CommonController {
                 q = config.select ? q.select(config.select) : q;
                 q = req.query.skip ? q.skip(skip) : q;
                 q = req.query.limit ? q.limit(limit) : q;
-                q = req.query.sort ? q.sort(req.query.sort) : q;
-
+                //q = req.query.sort ? q.sort(req.query.sort) : q;
+                
+                
                 var data = {page: Math.floor(skip / limit), pagesize: limit},
                     results = yield q.exec();
                 data.total = yield mongoose.model(config.resource).count(q._conditions);
