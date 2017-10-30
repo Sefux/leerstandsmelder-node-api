@@ -106,12 +106,11 @@ class UsersController extends CommonController {
 
 
         this.coroutines.postResource.main = Promise.coroutine(function* (req, res, next) {
-            deleteProtected(req);
-            if (req.user.scopes.indexOf('admin') === -1) {
-                delete req.body.confirmed;
-                delete req.body.blocked;
-                delete req.body.scopes;
-            }
+            deleteProtected(req);    
+            delete req.body.confirmed;
+            delete req.body.blocked;
+            delete req.body.scopes;
+        
 
             var user = yield mongoose.model('User').create(req.body);
             yield acl.setAclEntry(

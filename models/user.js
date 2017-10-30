@@ -17,6 +17,7 @@ var mongoose = require('mongoose'),
         message_me: { type: Boolean, default: false },
         notify: { type: Boolean, default: false },
         share_email: { type: Boolean, default: false },
+        accept_terms: { type: Boolean, default: false },
         created: Date,
         updated: Date,
         last_login: Date,
@@ -62,6 +63,10 @@ var mongoose = require('mongoose'),
                 type: 'boolean',
                 defaultValue: false
             },
+            accept_terms: {
+                type: 'boolean',
+                defaultValue: false
+            },
         }
     };
 
@@ -79,6 +84,13 @@ User.virtual('password').set(function (password) {
     this.password_salt = this.constructor.generatePasswordSalt();
     this.crypted_password = password;
 });
+
+/*
+//TODO: validate accept_terms on the server on user creation
+User.path('accept_terms').validate(function (value) {
+    return value;
+}, 'errors.users.accept_terms');
+*/
 
 User.methods.isValidPassword = function (password) {
     var instance = this;
