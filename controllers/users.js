@@ -29,7 +29,7 @@ class UsersController extends CommonController {
 
         function preHandler(req) {
             updateUUID(req);
-            if (req.user.uuid !== req.params.uuid && !req.user.scopes.indexOf('admin')) {
+            if (req.user.uuid !== req.params.uuid && !(req.user.scopes.indexOf('admin') > -1)) {
                 throw new restify.NotAuthorizedError();
             }
             return Promise.resolve();
@@ -42,8 +42,7 @@ class UsersController extends CommonController {
             if (req.user && req.user.uuid === req.params.uuid) {
                 selectAttributes = 'uuid nickname email message_me notify';
             }
-
-	        if (req.user.scopes.indexOf('admin') ) {
+	        if (req.api_key.scopes.indexOf('admin') ) {
 		        selectAttributes = 'uuid nickname confirmed blocked email message_me notify share_email created updated last_login failed_logins';
 	        }
 
@@ -54,7 +53,7 @@ class UsersController extends CommonController {
 
 
             //TODO: as admin i want to see/edited user rights/ACL
-	        if (req.user.scopes.indexOf('admin')) {
+	        if (req.api_key.scopes.indexOf('admin')) {
                 result = result.toObject();
                 result.api_keys = yield mongoose.model('ApiKey').find({user_uuid: result.uuid, active: true})
                     .select('created updated scopes').exec();
@@ -132,7 +131,7 @@ class UsersController extends CommonController {
         this.coroutines.putResource.main = Promise.coroutine(function* (req, res, next) {
             var user = yield mongoose.model('User').findOne({uuid: req.params.uuid, confirmed: true, blocked: false});
             deleteProtected(req);
-            if (req.user.scopes.indexOf('admin') === -1 && req.user.scopes.indexOf('editor') === -1) {
+            if (req.api_key.scopes.indexOf('admin') === -1 && req.api_key.scopes.indexOf('editor') === -1) {
                 delete req.body.confirmed;
                 delete req.body.blocked;
                 delete req.body.scopes;
@@ -151,27 +150,48 @@ class UsersController extends CommonController {
             }
             yield user.save();
 
-            //find scope difference
-            var difference = req.body.scopes.filter(function(scope) {
-              for (var i in req.body.api_keys[0].scopes) {
-                if (scope === req.body.api_keys[0].scopes[i]) { return false; }
-              };
-              return true;
-            });
-            if(req.body.scopes && difference.length > 0) {
-                //update user scopes
-                let api_key = yield mongoose.model('ApiKey')
+            if (req.api_key.scopes.indexOf('admin') ) {
+                //get user scopes
+                let user_api_key = yield mongoose.model('ApiKey')
                     .findOne({user_uuid: req.params.uuid, active: true})
                     .sort('-created').exec();
-                if (api_key) {
-                    for (var i in difference) {
-                        if (api_key.scopes.indexOf(difference[i]) === -1) {
-                            api_key.scopes.push(difference[i]);
-                            api_key.save();
-                        }
-                    };
-                }
                 
+                //find scope difference
+                var removeDifference = user_api_key.scopes.filter(function(scope) {
+                  for (var i in req.body.scopes) {
+                    if (scope === req.body.scopes[i]) { return false; }
+                  };
+                  return true;
+                });
+                var difference = req.body.scopes.filter(function(scope) {
+                  for (var i in user_api_key.scopes) {
+                    if (scope === user_api_key.scopes[i]) { return false; }
+                  };
+                  return true;
+                });
+                if(req.body.scopes && (difference.length > 0 || removeDifference.length > 0 )) {
+                    //update user scopes
+                    let api_key = yield mongoose.model('ApiKey')
+                        .findOne({user_uuid: req.params.uuid, active: true})
+                        .sort('-created').exec();
+                    if (user_api_key) {
+                        //remove scopes
+                        for (var i in removeDifference) {
+                            if (user_api_key.scopes.indexOf(removeDifference[i])) {
+                                user_api_key.scopes.splice( user_api_key.scopes.indexOf(removeDifference[i]), 1 );
+                                user_api_key.save();
+                            }
+                        };
+                        //add scopes
+                        for (var i in difference) {
+                            if (user_api_key.scopes.indexOf(difference[i]) === -1) {
+                                user_api_key.scopes.push(difference[i]);
+                                user_api_key.save();
+                            }
+                        };
+                    }
+                    
+                }
             }
             rHandler.handleDataResponse(user, 200, res, next);
         });
