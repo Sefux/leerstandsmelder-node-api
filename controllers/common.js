@@ -82,6 +82,7 @@ class CommonController {
                                 req.api_key.scopes.indexOf('admin') ||
                                 req.api_key.scopes.indexOf('region-' + region.uuid)
                             );
+                            isAdmin = isAdmin == -1 || !isAdmin ? false: true;
                         if (!isAdmin) {
                             return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
                         }
