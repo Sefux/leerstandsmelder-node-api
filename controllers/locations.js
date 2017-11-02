@@ -22,13 +22,18 @@ class LocationsController extends CommonController {
                     req.api_key.scopes.indexOf('admin') ||
                     req.api_key.scopes.indexOf('region-' + region.uuid)
                 );
+                
+                isAdmin = isAdmin == -1 || !isAdmin ? false: true;
 
             if (!region && !config.query.user_mapping) {
                 return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
             }
 
             query = require('../lib/util/query-mapping')({}, req, config);
-            query = conditionalAdd(query, 'hidden', false, !isAdmin);
+            if(!isAdmin) {
+                query = conditionalAdd(query, 'hidden', false,!isAdmin);
+            }
+            
             query = conditionalAdd(query, 'region_uuid', region ? region.uuid : undefined);
             query = conditionalAdd(query, 'lonlat', {
                 $near: [parseFloat(req.query.longitude || 10.0014), parseFloat(req.query.latitude || 53.5653)],
