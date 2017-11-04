@@ -1,8 +1,6 @@
 'use strict';
 
-var swagger = require('swagger-node-restify'),
-    access_tokens = require('../controllers/access-tokens'),
-    PingController = require('../controllers/ping'),
+var PingController = require('../controllers/ping'),
     ping = new PingController();
 
 module.exports = {
@@ -18,4 +16,4 @@ module.exports = {
             }
         }
     }
-}
+};
