@@ -13,7 +13,10 @@ class RegionsController extends CommonController {
             let limit = parseInt(req.query.limit || 0),
                 skip = parseInt(req.query.skip || 0),
                 lat = req.params.lat || req.query.lat,
-                lon = req.params.lon || req.query.lon;
+                lon = req.params.lon || req.query.lon,
+                isAdmin = req.api_key && (req.api_key.scopes.indexOf('admin') );
+                
+                isAdmin = isAdmin == -1 || !isAdmin ? false: true;
             if (lat && lon) {
                 let q = mongoose.model('Region').where('lonlat');
                 q.near({
@@ -50,7 +53,8 @@ class RegionsController extends CommonController {
                 var output = [];
 
                 yield Promise.map(results, function (item) {
-                    return mongoose.model('Region').findOne({uuid: item._id, hide:false})
+                    var hideParamter = isAdmin ? {uuid: item._id} : {uuid: item._id, hide:false};
+                    return mongoose.model('Region').findOne(hideParamter)
                         .then(function (region) {
                             if (region) {
                                 var out = region.toObject();
