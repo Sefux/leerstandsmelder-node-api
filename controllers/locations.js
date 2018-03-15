@@ -17,15 +17,18 @@ class LocationsController extends CommonController {
                 sort = req.query.sort || {'updated': -1},
                 skip = Math.max(parseInt(req.query.skip || 0), 0),
                 uuid = req.params.region_uuid || req.params.uuid,
-                region = yield mongoose.model('Region').findOne({$or: [{uuid: uuid}, {slug: uuid}]}),
-                isAdmin = req.api_key && (
-                    req.api_key.scopes.indexOf('admin') ||
-                    req.api_key.scopes.indexOf('region-' + region.uuid)
+                isAdmin = req.api_key &&  req.api_key.scopes && (
+                    req.api_key.scopes.indexOf('admin') > -1 ||
+                    req.api_key.scopes.indexOf('region-' + uuid) > -1
                 );
                 
-                isAdmin = isAdmin == -1 || !isAdmin ? false: true;
-
-            if (!region && !config.query.user_mapping) {
+            let region_query = {$or: [{uuid: uuid}, {slug: uuid.toLowerCase()}]};
+            if(!isAdmin) {
+                region_query = {$and: [{hide: false}, {$or: [{uuid: uuid}, {slug: uuid.toLowerCase()}]}]};
+            }
+            let region = yield mongoose.model('Region').findOne(region_query);
+            
+            if (!region && (!config.query || !config.query.user_mapping)) {
                 return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
             }
 
