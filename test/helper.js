@@ -15,7 +15,9 @@ module.exports.acl = acl;
 module.exports.init = function () {
     var _mongoose = module.exports.mongoose;
     if (!_mongoose.connection || _mongoose.connection.readyState === 0) {
-        _mongoose.connect(dburl);
+        _mongoose.connect(dburl, {
+            useMongoClient: true
+        });
         _mongoose.model('User', require('../models/user').User);
         _mongoose.model('ApiKey', require('../models/api-key').ApiKey);
         _mongoose.model('AccessToken', require('../models/access-token').AccessToken);
@@ -35,7 +37,12 @@ module.exports.getFixture = function (resource) {
             return {
                 nickname: chance.name(),
                 email: chance.email(),
-                password: chance.word({length: 8})
+                password: chance.word({length: 8}),
+                scopes: ['user']
+            };
+        case 'Region':
+            return {
+                title: chance.sentence({words: 3})
             };
         case 'Location':
             return {

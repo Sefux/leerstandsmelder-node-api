@@ -9,7 +9,7 @@ var chai = require('chai'),
     LocationsController = require('../../controllers/locations');
 
 describe('LocationsController', () => {
-    var currentUser, currentLocation,
+    var currentUser, currentLocation, currentRegion,
         proxySend, req, res, next, locationTemplate,
         controller = new LocationsController();
 
@@ -29,6 +29,14 @@ describe('LocationsController', () => {
             .then((userObj) => {
                 currentUser = userObj;
                 locationTemplate.user_uuid = currentUser.uuid;
+                return locationTemplate;
+            })
+            .then(() => {
+                return util.mongoose.model('Region').create(util.getFixture('Region'));
+            })
+            .then((regionObj) => {
+                currentRegion = regionObj;
+                locationTemplate.region_uuid = currentRegion.uuid;
                 return util.mongoose.model('Location').create(locationTemplate);
             })
             .then((locationObj) => {
