@@ -58,7 +58,11 @@ class LocationsController extends CommonController {
                     .select('uuid nickname').exec();
                 result.user = result.user ? result.user.toObject() : undefined;
                 result.region = yield mongoose.model('Region').findOne({uuid: result.region_uuid})
-                    .select('uuid title slug').exec();
+                    .select('uuid title slug hide').exec();
+                if(result.region.hide && !isAdmin) {
+                    //hide complete location because region is hidden
+                    return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                }    
                 result.region = result.region ? result.region.toObject() : undefined;
                 let photo = yield mongoose.model('Photo').findOne({location_uuid: result.uuid}).exec();
                 result = conditionalAdd(result, 'photo', photo ? photo.toObject() : undefined);
@@ -67,6 +71,41 @@ class LocationsController extends CommonController {
 
             rHandler.handleDataResponse(data, 200, res, next);
         });
+        this.coroutines.getResource.main = Promise.coroutine(function* (req, res, next, config) {
+                let query = {$or: [{uuid: req.params.uuid}, {slug: req.params.uuid.toLowerCase()}]},
+                    paths = mongoose.model(config.resource).schema.paths,
+                    q = mongoose.model(config.resource).findOne(query);
+                q = config.select ? q.select(config.select) : q;
+                let result = yield q.exec();
+                if (!result) {
+                    return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                }
+                result = result.toObject();                
+                
+                //check visibility
+                let region = yield mongoose.model('Region').findOne({uuid:result.region_uuid});
+                if (!region) {
+                    return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                }
+                // TODO: put this in lib
+                let isAdmin = req.api_key &&  req.api_key.scopes && (
+                        req.api_key.scopes.indexOf('admin') > -1 ||
+                        req.api_key.scopes.indexOf('region-' + region.uuid) > -1
+                    );
+                
+                if (!isAdmin && (result.hidden || region.hide)) {
+                    return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                }
+            
+                if (result && result.user_uuid) {
+                    result.user = yield mongoose.model('User')
+                        .findOne({uuid:result.user_uuid})
+                        .select('uuid nickname').exec();
+                    result.user = result.user ? result.user.toObject() : undefined;
+                }
+                
+                rHandler.handleDataResponse(result, 200, res, next);
+            });
 
         this.coroutines.searchResource = {
             pre: Promise.resolve,

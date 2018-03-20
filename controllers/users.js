@@ -42,7 +42,7 @@ class UsersController extends CommonController {
             if (req.user && req.user.uuid === req.params.uuid) {
                 selectAttributes = 'uuid nickname email message_me notify';
             }
-	        if (req.api_key.scopes.indexOf('admin') ) {
+	        if (req.api_key && req.api_key.scopes && req.api_key.scopes.indexOf('admin') > -1 ) {
 		        selectAttributes = 'uuid nickname confirmed blocked email message_me notify share_email created updated last_login failed_logins';
 	        }
 
@@ -53,7 +53,7 @@ class UsersController extends CommonController {
 
 
             //TODO: as admin i want to see/edited user rights/ACL
-	        if (req.api_key.scopes.indexOf('admin')) {
+	        if (req.api_key && req.api_key.scopes && req.api_key.scopes.indexOf('admin') > -1 ) {
                 result = result.toObject();
                 result.api_keys = yield mongoose.model('ApiKey').find({user_uuid: result.uuid, active: true})
                     .select('created updated scopes').exec();
@@ -131,7 +131,7 @@ class UsersController extends CommonController {
         this.coroutines.putResource.main = Promise.coroutine(function* (req, res, next) {
             var user = yield mongoose.model('User').findOne({uuid: req.params.uuid, confirmed: true, blocked: false});
             deleteProtected(req);
-            if (req.api_key.scopes.indexOf('admin') === -1 && req.api_key.scopes.indexOf('editor') === -1) {
+            if (!req.api_key || !req.api_key.scopes || (req.api_key.scopes.indexOf('admin') === -1 && req.api_key.scopes.indexOf('editor') === -1)) {
                 delete req.body.confirmed;
                 delete req.body.blocked;
                 delete req.body.scopes;
@@ -150,7 +150,8 @@ class UsersController extends CommonController {
             }
             yield user.save();
 
-            if (req.api_key.scopes.indexOf('admin') ) {
+            //only admin users can do this
+            if (req.api_key && req.api_key.scopes && req.api_key.scopes.indexOf('admin') > -1 ) {
                 //get user scopes
                 let user_api_key = yield mongoose.model('ApiKey')
                     .findOne({user_uuid: req.params.uuid, active: true})

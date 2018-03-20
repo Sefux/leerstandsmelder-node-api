@@ -78,11 +78,11 @@ class CommonController {
                             return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
                         }
                         // TODO: put this in lib
-                        let isAdmin = req.api_key && (
-                                req.api_key.scopes.indexOf('admin') ||
-                                req.api_key.scopes.indexOf('region-' + region.uuid)
+                        let isAdmin = req.api_key && req.api_key.scopes && (
+                                req.api_key.scopes.indexOf('admin') > -1 ||
+                                req.api_key.scopes.indexOf('region-' + region.uuid) > -1
                             );
-                            isAdmin = isAdmin == -1 || !isAdmin ? false: true;
+                            
                         if (!isAdmin) {
                             return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
                         }
