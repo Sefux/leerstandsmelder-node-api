@@ -41,7 +41,6 @@ describe('RouteAuth', () => {
             })
             .then(() => {
                 var template = util.getFixture('User');
-                template.confirmed = true;
                 req = {
                     body: template,
                     url: '/user'
@@ -49,11 +48,11 @@ describe('RouteAuth', () => {
                 return users.coroutines.postResource.main(req, res, sinon.spy(), {resource: 'User'})
                     .then(() => {
                         currentUser = resourceProxy.args[0][1];
+                        currentUser.confirmUser();
                     });
             })
             .then(() => {
                 var template = util.getFixture('User');
-                template.confirmed = true;
                 req = {
                     body: template,
                     url: '/user'
@@ -146,7 +145,7 @@ describe('RouteAuth', () => {
             .then(() => {
                 proxyNext.calledOnce.should.be.true;
                 proxyNext.args[0].length.should.equal(1);
-                proxyNext.args[0][0].restCode.should.equal('NotAuthorized');
+                proxyNext.args[0][0].statusCode.should.equal(403);
             });
     });
 
@@ -193,7 +192,7 @@ describe('RouteAuth', () => {
             .then(() => {
                 proxyNext.calledOnce.should.be.true;
                 proxyNext.args[0].length.should.equal(1);
-                proxyNext.args[0][0].restCode.should.equal('NotAuthorized');
+                proxyNext.args[0][0].statusCode.should.equal(403);
             });
     });
 
@@ -236,7 +235,7 @@ describe('RouteAuth', () => {
             .then(() => {
                 proxyNext.calledOnce.should.be.true;
                 proxyNext.args[0].length.should.equal(1);
-                proxyNext.args[0][0].restCode.should.equal('NotAuthorized');
+                proxyNext.args[0][0].statusCode.should.equal(403);
             });
     });
 });
