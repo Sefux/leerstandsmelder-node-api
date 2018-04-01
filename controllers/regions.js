@@ -16,12 +16,12 @@ class RegionsController extends CommonController {
                 lat = req.params.lat || req.query.lat,
                 lon = req.params.lon || req.query.lon,
                 isAdmin = req.api_key &&  req.api_key.scopes && (
-                        req.api_key.scopes.indexOf('admin') > -1 ||
-                        req.api_key.scopes.indexOf('region-' + req.params.uuid) > -1
+                        req.api_key.scopes.indexOf("admin") > -1 ||
+                        req.api_key.scopes.indexOf("region-" + req.params.uuid) > -1
                     );
 
             if (lat && lon) {
-                let q = mongoose.model('Region').where('lonlat');
+                let q = mongoose.model("Region").where("lonlat");
                 q.near({
                     center: {coordinates: [lon, lat], type: 'Point'}
                 });
@@ -42,7 +42,7 @@ class RegionsController extends CommonController {
 
                 rHandler.handleDataResponse(data, 200, res, next);
             } else {
-                var results = yield mongoose.model('Location').mapReduce({
+                var results = yield mongoose.model("Location").mapReduce({
                     map: function () {
                         if (!this.hide) {
                             emit(this.region_uuid, 1); // jshint ignore:line
@@ -57,7 +57,7 @@ class RegionsController extends CommonController {
 
                 yield Promise.map(results, function (item) {
                     var hideParamter = isAdmin ? {uuid: item._id} : {uuid: item._id, hide:false};
-                    return mongoose.model('Region').findOne(hideParamter)
+                    return mongoose.model("Region").findOne(hideParamter)
                         .then(function (region) {
                             if (region) {
                                 var out = region.toObject();
@@ -93,8 +93,8 @@ class RegionsController extends CommonController {
         });
         this.coroutines.getResource.main = Promise.coroutine(function* (req, res, next, config) {
             let isAdmin = req.api_key &&  req.api_key.scopes && (
-                    req.api_key.scopes.indexOf('admin') > -1 ||
-                    req.api_key.scopes.indexOf('region-' + req.params.uuid) > -1
+                    req.api_key.scopes.indexOf("admin") > -1 ||
+                    req.api_key.scopes.indexOf("region-" + req.params.uuid) > -1
                 );
                 let query = {$or: [{uuid: req.params.uuid}, {slug: req.params.uuid.toLowerCase()}]};
                 if(!isAdmin) {
