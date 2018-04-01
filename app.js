@@ -5,6 +5,7 @@ var restify = require('restify'),
     swagger = require('swagger-node-restify'),
     swaggerModels = {},
     preflightEnabler = require('se7ensky-restify-preflight'),
+    corsMiddleware = require('restify-cors-middleware'),
     urlExtParser = require('./lib/parsers/urlext-parser'),
     filterUUID = require('./lib/util/filter-uuid'),
     tokenAuth = require('./lib/auth/token-auth'),
@@ -16,6 +17,13 @@ var restify = require('restify'),
     fs = require('fs-extra'),
     Promise = require('bluebird'),
     errorReporter = require('./lib/util/error-reporter');
+
+var cors = corsMiddleware({
+  preflightMaxAge: 5, //Optional
+  origins: ['http://localhost:7888'],
+  credentials: true,
+  allowHeaders: ['Authorization', 'Basic']
+});
 
 mongoose.Promise = Promise;
 Promise.promisifyAll(fs);
@@ -74,25 +82,22 @@ Promise.coroutine(function* () {
     restify.defaultResponseHeaders = function() {
         this.header('Content-type', 'application/json; encoding=utf-8');
     };
+    server.pre(cors.preflight);
     server.pre(restify.pre.userAgentConnection());
     server.pre(urlExtParser());
 
-    server.use(restify.CORS({
-        credentials: true,
-        origins: ['*'],
-        allow_headers: ['Authorization', 'Basic']
-    }));
+    // server.use(cors.actual);
 
-    preflightEnabler(server, {headers: ['Authorization', 'Basic']});
+    // preflightEnabler(server, {headers: ['Authorization', 'Basic']});
 
-    server.use(restify.fullResponse());
-    server.use(restify.gzipResponse());
-    server.use(restify.authorizationParser());
+    server.use(restify.plugins.fullResponse());
+    server.use(restify.plugins.gzipResponse());
+    server.use(restify.plugins.authorizationParser());
     server.use(tokenAuth());
     server.use(routeAuth);
     server.use(userAliasParser());
-    server.use(restify.bodyParser());
-    server.use(restify.queryParser());
+    server.use(restify.plugins.bodyParser());
+    server.use(restify.plugins.queryParser());
     server.use(filterUUID());
     server.use(validateCaptcha());
 
