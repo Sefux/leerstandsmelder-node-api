@@ -39,7 +39,6 @@ describe('RouteAuth', () => {
             })
             .then(() => {
                 var template = util.getFixture('User');
-                template.confirmed = true;
                 req = {
                     body: template,
                     url: '/user'
@@ -47,11 +46,11 @@ describe('RouteAuth', () => {
                 return users.coroutines.postResource.main(req, res, sinon.spy(), {resource: 'User'})
                     .then(() => {
                         currentUser = resourceProxy.args[0][1];
+                        currentUser.confirmUser();
                     });
             })
             .then(() => {
                 var template = util.getFixture('User');
-                template.confirmed = true;
                 req = {
                     body: template,
                     url: '/user'

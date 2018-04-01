@@ -4,7 +4,6 @@ var restify = require('restify'),
     mongoose = require('mongoose'),
     swagger = require('swagger-node-restify'),
     swaggerModels = {},
-    preflightEnabler = require('se7ensky-restify-preflight'),
     corsMiddleware = require('restify-cors-middleware'),
     urlExtParser = require('./lib/parsers/urlext-parser'),
     filterUUID = require('./lib/util/filter-uuid'),
@@ -20,7 +19,7 @@ var restify = require('restify'),
 
 var cors = corsMiddleware({
   preflightMaxAge: 5, //Optional
-  origins: ['http://localhost:7888'],
+  origins: ['http://localhost:7888','https:://www.leerstandsmelder.de','https://leerstandsmelder.com','http://dev.leerstandsmelder.de'],
   credentials: true,
   allowHeaders: ['Authorization', 'Basic']
 });
@@ -62,7 +61,9 @@ Promise.coroutine(function* () {
         }
     }
 
-    mongoose.connect(dburl, {useMongoClient: true});
+    mongoose.connect(dburl, {
+        useMongoClient: true
+    });
     addModel('User', require('./models/user'));
     addModel('ApiKey', require('./models/api-key'));
     addModel('AccessToken', require('./models/access-token'));

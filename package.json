@@ -34,7 +34,6 @@
     "restify-cors-middleware": "^1.1.0",
     "restify-errors": "^6.0.0",
     "sanitizer": "^0.1.2",
-    "se7ensky-restify-preflight": "^0.1.7",
     "secure-random": "^1.1.1",
     "serve-static": "^1.11.1",
     "sha1": "^1.1.1",

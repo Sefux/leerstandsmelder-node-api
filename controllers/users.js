@@ -12,7 +12,6 @@ class UsersController extends CommonController {
         super();
 
         function deleteProtected(req) {
-            delete req.body.scopes;
             delete req.body.single_access_token;
             delete req.body.failed_logins;
             delete req.body.crypted_password;
@@ -42,8 +41,7 @@ class UsersController extends CommonController {
             if (req.user && req.user.uuid === req.params.uuid) {
                 selectAttributes = 'uuid nickname email message_me notify';
             }
-
-	        if (req.user.scopes.indexOf('admin') ) {
+	        if (req.api_key && req.api_key.scopes && req.api_key.scopes.indexOf('admin') > -1 ) {
 		        selectAttributes = 'uuid nickname confirmed blocked email message_me notify share_email created updated last_login failed_logins';
 	        }
 
@@ -54,7 +52,7 @@ class UsersController extends CommonController {
 
 
             //TODO: as admin i want to see/edited user rights/ACL
-	        if (req.user.scopes.indexOf('admin')) {
+	        if (req.api_key && req.api_key.scopes && req.api_key.scopes.indexOf('admin') > -1 ) {
                 result = result.toObject();
                 result.api_keys = yield mongoose.model('ApiKey').find({user_uuid: result.uuid, active: true})
                     .select('created updated scopes').exec();
@@ -86,7 +84,8 @@ class UsersController extends CommonController {
                 q = config.select ? q.select(config.select) : q;
                 q = req.query.skip ? q.skip(skip) : q;
                 q = req.query.limit ? q.limit(limit) : q;
-                q = req.query.sort ? q.sort(req.query.sort) : q;
+                //q = req.query.sort ? q.sort(req.query.sort) : q;
+
 
                 var data = {page: Math.floor(skip / limit), pagesize: limit},
                     results = yield q.exec();
@@ -106,6 +105,10 @@ class UsersController extends CommonController {
 
         this.coroutines.postResource.main = Promise.coroutine(function* (req, res, next) {
             deleteProtected(req);
+            delete req.body.confirmed;
+            delete req.body.blocked;
+            delete req.body.scopes;
+
 
             var user = yield mongoose.model('User').create(req.body);
             yield acl.setAclEntry(
@@ -127,10 +130,12 @@ class UsersController extends CommonController {
         this.coroutines.putResource.main = Promise.coroutine(function* (req, res, next) {
             var user = yield mongoose.model('User').findOne({uuid: req.params.uuid, confirmed: true, blocked: false});
             deleteProtected(req);
-            if (req.user.scopes.indexOf('admin') === -1) {
+            if (!req.api_key || !req.api_key.scopes || (req.api_key.scopes.indexOf('admin') === -1 && req.api_key.scopes.indexOf('editor') === -1)) {
                 delete req.body.confirmed;
                 delete req.body.blocked;
+                delete req.body.scopes;
             }
+
             if (req.body.password) {
                 user.password = req.body.password;
                 yield user.save();
@@ -143,6 +148,48 @@ class UsersController extends CommonController {
                 //}
             }
             yield user.save();
+
+            //only admin users can do this
+            if (req.api_key && req.api_key.scopes && req.api_key.scopes.indexOf('admin') > -1 ) {
+                //get user scopes
+                let user_api_key = yield mongoose.model('ApiKey')
+                    .findOne({user_uuid: req.params.uuid, active: true})
+                    .sort('-created').exec();
+
+                //find scope difference
+                var removeDifference = user_api_key.scopes.filter(function(scope) {
+                  for (var i in req.body.scopes) {
+                    if (scope === req.body.scopes[i]) { return false; }
+                  }
+                  return true;
+                });
+                var difference = req.body.scopes.filter(function(scope) {
+                  for (var x in user_api_key.scopes) {
+                    if (scope === user_api_key.scopes[x]) { return false; }
+                  }
+                  return true;
+                });
+                if(req.body.scopes && (difference.length > 0 || removeDifference.length > 0 )) {
+                    //update user scopes
+                    if (user_api_key) {
+                        //remove scopes
+                        for (var y in removeDifference) {
+                            if (user_api_key.scopes.indexOf(removeDifference[y])) {
+                                user_api_key.scopes.splice( user_api_key.scopes.indexOf(removeDifference[y]), 1 );
+                                user_api_key.save();
+                            }
+                        }
+                        //add scopes
+                        for (var z in difference) {
+                            if (user_api_key.scopes.indexOf(difference[z]) === -1) {
+                                user_api_key.scopes.push(difference[z]);
+                                user_api_key.save();
+                            }
+                        }
+                    }
+
+                }
+            }
             rHandler.handleDataResponse(user, 200, res, next);
         });
 

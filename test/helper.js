@@ -51,7 +51,12 @@ module.exports.getFixture = function (resource) {
             return {
                 nickname: chance.name(),
                 email: chance.email(),
-                password: chance.word({length: 8})
+                password: chance.word({length: 8}),
+                scopes: ['user']
+            };
+        case 'Region':
+            return {
+                title: chance.sentence({words: 3})
             };
         case 'Location':
             return {

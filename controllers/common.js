@@ -1,7 +1,7 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-    restify = require('restify'),
+    restifyErrors = require('restify-errors'),
     Promise = require('bluebird'),
     aclManager = require('../lib/auth/acl-manager'),
     rHandler = require('../lib/util/response-handlers');
@@ -35,7 +35,7 @@ class CommonController {
                     q = config.select ? q.select(config.select) : q;
                     q = req.query.skip ? q.skip(skip) : q;
                     q = req.query.limit ? q.limit(limit) : q;
-                    q = req.query.sort ? q.sort(req.query.sort) : q;
+                    q = req.query.sort ? q.sort(req.query.sort) : q.sort({'created':-1});
 
                     var data = {page: Math.floor(skip / limit), pagesize: limit},
                         results = yield q.exec();
@@ -69,21 +69,22 @@ class CommonController {
                     q = config.select ? q.select(config.select) : q;
                     let result = yield q.exec();
                     if (!result) {
-                        return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                        return rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
                     }
                     result = result.toObject();
                     if (paths.hasOwnProperty('hidden') && result.hidden) {
                         let region = yield mongoose.model('Region').findOne({uuid:result.region_uuid});
                         if (!region) {
-                            return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                            return rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
                         }
                         // TODO: put this in lib
-                        let isAdmin = req.api_key && (
-                                req.api_key.scopes.indexOf('admin') ||
-                                req.api_key.scopes.indexOf('region-' + region.uuid)
+                        let isAdmin = req.api_key && req.api_key.scopes && (
+                                req.api_key.scopes.indexOf('admin') > -1 ||
+                                req.api_key.scopes.indexOf('region-' + region.uuid) > -1
                             );
+
                         if (!isAdmin) {
-                            return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                            return rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
                         }
                     }
                     if (result && result.user_uuid) {
@@ -135,7 +136,7 @@ class CommonController {
                         yield data.save();
                         rHandler.handleDataResponse(data, 200, res, next);
                     } else {
-                        rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                        rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
                     }
                 }),
                 pre: Promise.resolve
@@ -149,7 +150,7 @@ class CommonController {
                         yield aclManager.removeAclEntry(req.url, 'user', '*');
                         rHandler.handleDataResponse(result, 200, res, next);
                     } else {
-                        rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
+                        rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
                     }
                 }),
                 pre: Promise.resolve

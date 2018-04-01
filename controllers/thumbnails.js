@@ -5,7 +5,7 @@ var path = require('path'),
     sharp = require('sharp'),
     config = require('../config.json'),
     Promise = require('bluebird'),
-    restify = require('restify'),
+    restifyErrors = require('restify-errors'),
     CommonController = require('./common');
 
 class ThumbnailsController extends CommonController {
@@ -28,7 +28,7 @@ class ThumbnailsController extends CommonController {
                 });
 
             if (!(yield fsExists(originalFile))) {
-                return next(new restify.NotFoundError());
+                return next(new restifyErrors.NotFoundError());
             }
 
             var input;

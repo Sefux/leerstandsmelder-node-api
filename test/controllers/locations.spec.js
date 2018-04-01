@@ -9,7 +9,8 @@ var chai = require('chai'),
     LocationsController = require('../../controllers/locations');
 
 describe('LocationsController', () => {
-    var currentUser, currentLocation,
+    var currentUser, currentLocation, currentRegion,
+        currentLocationHide, currentRegionHide,
         proxySend, req, res, next, locationTemplate,
         controller = new LocationsController();
 
@@ -27,10 +28,32 @@ describe('LocationsController', () => {
             .then((userObj) => {
                 currentUser = userObj;
                 locationTemplate.user_uuid = currentUser.uuid;
+                return locationTemplate;
+            })
+            .then(() => {
+                return util.mongoose.model('Region').create(util.getFixture('Region'));
+            })
+            .then((regionObj) => {
+                currentRegion = regionObj;
+                locationTemplate.region_uuid = currentRegion.uuid;
                 return util.mongoose.model('Location').create(locationTemplate);
             })
             .then((locationObj) => {
                 currentLocation = locationObj;
+            })
+            .then(() => {
+                //create hidden region
+                var regionTemplateHide = util.getFixture('Region');
+                regionTemplateHide.hide = true;
+                return util.mongoose.model('Region').create(regionTemplateHide);
+            })
+            .then((regionObjHide) => {
+                currentRegionHide = regionObjHide;
+                locationTemplate.region_uuid = currentRegionHide.uuid;
+                return util.mongoose.model('Location').create(locationTemplate);
+            })
+            .then((locationObjHide) => {
+                currentLocationHide = locationObjHide;
             })
             .catch((err) => {
                 console.log(err.message);
@@ -63,6 +86,16 @@ describe('LocationsController', () => {
         next = () => {
             proxySend.calledOnce.should.be.true;
             proxySend.calledWith(200);
+        };
+        return controller.coroutines.getResource.main(req, res, next, {resource: 'Location'});
+    });
+
+    it('does NOT fetch a location from a hidden region', () => {
+        req = {
+            params: {uuid: currentLocationHide.uuid}
+        };
+        next = () => {
+          proxySend.calledOnce.should.be.false;
         };
         return controller.coroutines.getResource.main(req, res, next, {resource: 'Location'});
     });
