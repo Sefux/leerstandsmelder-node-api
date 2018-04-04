@@ -22,16 +22,18 @@ class LocationsController extends CommonController {
                     req.api_key.scopes.indexOf("region-" + uuid) > -1
                 );
 
-            let regionQuery = {$or: [{uuid: uuid}, {slug: uuid.toLowerCase()}]};
-            if(!isAdmin) {
-                regionQuery = {$and: [{hide: false}, {$or: [{uuid: uuid}, {slug: uuid.toLowerCase()}]}]};
-            }
-            let region = yield mongoose.model("Region").findOne(regionQuery);
+            var region = false;
+            if(uuid) {
+              let regionQuery = {$or: [{uuid: uuid}, {slug: uuid.toLowerCase()}]};
+              if(!isAdmin) {
+                  regionQuery = {$and: [{hide: false}, {$or: [{uuid: uuid}, {slug: uuid.toLowerCase()}]}]};
+              }
+              region = yield mongoose.model("Region").findOne(regionQuery);
 
-            if (!region && (!config.query || !config.query.user_mapping)) {
-                return rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
+              if (!region && (!config.query || !config.query.user_mapping)) {
+                  return rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
+              }
             }
-
             query = require('../lib/util/query-mapping')({}, req, config);
             if(!isAdmin) {
                 query = conditionalAdd(query, "hidden", false,!isAdmin);
@@ -57,9 +59,13 @@ class LocationsController extends CommonController {
                 result.user = yield mongoose.model("User").findOne({uuid: result.user_uuid})
                     .select("uuid nickname").exec();
                 result.user = result.user ? result.user.toObject() : undefined;
-                result.region = yield mongoose.model("Region").findOne({uuid: result.region_uuid})
-                    .select("uuid title slug hide").exec();
-                if(result.region.hide && !isAdmin) {
+                if(region) {
+                  result.region = region;
+                } else {
+                  result.region = yield mongoose.model("Region").findOne({uuid: result.region_uuid})
+                      .select("uuid title slug hide").exec();
+                }
+                if(result.region && result.region.hide && !isAdmin) {
                     //hide complete location because region is hidden
                     return rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
                 }
