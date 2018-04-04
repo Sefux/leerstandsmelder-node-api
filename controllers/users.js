@@ -20,7 +20,7 @@ class UsersController extends CommonController {
         }
 
         function updateUUID(req) {
-            if (req.params.uuid === "me" && req.user && !req.user.scopes.indexOf("admin")) {
+            if (req.params.uuid === "me" && req.user && req.user.scopes.indexOf("admin") < 0 ) {
                 req.params.uuid = req.user.uuid;
             }
             return Promise.resolve();
@@ -28,7 +28,7 @@ class UsersController extends CommonController {
 
         function preHandler(req) {
             updateUUID(req);
-            if (req.user.uuid !== req.params.uuid && !req.user.scopes.indexOf("admin")) {
+            if (req.user.uuid !== req.params.uuid && req.user.scopes.indexOf("admin") < 0) {
                 throw restifyErrors.makeErrFromCode(403);
             }
             return Promise.resolve();
@@ -156,6 +156,10 @@ class UsersController extends CommonController {
                     .findOne({user_uuid: req.params.uuid, active: true})
                     .sort("-created").exec();
 
+                //are scopes avaiable inmodel?
+                if(!userApiKey) {
+                  userApiKey = yield mongoose.model("ApiKey").create({user_uuid: req.params.uuid, active: true});
+                }
                 //find scope difference
                 var removeDifference = userApiKey.scopes.filter(function(scope) {
                   for (var i in req.body.scopes) {
