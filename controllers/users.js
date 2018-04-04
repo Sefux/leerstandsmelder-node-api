@@ -158,8 +158,8 @@ class UsersController extends CommonController {
                     .sort("-created").exec();
 
                 //are scopes avaiable inmodel?
-                if(!userApiKey) {
-                  userApiKey = yield mongoose.model("ApiKey").create({user_uuid: req.params.uuid, active: true});
+                if(!user_api_key) {
+                  user_api_key = yield mongoose.model("ApiKey").create({user_uuid: req.params.uuid, active: true});
                 }
                 //find scope difference
                 var removeDifference = user_api_key.scopes.filter(function(scope) {
