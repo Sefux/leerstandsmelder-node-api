@@ -21,7 +21,7 @@ class UsersController extends CommonController {
         }
 
         function updateUUID(req) {
-            if (req.params.uuid === 'me' && req.user && !req.user.scopes.indexOf('admin')) {
+            if (req.params.uuid === "me" && req.user && req.user.scopes.indexOf("admin") < 0 ) {
                 req.params.uuid = req.user.uuid;
             }
             return Promise.resolve();
@@ -29,8 +29,8 @@ class UsersController extends CommonController {
 
         function preHandler(req) {
             updateUUID(req);
-            if (req.user.uuid !== req.params.uuid && !(req.user.scopes.indexOf('admin') > -1)) {
-                throw new restify.NotAuthorizedError();
+            if (req.user.uuid !== req.params.uuid && req.user.scopes.indexOf("admin") < 0) {
+              throw new restify.NotAuthorizedError();
             }
             return Promise.resolve();
         }
@@ -86,8 +86,8 @@ class UsersController extends CommonController {
                 q = req.query.skip ? q.skip(skip) : q;
                 q = req.query.limit ? q.limit(limit) : q;
                 //q = req.query.sort ? q.sort(req.query.sort) : q;
-                
-                
+
+
                 var data = {page: Math.floor(skip / limit), pagesize: limit},
                     results = yield q.exec();
                 data.total = yield mongoose.model(config.resource).count(q._conditions);
@@ -105,11 +105,11 @@ class UsersController extends CommonController {
 
 
         this.coroutines.postResource.main = Promise.coroutine(function* (req, res, next) {
-            deleteProtected(req);    
+            deleteProtected(req);
             delete req.body.confirmed;
             delete req.body.blocked;
             delete req.body.scopes;
-        
+
 
             var user = yield mongoose.model('User').create(req.body);
             yield acl.setAclEntry(
@@ -136,7 +136,7 @@ class UsersController extends CommonController {
                 delete req.body.blocked;
                 delete req.body.scopes;
             }
-            
+
             if (req.body.password) {
                 user.password = req.body.password;
                 yield user.save();
@@ -155,8 +155,12 @@ class UsersController extends CommonController {
                 //get user scopes
                 let user_api_key = yield mongoose.model('ApiKey')
                     .findOne({user_uuid: req.params.uuid, active: true})
-                    .sort('-created').exec();
-                
+                    .sort("-created").exec();
+
+                //are scopes avaiable inmodel?
+                if(!userApiKey) {
+                  userApiKey = yield mongoose.model("ApiKey").create({user_uuid: req.params.uuid, active: true});
+                }
                 //find scope difference
                 var removeDifference = user_api_key.scopes.filter(function(scope) {
                   for (var i in req.body.scopes) {
@@ -191,7 +195,7 @@ class UsersController extends CommonController {
                             }
                         };
                     }
-                    
+
                 }
             }
             rHandler.handleDataResponse(user, 200, res, next);
