@@ -19,7 +19,7 @@ var restify = require('restify'),
 
 var cors = corsMiddleware({
   preflightMaxAge: 5, //Optional
-  origins: ["http://localhost:7888","https:://www.leerstandsmelder.de","https://leerstandsmelder.com","http://dev.leerstandsmelder.de"],
+  origins: ["http://localhost:7888","https://www.leerstandsmelder.de","https://leerstandsmelder.com","http://dev.leerstandsmelder.de"],
   credentials: true,
   allowHeaders: ['Authorization', 'Basic']
 });
