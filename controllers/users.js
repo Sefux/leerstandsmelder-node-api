@@ -200,10 +200,13 @@ class UsersController extends CommonController {
         this.coroutines.resetUserResource = {
             main: Promise.coroutine(function* (req, res, next) {
                 var user = yield mongoose.model("User").findOne({email: req.body.email, blocked: false}).exec();
-                //yield workers.sendResetMail(user.uuid);
-                user.requestPasswordReset();
-
-                rHandler.handleDataResponse(user, 201, res, next);
+                if(user) {
+                  //yield workers.sendResetMail(user.uuid);
+                  user.requestPasswordReset();
+                  rHandler.handleDataResponse(user, 201, res, next);
+                } else {
+                  rHandler.handleErrorResponse(new restifyErrors.makeErrFromCode(500), res, next);
+                }
             }),
             pre: Promise.resolve
         };
