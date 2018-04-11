@@ -24,7 +24,12 @@ class ThumbnailsController extends CommonController {
                 originalFile = path.join(config.file_storage.path, 'photos',
                     `${req.params.uuid}`),
                 fsExists = Promise.promisify((file, cb) => {
-                    fs.exists(file, (exists) => { cb(null, exists); });
+                    fs.stat(file, (stats) => {
+                      if (!stats) {
+                        console.log('FILE NOT FOUND:', file);
+                      }
+                      cb(null, stats);
+                    });
                 });
 
             if (!(yield fsExists(originalFile))) {
