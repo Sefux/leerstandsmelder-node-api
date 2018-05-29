@@ -25,23 +25,25 @@ class ThumbnailsController extends CommonController {
                     `${req.params.uuid}`),
                 fsExists = Promise.promisify((file, cb) => {
                     fs.stat(file, (err, stats) => {
-                      if (err && err.code != undefined && err.code == 'ENOENT') {
+                      if (err && err.code !== undefined && err.code === 'ENOENT') {
                         console.log('FILE NOT FOUND:', file);
-                        cb(null, err);
+                        return cb(null, null);
                       }
-                      if(err == null) {
-                          cb(null, stats);
+                      if(err === null) {
+                          return cb(null, stats);
                       }
+                      cb(err);
                     });
                 });
 
-            if (!(yield fsExists(originalFile))) {
+            var stats = yield fsExists(originalFile);
+            if (!stats) {
                 return next(new restifyErrors.NotFoundError());
             }
 
-            var input;
+            var input, tstats = yield fsExists(thumbFile);
 
-            if (!(yield fsExists(thumbFile))) {
+            if (!tstats) {
                 var size = req.params.size.split('x'),
                     width = Math.min(1000, Math.max(0, parseInt(size[0]))),
                     height = size.length === 2 ? Math.min(1000, Math.max(0, parseInt(size[1]))) : width,
