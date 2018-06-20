@@ -61,7 +61,7 @@ class ThumbnailsController extends CommonController {
                     });
                 }
 
-                imgpipe.clone().jpeg().quality(80).toFile(thumbFile, (err) => {
+                imgpipe.clone().jpeg({quality: 80}).toFile(thumbFile, (err) => {
                     if (err) {
                         throw err;
                     }
