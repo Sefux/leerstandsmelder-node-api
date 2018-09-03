@@ -28,7 +28,7 @@ class UsersController extends CommonController {
 
         function preHandler(req) {
             updateUUID(req);
-            if (req.user.uuid !== req.params.uuid && !req.user.scopes.indexOf('admin')) {
+            if (req.user.uuid !== req.params.uuid && req.user.scopes.indexOf("admin") < 0) {
                 throw restifyErrors.makeErrFromCode(403);
             }
             return Promise.resolve();
@@ -36,14 +36,14 @@ class UsersController extends CommonController {
 
         this.coroutines.getResource.pre = updateUUID;
         this.coroutines.getResource.main = Promise.coroutine(function* (req, res, next, config) {
-            var selectAttributes = 'uuid nickname';
+            var selectAttributes = "uuid nickname";
 
             if (req.user && req.user.uuid === req.params.uuid) {
-                selectAttributes = 'uuid nickname email message_me notify';
+                selectAttributes = "uuid nickname email message_me notify";
             }
-	        if (req.api_key && req.api_key.scopes && req.api_key.scopes.indexOf('admin') > -1 ) {
-		        selectAttributes = 'uuid nickname confirmed blocked email message_me notify share_email created updated last_login failed_logins';
-	        }
+            if (req.api_key && req.api_key.scopes && req.api_key.scopes.indexOf("admin") > -1 ) {
+              selectAttributes = "uuid nickname confirmed blocked email message_me notify share_email created updated last_login failed_logins";
+            }
 
             var q = mongoose.model(config.resource)
                 .findOne({uuid: req.params.uuid, confirmed: true, blocked: false})
@@ -52,11 +52,11 @@ class UsersController extends CommonController {
 
 
             //TODO: as admin i want to see/edited user rights/ACL
-	        if (req.api_key && req.api_key.scopes && req.api_key.scopes.indexOf('admin') > -1 ) {
+            if (req.api_key && req.api_key.scopes && req.api_key.scopes.indexOf("admin") > -1 ) {
                 result = result.toObject();
-                result.api_keys = yield mongoose.model('ApiKey').find({user_uuid: result.uuid, active: true})
-                    .select('created updated scopes').exec();
-	        }
+                result.api_keys = yield mongoose.model("ApiKey").find({user_uuid: result.uuid, active: true})
+                    .select("created updated scopes").exec();
+            }
 
 
 
@@ -67,13 +67,13 @@ class UsersController extends CommonController {
             }
         });
         this.coroutines.findResource.main = Promise.coroutine(function* (req, res, next, config) {
-                if (req.params.uuid === 'me' && req.user) {
+                if (req.params.uuid === "me" && req.user) {
                     req.params.uuid = req.user.uuid;
                 }
-                let query = require('../lib/util/query-mapping')({}, req, config);
+                let query = require("../lib/util/query-mapping")({}, req, config);
 
                 let paths = mongoose.model(config.resource).schema.paths;
-                if (paths.hasOwnProperty('hidden')) {
+                if (paths.hasOwnProperty("hidden")) {
                     query.hidden = false;
                 }
 
@@ -93,8 +93,8 @@ class UsersController extends CommonController {
 
                 data.results = yield Promise.map(results, Promise.coroutine(function* (result) {
                     result = result.toObject();
-                    result.api_keys = yield mongoose.model('ApiKey').find({user_uuid: result.uuid})
-                        .select('created updated scopes').exec();
+                    result.api_keys = yield mongoose.model("ApiKey").find({user_uuid: result.uuid})
+                        .select("created updated scopes").exec();
                     return result;
                 }));
 
@@ -110,15 +110,15 @@ class UsersController extends CommonController {
             delete req.body.scopes;
 
 
-            var user = yield mongoose.model('User').create(req.body);
+            var user = yield mongoose.model("User").create(req.body);
             yield acl.setAclEntry(
-                '/users/' + user.uuid,
-                [user.uuid, 'admin'],
-                ['get', 'put', 'delete']
+                "/users/" + user.uuid,
+                [user.uuid, "admin"],
+                ["get", "put", "delete"]
             );
-            yield acl.setAclEntry('/users/' + user.uuid, ['user'], ['get']);
-            yield acl.setAclEntry('/users/me', [user.uuid], ['get', 'put', 'delete']);
-            if (!req.query || !req.query.hasOwnProperty('noconfirm')) {
+            yield acl.setAclEntry("/users/" + user.uuid, ["user"], ["get"]);
+            yield acl.setAclEntry("/users/me", [user.uuid], ["get", "put", "delete"]);
+            if (!req.query || !req.query.hasOwnProperty("noconfirm")) {
                 //yield workers.sendConfirmationMail(user.uuid);
                 user.sendConfirmationMail();
             }
@@ -128,9 +128,9 @@ class UsersController extends CommonController {
 
         this.coroutines.putResource.pre = preHandler;
         this.coroutines.putResource.main = Promise.coroutine(function* (req, res, next) {
-            var user = yield mongoose.model('User').findOne({uuid: req.params.uuid, confirmed: true, blocked: false});
+            var user = yield mongoose.model("User").findOne({uuid: req.params.uuid, confirmed: true, blocked: false});
             deleteProtected(req);
-            if (!req.api_key || !req.api_key.scopes || (req.api_key.scopes.indexOf('admin') === -1 && req.api_key.scopes.indexOf('editor') === -1)) {
+            if (!req.api_key || !req.api_key.scopes || (req.api_key.scopes.indexOf("admin") === -1 && req.api_key.scopes.indexOf("editor") === -1)) {
                 delete req.body.confirmed;
                 delete req.body.blocked;
                 delete req.body.scopes;
@@ -150,49 +150,46 @@ class UsersController extends CommonController {
             yield user.save();
 
             //only admin users can do this
-            if (req.api_key && req.api_key.scopes && req.api_key.scopes.indexOf('admin') > -1 ) {
+            if (req.api_key && req.api_key.scopes && req.api_key.scopes.indexOf("admin") > -1 ) {
                 //get user scopes
-                let user_api_key = yield mongoose.model('ApiKey')
+                let userApiKey = yield mongoose.model("ApiKey")
                     .findOne({user_uuid: req.params.uuid, active: true})
                     .sort("-created").exec();
 
                 //are scopes avaiable inmodel?
-                if(!user_api_key) {
-                  user_api_key = yield mongoose.model("ApiKey").create({user_uuid: req.params.uuid, active: true});
+                if(!userApiKey) {
+                  userApiKey = yield mongoose.model("ApiKey").create({user_uuid: req.params.uuid, active: true});
                 }
                 //find scope difference
-                var removeDifference = user_api_key.scopes.filter(function(scope) {
+                var removeDifference = userApiKey.scopes.filter(function(scope) {
                   for (var i in req.body.scopes) {
                     if (scope === req.body.scopes[i]) { return false; }
-                  };
+                  }
                   return true;
                 });
                 var difference = req.body.scopes.filter(function(scope) {
-                  for (var i in user_api_key.scopes) {
-                    if (scope === user_api_key.scopes[i]) { return false; }
-                  };
+                  for (var x in userApiKey.scopes) {
+                    if (scope === userApiKey.scopes[x]) { return false; }
+                  }
                   return true;
                 });
                 if(req.body.scopes && (difference.length > 0 || removeDifference.length > 0 )) {
                     //update user scopes
-                    let api_key = yield mongoose.model('ApiKey')
-                        .findOne({user_uuid: req.params.uuid, active: true})
-                        .sort('-created').exec();
-                    if (user_api_key) {
+                    if (userApiKey) {
                         //remove scopes
-                        for (var i in removeDifference) {
-                            if (user_api_key.scopes.indexOf(removeDifference[i])) {
-                                user_api_key.scopes.splice( user_api_key.scopes.indexOf(removeDifference[i]), 1 );
-                                user_api_key.save();
+                        for (var y in removeDifference) {
+                            if (userApiKey.scopes.indexOf(removeDifference[y])) {
+                                userApiKey.scopes.splice( userApiKey.scopes.indexOf(removeDifference[y]), 1 );
+                                userApiKey.save();
                             }
-                        };
+                        }
                         //add scopes
-                        for (var i in difference) {
-                            if (user_api_key.scopes.indexOf(difference[i]) === -1) {
-                                user_api_key.scopes.push(difference[i]);
-                                user_api_key.save();
+                        for (var z in difference) {
+                            if (userApiKey.scopes.indexOf(difference[z]) === -1) {
+                                userApiKey.scopes.push(difference[z]);
+                                userApiKey.save();
                             }
-                        };
+                        }
                     }
 
                 }
@@ -202,11 +199,14 @@ class UsersController extends CommonController {
 
         this.coroutines.resetUserResource = {
             main: Promise.coroutine(function* (req, res, next) {
-                var user = yield mongoose.model('User').findOne({email: req.body.email, blocked: false}).exec();
-                //yield workers.sendResetMail(user.uuid);
-                user.requestPasswordReset();
-
-                rHandler.handleDataResponse(user, 201, res, next);
+                var user = yield mongoose.model("User").findOne({email: req.body.email, blocked: false}).exec();
+                if(user) {
+                  //yield workers.sendResetMail(user.uuid);
+                  user.requestPasswordReset();
+                  rHandler.handleDataResponse(user, 201, res, next);
+                } else {
+                  rHandler.handleErrorResponse(new restifyErrors.makeErrFromCode(500), res, next);
+                }
             }),
             pre: Promise.resolve
         };

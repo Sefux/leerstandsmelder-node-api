@@ -15,17 +15,17 @@ module.exports.get = function (req, res, next) {
             if (err) {
                 res.send(responseHandlers.handleErrorResponse(err, res, next));
             } else {
-                var restify = require('restify');
+                var restifyErrors = require('restify-errors');
                 if (photo) {
                     var readStream = fs.createReadStream(path.join(config.file_storage.path, 'photos', photo.uuid));
                     readStream.on('error', function (err) {
                         console.log(`Error reading image file: ${err.message}`);
-                        res.send(new restify.NotFoundError());
+                        res.send(new restifyErrors.NotFoundError());
                     });
                     res.setHeader("Content-Type", photo.mime_type);
                     readStream.pipe(res);
                 } else {
-                    res.send(new restify.NotFoundError());
+                    res.send(new restifyErrors.NotFoundError());
                 }
             }
             next();

@@ -27,7 +27,9 @@
     "redirect_host": "http://localhost:7888"
   },
   "frontend": {
-    "base_url": "http://localhost:7888"
+    "base_url": "http://localhost:7888",
+    "origins": ["*"],
+    "credentials": false
   },
   "file_storage": {
     "type": "local",

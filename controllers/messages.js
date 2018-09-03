@@ -2,7 +2,7 @@
 
 var mongoose = require('mongoose'),
     Promise = require('bluebird'),
-    restify = require('restify'),
+    restifyErrors = require('restify-errors'),
     CommonController = require('./common');
 
 class MessagesController extends CommonController {
@@ -40,7 +40,7 @@ class MessagesController extends CommonController {
                 res.send(200, message);
                 return next();
             }
-            next(new restify.NotAuthorizedError());
+            next(new restifyErrors.NotAuthorizedError());
         });
     }
 }

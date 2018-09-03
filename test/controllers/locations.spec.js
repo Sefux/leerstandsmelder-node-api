@@ -89,13 +89,13 @@ describe('LocationsController', () => {
         };
         return controller.coroutines.getResource.main(req, res, next, {resource: 'Location'});
     });
-    
+
     it('does NOT fetch a location from a hidden region', () => {
         req = {
             params: {uuid: currentLocationHide.uuid}
         };
         next = () => {
-            proxySend.calledOnce.should.be.false;
+          proxySend.calledOnce.should.be.false;
         };
         return controller.coroutines.getResource.main(req, res, next, {resource: 'Location'});
     });

@@ -1,7 +1,7 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-    restify = require('restify'),
+    restifyErrors = require('restify-errors'),
     Promise = require('bluebird'),
     rHandler = require('../lib/util/response-handlers');
 
@@ -50,7 +50,7 @@ module.exports.post = function (req, res, next) {
         // Send error and abort if key is inactive, no key is found or could not be created (no user)
 
         if (!cred.api_key || !cred.api_key.active) {
-            rHandler.handleErrorResponse(new restify.InvalidCredentialsError(), res, next);
+            rHandler.handleErrorResponse(new restifyErrors.InvalidCredentialsError(), res, next);
             return;
         }
 
@@ -71,6 +71,6 @@ module.exports.post = function (req, res, next) {
         }
     })().catch(function (err) {
         console.log('Unresolved auth error', err.message, err.stack);
-        rHandler.handleErrorResponse(new restify.InvalidCredentialsError(), res, next);
+        rHandler.handleErrorResponse(new restifyErrors.InvalidCredentialsError(), res, next);
     });
 };
