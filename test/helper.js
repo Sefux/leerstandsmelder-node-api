@@ -14,21 +14,21 @@ module.exports.mongoose = require('mongoose');
 module.exports.mongoose.Promise = Promise;
 
 module.exports.init = function () {
-  var _mongoose = module.exports.mongoose
-    if (_mongoose && (!_mongoose.connection || _mongoose.connection.readyState === 0)) {
-        return _mongoose.connect(dburl, {useMongoClient: true})
-          .then(() => {
-            _mongoose.model('User', require('../models/user').User);
-            _mongoose.model('ApiKey', require('../models/api-key').ApiKey);
-            _mongoose.model('AccessToken', require('../models/access-token').AccessToken);
-            _mongoose.model('AclEntry', require('../models/acl-entry').AclEntry);
-            _mongoose.model('Comment', require('../models/comment').Comment);
-            _mongoose.model('Location', require('../models/location').Location);
-            _mongoose.model('Message', require('../models/message').Message);
-            _mongoose.model('Region', require('../models/region').Region);
-            _mongoose.model('Photo', require('../models/photo').Photo);
-            _mongoose.model('Post', require('../models/post').Post);
-          });
+    var _mongoose = module.exports.mongoose;
+    if (!_mongoose.connection || _mongoose.connection.readyState === 0) {
+        _mongoose.connect(dburl, {
+            useMongoClient: true
+        });
+        _mongoose.model('User', require('../models/user').User);
+        _mongoose.model('ApiKey', require('../models/api-key').ApiKey);
+        _mongoose.model('AccessToken', require('../models/access-token').AccessToken);
+        _mongoose.model('AclEntry', require('../models/acl-entry').AclEntry);
+        _mongoose.model('Comment', require('../models/comment').Comment);
+        _mongoose.model('Location', require('../models/location').Location);
+        _mongoose.model('Message', require('../models/message').Message);
+        _mongoose.model('Region', require('../models/region').Region);
+        _mongoose.model('Photo', require('../models/photo').Photo);
+        _mongoose.model('Post', require('../models/post').Post);
     }
     return Promise.resolve()
 };
@@ -51,7 +51,12 @@ module.exports.getFixture = function (resource) {
             return {
                 nickname: chance.name(),
                 email: chance.email(),
-                password: chance.word({length: 8})
+                password: chance.word({length: 8}),
+                scopes: ['user']
+            };
+        case 'Region':
+            return {
+                title: chance.sentence({words: 3})
             };
         case 'Location':
             return {

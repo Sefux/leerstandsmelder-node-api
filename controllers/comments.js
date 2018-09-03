@@ -12,18 +12,19 @@ class CommentsController extends CommonController {
         super();
 
         this.coroutines.findResource.main = Promise.coroutine(function* (req, res, next, config) {
+            
             let query, q, maxdist = parseFloat(req.query.radius || 2000) / 6371,
                 limit = Math.min(Math.max(parseInt(req.query.limit || 10000), 0), 10000),
                 sort = req.query.sort || {'updated': -1},
                 skip = Math.max(parseInt(req.query.skip || 0), 0),
                 uuid = req.params.region_uuid || req.params.uuid,
                 region = yield mongoose.model('Region').findOne({$or: [{uuid: uuid}, {slug: uuid}]}),
-                isAdmin = req.api_key && (
-                    req.api_key.scopes.indexOf('admin') ||
-                    req.api_key.scopes.indexOf('region-' + region.uuid)
-                );
+                isAdmin = req.api_key &&  req.api_key.scopes && (
+                        req.api_key.scopes.indexOf('admin') > -1 ||
+                        req.api_key.scopes.indexOf('region-' + region.uuid) > -1
+                    );
 
-            if (!region && !config.query.user_mapping) {
+            if ((!isAdmin && !region && !config.query.user_mapping) || (!isAdmin && region.hide)) {
                 return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
             }
 

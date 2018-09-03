@@ -35,7 +35,7 @@ class CommonController {
                     q = config.select ? q.select(config.select) : q;
                     q = req.query.skip ? q.skip(skip) : q;
                     q = req.query.limit ? q.limit(limit) : q;
-                    q = req.query.sort ? q.sort(req.query.sort) : q;
+                    q = req.query.sort ? q.sort(req.query.sort) : q.sort({'created':-1});
 
                     var data = {page: Math.floor(skip / limit), pagesize: limit},
                         results = yield q.exec();
@@ -78,10 +78,11 @@ class CommonController {
                             return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
                         }
                         // TODO: put this in lib
-                        let isAdmin = req.api_key && (
-                                req.api_key.scopes.indexOf('admin') ||
-                                req.api_key.scopes.indexOf('region-' + region.uuid)
+                        let isAdmin = req.api_key && req.api_key.scopes && (
+                                req.api_key.scopes.indexOf('admin') > -1 ||
+                                req.api_key.scopes.indexOf('region-' + region.uuid) > -1
                             );
+                            
                         if (!isAdmin) {
                             return rHandler.handleErrorResponse(new restify.NotFoundError(), res, next);
                         }
