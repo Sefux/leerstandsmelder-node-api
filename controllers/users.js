@@ -46,7 +46,7 @@ class UsersController extends CommonController {
             }
 
             var q = mongoose.model(config.resource)
-                .findOne({uuid: req.params.uuid, confirmed: true, blocked: false})
+                .findOne({$or: [{uuid: req.params.uuid},{nickname: {$regex: req.params.uuid, $options: "i"}}], confirmed: true, blocked: false})
                 .select(selectAttributes);
             var result = yield q.exec();
 

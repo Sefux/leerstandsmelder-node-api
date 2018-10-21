@@ -133,6 +133,20 @@ module.exports = {
             }
         }
     },
+    '/users/:uuid/locations': {
+        'get': {
+            controller: locations.map('find', {resource: 'Location', config: {action: 'user'}}),
+            scope: 'public',
+            spec: {
+                path: '/users/{uuid}/locations',
+                description: 'Get Locations for other user.',
+                summary: 'Get users locations',
+                errorResponses: [swagger.errors.forbidden()],
+                nickname: 'getUserLocations',
+                responseClass: 'List[Location]'
+            }
+        }
+    },
     '/users/me/messages': {
         'get': {
             controller: messages.map('find', {resource: 'Message'}),

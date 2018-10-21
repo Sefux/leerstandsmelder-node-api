@@ -23,22 +23,30 @@ class LocationsController extends CommonController {
                 );
 
             var region = false;
-            if(uuid) {
-              let regionQuery = {$or: [{uuid: uuid}, {slug: uuid.toLowerCase()}]};
-              if(!isAdmin) {
-                  regionQuery = {$and: [{hide: false}, {$or: [{uuid: uuid}, {slug: uuid.toLowerCase()}]}]};
-              }
-              region = yield mongoose.model("Region").findOne(regionQuery);
 
-              if (!region && (!config.query || !config.query.user_mapping)) {
-                  return rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
+            if(config.config && config.config.action && config.config.action == 'user') {
+
+            } else {
+              if(uuid) {
+                let regionQuery = {$or: [{uuid: uuid}, {slug: uuid.toLowerCase()}]};
+                if(!isAdmin) {
+                    regionQuery = {$and: [{hide: false}, {$or: [{uuid: uuid}, {slug: uuid.toLowerCase()}]}]};
+                }
+                region = yield mongoose.model("Region").findOne(regionQuery);
+
+                if (!region && (!config.query || !config.query.user_mapping)) {
+                    return rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
+                }
               }
             }
+
             query = require('../lib/util/query-mapping')({}, req, config);
             if(!isAdmin) {
                 query = conditionalAdd(query, "hidden", false,!isAdmin);
             }
-
+            if(config.config && config.config.action && config.config.action == 'user') {
+                query = conditionalAdd(query, "user_uuid", uuid);
+            }
             query = conditionalAdd(query, "region_uuid", region ? region.uuid : undefined);
             query = conditionalAdd(query, "lonlat", {
                 $near: [parseFloat(req.query.longitude || 10.0014), parseFloat(req.query.latitude || 53.5653)],
