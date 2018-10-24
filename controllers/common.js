@@ -24,8 +24,16 @@ class CommonController {
                     let query = require('../lib/util/query-mapping')({}, req, config);
 
                     let paths = mongoose.model(config.resource).schema.paths;
+
                     if (paths.hasOwnProperty('hidden')) {
-                        query.hidden = false;
+
+                      /*var isAdmin = req.api_key &&  req.api_key.scopes && (
+                              req.api_key.scopes.indexOf("admin") > -1
+                          );*/
+
+                          //if(!isAdmin) {
+                              query.hidden = false;
+                          //}
                     }
 
                     let limit = Math.abs(parseInt(req.query.limit) || 5),
@@ -72,21 +80,7 @@ class CommonController {
                         return rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
                     }
                     result = result.toObject();
-                    if (paths.hasOwnProperty("hidden") && result.hidden) {
-                        let region = yield mongoose.model("Region").findOne({uuid:result.region_uuid});
-                        if (!region) {
-                            return rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
-                        }
-                        // TODO: put this in lib
-                        let isAdmin = req.api_key && req.api_key.scopes && (
-                                req.api_key.scopes.indexOf("admin") > -1 ||
-                                req.api_key.scopes.indexOf("region-" + region.uuid) > -1
-                            );
 
-                        if (!isAdmin) {
-                            return rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
-                        }
-                    }
                     if (result && result.user_uuid) {
                         result.user = yield mongoose.model("User")
                             .findOne({uuid:result.user_uuid})
@@ -98,6 +92,18 @@ class CommonController {
                             .findOne({uuid:result.subject_uuid})
                             .select("uuid title city").exec();
                         result.location = result.location ? result.location.toObject() : undefined;
+                    }
+                    if (paths.hasOwnProperty("hidden") && result.hidden) {
+                        var region_uuid = result.region_uuid || result.location.region_uuid;
+                        // TODO: put this in lib
+                        var isAdmin = req.api_key && req.api_key.scopes && (
+                                req.api_key.scopes.indexOf("admin") > -1 ||
+                                req.api_key.scopes.indexOf("region-" + region_uuid) > -1
+                            );
+
+                        if (!isAdmin) {
+                            return rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
+                        }
                     }
                     rHandler.handleDataResponse(result, 200, res, next);
                 }),

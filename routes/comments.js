@@ -2,7 +2,9 @@
 
 var swagger = require('swagger-node-restify'),
     CommonController = require('../controllers/common'),
-    res = new CommonController();
+    CommentsController = require('../controllers/comments'),
+    res = new CommonController(),
+    comments = new CommentsController();
 
 module.exports = {
     '/comments': {
@@ -70,12 +72,12 @@ module.exports = {
             }
         },
         'delete': {
-            controller: res.map('delete', {resource: 'Comment'}),
+            controller: comments.map('delete', {resource: 'Comment'}),
             scope: 'owner',
             spec: {
                 path: '/comments/{uuid}',
-                description: 'Delete a comment',
-                summary: 'Delete Comment',
+                description: 'Hide a comment',
+                summary: 'Hide Comment',
                 params: [swagger.pathParam('uuid', 'UUID of the comment', 'string')],
                 errorResponses: [swagger.errors.notFound('Comment')],
                 nickname: 'deleteComment'

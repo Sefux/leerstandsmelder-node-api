@@ -58,6 +58,18 @@ class CommentsController extends CommonController {
 
             rHandler.handleDataResponse(data, 200, res, next);
         });
+        this.coroutines.deleteResource.main = Promise.coroutine(function* (req, res, next, config) {
+
+          let data = yield mongoose.model(config.resource).findOne({uuid: req.params.uuid}).exec();
+          if (data) {
+            console.log('data to hide', data);
+              data['hidden'] = true;
+              yield data.save();
+              rHandler.handleDataResponse(data, 200, res, next);
+          } else {
+              rHandler.handleErrorResponse(new restifyErrors.NotFoundError(), res, next);
+          }
+        });
     }
 }
 
