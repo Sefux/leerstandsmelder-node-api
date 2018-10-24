@@ -129,8 +129,9 @@ var mongoose = require('mongoose'),
     };
 
 Location.methods.updateSlug = function () {
+    this.street = this.street || "";
     this.title = this.street;
-    this.slug = slug(this.street + ' ' + this.uuid.substr(0,5));
+    this.slug = slug(this.street  + ' ' + this.uuid.substr(0,5));
 };
 
 module.exports.Location = require('../lib/util/model-helper').setup(
