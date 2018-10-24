@@ -62,8 +62,8 @@ class CommentsController extends CommonController {
 
           let data = yield mongoose.model(config.resource).findOne({uuid: req.params.uuid}).exec();
           if (data) {
-            console.log('data to hide', data);
-              data['hidden'] = true;
+            //console.log('data to hide', data);
+              data.hidden = true;
               yield data.save();
               rHandler.handleDataResponse(data, 200, res, next);
           } else {

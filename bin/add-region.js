@@ -9,6 +9,7 @@ var Promise = require('bluebird'),
 mongoose.Promise = Promise;
 
 Promise.coroutine(function* () {
+    yield config.load();
     if (!config) {
         throw new Error('Server has not been configured yet. Please run bin/setup.');
     }

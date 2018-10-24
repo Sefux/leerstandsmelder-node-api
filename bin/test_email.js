@@ -10,6 +10,7 @@ var Promise = require('bluebird'),
 mongoose.Promise = Promise;
 
 Promise.coroutine(function* () {
+    yield serverConfig.load();
     if (!serverConfig) {
         throw new Error('Server has not been configured yet. Please run bin/setup.');
     }
@@ -25,7 +26,7 @@ Promise.coroutine(function* () {
             rejectUnauthorized: serverConfig.mailer.validateSSL
         }
     });
-    
+
     // setup email data with unicode symbols
     let mailOptions = {
         from: serverConfig.mailer.address, // sender address
@@ -41,7 +42,7 @@ Promise.coroutine(function* () {
         }
         console.log('Message sent: %s', info.messageId);
     });
-    
+
 
 })()
 .catch(function (err) {

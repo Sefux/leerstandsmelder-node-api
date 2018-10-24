@@ -17,7 +17,7 @@ async.waterfall([
     function (cb) {
         createAdminUser(cb);
     }
-], function (err,cb) {
+], function (err) {
     console.log('\n');
     if (err) {
         console.log('MAP-OZ API Server setup failed.', err);
@@ -87,7 +87,7 @@ function createAdminUser(cb) {
         console.log('apikey',apikey);
         console.log('err',err);
 
-        //cb(err);
+        cb();
     });
 }
 
