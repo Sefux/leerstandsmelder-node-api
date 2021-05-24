@@ -40,7 +40,6 @@ class ThumbnailsController extends CommonController {
             if (!stats) {
                 return next(new restifyErrors.NotFoundError());
             }
-
             var input, tstats = yield fsExists(thumbFile);
 
             if (!tstats) {
@@ -51,13 +50,11 @@ class ThumbnailsController extends CommonController {
 
                 if (req.params.type === 'square') {
                     imgpipe.resize(width, width || null, {
-                        kernel: sharp.kernel.lanczos2,
-                        interpolator: sharp.interpolator.nohalo
+                        kernel: sharp.kernel.lanczos2
                     }).crop(sharp.strategy.entropy);
                 } else {
                     imgpipe.resize(width || null, height || null, {
-                        kernel: sharp.kernel.lanczos2,
-                        interpolator: sharp.interpolator.nohalo
+                        kernel: sharp.kernel.lanczos2
                     });
                 }
 
